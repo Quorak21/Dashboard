@@ -1,0 +1,44 @@
+<button routerLink="/{{asset}}"
+    class="group relative w-60 flex flex-col items-center p-6 rounded-2xl bg-dark-800/40 backdrop-blur-md border border-copper-500/20 shadow-lg shadow-black/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(184,115,51,0.2)] hover:border-copper-500/50 cursor-pointer overflow-hidden">
+
+
+
+    <!-- Lueur au survol -->
+    <div
+        class="absolute inset-0 bg-gradient-to-b from-transparent to-copper-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+    </div>
+
+    <!-- Logo -->
+    <div
+        class="relative w-16 h-16 flex items-center justify-center mb-2 transform transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-1 z-10">
+        <!-- Effet de halo cuivré autour du logo -->
+        <div
+            class="absolute inset-0 rounded-full bg-copper-500/20 blur-md group-hover:bg-copper-500/40 transition-all duration-300">
+        </div>
+        <img [src]="logo" alt="Logo de {{asset}}"
+            class="relative z-10 w-full h-full object-contain filter drop-shadow-[0_0_4px_rgba(255,255,255,0.1)]">
+    </div>
+
+    <!-- Nom -->
+    <h3 class="text-lg font-bold text-white tracking-widest uppercase mb-1 z-10 drop-shadow-sm">
+        {{name}}
+    </h3>
+
+    <!-- Ligne de séparation élégante -->
+    <div
+        class="w-8 h-[2px] bg-copper-500/40 rounded-full mb-3 z-10 transition-all duration-300 group-hover:w-16 group-hover:bg-copper-400">
+    </div>
+
+    <!-- Prix -->
+    <p
+        class="text-2xl font-black bg-gradient-to-r from-copper-300 to-copper-500 text-transparent bg-clip-text drop-shadow-sm z-10">
+        0.00 CHF
+    </p>
+
+    <!-- Placeholder de variation a voir
+    <span class="text-xs font-semibold mt-2 text-green-400 bg-green-400/10 border border-green-400/20 px-3 py-1 rounded-full z-10 tracking-widest">
+      +0.0%
+    </span>
+    -->
+
+</button>
