@@ -53,19 +53,7 @@ services:
     networks:
       - dashboard-network
 
-  tunnel:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflare-tunnel
-    restart: always
-    command: tunnel run
-    environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
-    deploy:
-      resources:
-        limits:
-          memory: 100M
-    networks:
-      - dashboard-network
+
 
 networks:
   dashboard-network:
