@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.dokkcorp.ch'  // TODO: Remplacer par l'URL du tunnel Cloudflare
+  apiUrl: 'http://83.228.240.75:8080'
 };
