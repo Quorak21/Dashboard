@@ -10,7 +10,12 @@ import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
 
 @Repository
 public interface AssetSnapshotRepository extends JpaRepository<AssetSnapshot, Long> {
+
     Optional<AssetSnapshot> findFirstByOrderByDayDesc();
 
-    List<AssetSnapshot> findTop365BySymbolOrderByDayAsc(String symbol);
+    Optional<AssetSnapshot> findFirstBySymbolOrderByDayDesc(String symbol);
+
+    List<AssetSnapshot> findTop365BySymbolOrderByDayDesc(String symbol);
+
+    void deleteByDayBefore(Long timestamp);
 }

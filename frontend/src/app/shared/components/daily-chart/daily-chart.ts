@@ -37,7 +37,7 @@ export class DailyChart implements AfterViewInit, OnChanges {
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+    const gradient = ctx.createLinearGradient(0, 0, 0, this.chartCanvas.nativeElement.clientHeight);
     gradient.addColorStop(0, 'rgba(229, 160, 117, 0.2)'); // Light Copper
     gradient.addColorStop(1, 'rgba(229, 160, 117, 0)');
 

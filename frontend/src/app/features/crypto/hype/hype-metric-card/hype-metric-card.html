@@ -1,0 +1,43 @@
+<div
+    class="relative w-full bg-dark-800/40 backdrop-blur-md border border-copper-500/20 rounded-2xl p-6 shadow-xl shadow-black/50 overflow-hidden group hover:border-copper-500/40 hover:bg-dark-800/60 transition-all duration-500">
+
+    <!-- Lueur subtile en fond au hover -->
+    <div
+        class="absolute -top-16 -right-16 w-32 h-32 bg-copper-500/5 rounded-full blur-[40px] pointer-events-none group-hover:bg-copper-500/15 transition-all duration-700">
+    </div>
+
+    <h3
+        class="text-copper-300 text-xs font-black uppercase tracking-[0.2em] mb-5 pb-3 border-b border-copper-500/20 drop-shadow-sm flex items-center relative z-10">
+        <!-- Petit carré d'accent -->
+        <span class="w-1.5 h-1.5 bg-copper-500 mr-2 rounded-sm shadow-[0_0_8px_rgba(184,115,51,0.6)]"></span>
+        {{ card.title }}
+    </h3>
+
+    <div class="space-y-3 relative z-10">
+        @for (metric of card.metrics; track metric.label) {
+        <div class="flex justify-between items-center group/item hover:bg-white/[0.03] p-1.5 -mx-1.5 rounded-lg transition-colors duration-300">
+            <span class="text-copper-300/60 text-sm font-medium tracking-wide group-hover/item:text-copper-300 transition-colors whitespace-nowrap mr-2">
+                {{ metric.label }}
+            </span>
+
+            <div class="flex items-center gap-2 whitespace-nowrap text-right">
+                @if (metric.variation !== undefined) {
+                <span class="flex items-center text-[10px] font-bold px-2 py-0.5 rounded-md border shadow-sm"
+                    [class]="metric.variation >= 0 ? 'text-green-400 bg-green-400/10 border-green-400/20' : 'text-red-400 bg-red-400/10 border-red-400/20'">
+                    {{ metric.variation > 0 ? '+' : '' }}{{ metric.variation | number:'1.2-2' }}%
+                </span>
+                }
+                <span class="font-mono font-semibold tracking-wider drop-shadow-sm flex items-center gap-1.5 whitespace-nowrap"
+                    [class]="metric.colorClass ? metric.colorClass : 'text-copper-300'">
+                    {{ metric.value }}
+                    @if (metric.ratio !== undefined) {
+                    <span class="text-copper-200/60 text-[9px] leading-none font-medium bg-copper-500/10 px-1 py-[3px] rounded-sm border border-copper-500/20 opacity-80">
+                        {{ metric.ratio }}
+                    </span>
+                    }
+                </span>
+            </div>
+        </div>
+        }
+    </div>
+</div>

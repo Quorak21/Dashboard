@@ -37,7 +37,7 @@ export class PriceChart implements AfterViewInit, OnChanges {
     const ctx = this.chartCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    const gradient = ctx.createLinearGradient(0, 0, 0, this.chartCanvas.nativeElement.clientHeight);
     gradient.addColorStop(0, 'rgba(184, 115, 51, 0.3)');
     gradient.addColorStop(1, 'rgba(184, 115, 51, 0)');
 

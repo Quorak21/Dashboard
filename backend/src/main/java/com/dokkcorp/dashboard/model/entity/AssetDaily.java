@@ -21,5 +21,11 @@ public class AssetDaily {
     private Double priceChangePercentage24h;
     private Double totalVolume;
     private Long lastRefresh;
+    private String burnedHype;
+    private String circulatingSupply;
+    private String feesDaily;
+    private String dailyVolume;
+    private String openInterest;
+    private String totalValueLocked;
 
 }

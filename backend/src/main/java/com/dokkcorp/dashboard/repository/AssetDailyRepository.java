@@ -8,9 +8,15 @@ import org.springframework.stereotype.Repository;
 
 import com.dokkcorp.dashboard.model.entity.AssetDaily;
 
+import jakarta.transaction.Transactional;
+
 @Repository
 public interface AssetDailyRepository extends JpaRepository<AssetDaily, Long> {
+
     Optional<AssetDaily> findFirstBySymbolOrderByLastRefreshDesc(String symbol);
 
-    List<AssetDaily> findTop288BySymbolOrderByLastRefreshAsc(String symbol);
+    List<AssetDaily> findTop144BySymbolOrderByLastRefreshDesc(String symbol);
+
+    @Transactional
+    void deleteByLastRefreshBefore(Long timestamp);
 }

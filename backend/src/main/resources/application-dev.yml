@@ -1,0 +1,12 @@
+spring:
+  docker:
+    compose:
+      enabled: true
+      file: compose.yaml
+      lifecycle-management: start_and_stop
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        "[format_sql]": true

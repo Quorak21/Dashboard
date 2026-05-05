@@ -1,0 +1,71 @@
+<div
+    class="relative w-full h-full min-h-[280px] bg-dark-800/60 rounded-3xl border border-orange-500/30 shadow-2xl shadow-black overflow-hidden group hover:border-orange-500/60 transition-all duration-700 flex flex-col p-6">
+
+    <!-- Background Image (Plus visible) -->
+    <div
+        class="absolute inset-0 bg-[url('/assets/images/burn.png')] bg-cover bg-center group-hover:scale-110 transition-all duration-1000">
+    </div>
+
+    <!-- Dark Gradient Overlay for readability -->
+    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/70 to-dark-800/30 pointer-events-none">
+    </div>
+
+    <!-- Header -->
+    <div class="flex justify-center relative z-10">
+        <h3 class="text-orange-400 text-xs font-black uppercase tracking-[0.2em] drop-shadow-md flex items-center">
+            <!-- Flame Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 mr-2 text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,1)] animate-pulse"
+                viewBox="0 0 24 24" fill="currentColor">
+                <path
+                    d="M12 2C12 2 7 7.08 7 12C7 15.6 9.17 18.66 12 20.34C14.83 18.66 17 15.6 17 12C17 7.08 12 2 12 2ZM11.1 18.17C9.36 17.22 8.1 15.22 8.1 13C8.1 10.36 10.16 8 12 6.1C13.84 8 15.9 10.36 15.9 13C15.9 15.22 14.64 17.22 12.9 18.17C12.82 17.13 12.44 16.15 11.83 15.34C11.66 16.32 11.23 17.25 10.59 18.06C10.74 18.1 10.92 18.13 11.1 18.17Z" />
+                <path
+                    d="M12 10.5C11.17 10.5 10.5 11.17 10.5 12C10.5 12.83 11.17 13.5 12 13.5C12.83 13.5 13.5 12.83 13.5 12C13.5 11.17 12.83 10.5 12 10.5Z"
+                    fill="#fb923c" />
+            </svg>
+            Burn 24h
+        </h3>
+    </div>
+
+    <!-- Gauge Section (Plus large et centrée) -->
+    <div class="relative z-10 flex-grow flex items-center justify-center mt-6">
+        <div class="relative w-full max-w-[350px] aspect-[4/3]">
+            <!-- Semi-Circle SVG (stroke-width augmenté à 12) -->
+            <svg viewBox="0 0 110 40" class="w-full h-full drop-shadow-2xl overflow-visible">
+                <!-- Background Track -->
+                <path d="M 10 50 A 35 50 0 0 1 100 50" fill="none" stroke="currentColor" stroke-width="12"
+                    stroke-linecap="round" class="text-orange-950/60" />
+
+                <!-- Foreground Gauge (Dynamic) -->
+                <path d="M 10 50 A 35 50 0 0 1 100 50" fill="none" stroke="url(#flameGradient)" stroke-width="12"
+                    stroke-linecap="round"
+                    class="drop-shadow-[0_0_15px_rgba(249,115,22,0.8)] transition-all duration-1000 ease-out"
+                    [style.stroke-dasharray]="dashArrayStyle()" />
+
+                <!-- Gradient Definition -->
+                <defs>
+                    <linearGradient id="flameGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#ef4444" /> <!-- Red -->
+                        <stop offset="50%" stop-color="#f97316" /> <!-- Orange -->
+                        <stop offset="100%" stop-color="#eab308" /> <!-- Yellow -->
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <!-- Burned 24h Text Inside Gauge -->
+            <div class="absolute inset-0 flex flex-col items-center justify-end pb-0">
+                <span
+                    class="text-4xl font-mono font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 drop-shadow-[0_0_20px_rgba(249,115,22,0.5)]">
+                    {{ formatNumber(burned24h()) }}
+                </span>
+                <span class="text-orange-200/70 text-[11px] font-bold tracking-[0.2em] uppercase mt-2">
+                    Tokens Destroyed
+                </span>
+                <span class="text-orange-200/40 text-[9px] font-medium tracking-wider mt-1">
+                    Total: <span class="text-orange-500/80 font-bold">{{ formatNumber(+hypeBurned()) }}%</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+</div>

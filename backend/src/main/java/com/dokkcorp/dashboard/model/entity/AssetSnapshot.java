@@ -18,5 +18,10 @@ public class AssetSnapshot {
     private String symbol;
     private Double price;
     private Long day;
-
+    private Double volume24h;
+    private Double fees24h;
+    private Double hlpProvider;
+    private Double openInterest;
+    private String burnedHype;
+    private String circulatingSupply;
 }
