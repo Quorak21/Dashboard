@@ -34,77 +34,80 @@ export class DailyChart implements AfterViewInit, OnChanges {
   }
 
   private createChart() {
-    const ctx = this.chartCanvas.nativeElement.getContext('2d');
-    if (!ctx) return;
+    setTimeout(() => {
+      const ctx = this.chartCanvas.nativeElement.getContext('2d');
+      if (!ctx) return;
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, this.chartCanvas.nativeElement.clientHeight);
-    gradient.addColorStop(0, 'rgba(229, 160, 117, 0.2)'); // Light Copper
-    gradient.addColorStop(1, 'rgba(229, 160, 117, 0)');
+      const gradient = ctx.createLinearGradient(0, 0, 0, this.chartCanvas.nativeElement.clientHeight);
+      gradient.addColorStop(0, 'rgba(229, 160, 117, 0.2)'); // Light Copper
+      gradient.addColorStop(1, 'rgba(229, 160, 117, 0)');
 
-    this.chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: this.labels.map(l => new Date(l).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })),
-        datasets: [{
-          data: this.prices,
-          borderColor: '#e5a075', // Light Copper
-          backgroundColor: gradient,
-          fill: true,
-          tension: 0.3,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-          pointHoverBackgroundColor: '#e5a075',
-          pointHoverBorderColor: '#fff',
-          pointHoverBorderWidth: 1,
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: { padding: { right: 5 } },
-        interaction: { intersect: false, mode: 'index' },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: '#1a1a1a',
-            titleColor: '#e5a075',
-            borderColor: 'rgba(184, 115, 51, 0.3)',
-            borderWidth: 1,
-            padding: 14,
-            titleFont: { size: 18, weight: 'bold' },
-            bodyFont: { size: 16 },
-            titleAlign: 'center',
-            bodyAlign: 'center',
-            displayColors: false,
-            callbacks: {
-              label: (ctx) => `${ctx.parsed.y?.toFixed(2)}$`
-            }
-          }
+      this.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: this.labels.map(l => new Date(l).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })),
+          datasets: [{
+            data: this.prices,
+            borderColor: '#e5a075', // Light Copper
+            backgroundColor: gradient,
+            fill: true,
+            tension: 0.3,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            pointHoverBackgroundColor: '#e5a075',
+            pointHoverBorderColor: '#fff',
+            pointHoverBorderWidth: 1,
+            borderWidth: 2
+          }]
         },
-        scales: {
-          x: {
-            grid: { display: false },
-            ticks: {
-              color: 'rgba(255, 255, 255, 0.4)',
-              maxTicksLimit: 6,
-              font: { size: 9 }
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          devicePixelRatio: window.devicePixelRatio,
+          layout: { padding: { right: 5 } },
+          interaction: { intersect: false, mode: 'index' },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1a1a1a',
+              titleColor: '#e5a075',
+              borderColor: 'rgba(184, 115, 51, 0.3)',
+              borderWidth: 1,
+              padding: { top: 10, bottom: 10, left: 15, right: 15 },
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 14 },
+              titleAlign: 'center',
+              bodyAlign: 'center',
+              displayColors: false,
+              callbacks: {
+                label: (ctx) => `${ctx.parsed.y?.toFixed(2)}$`
+              }
             }
           },
-          y: {
-            position: 'left',
-            grid: { color: 'rgba(255, 255, 255, 0.03)' },
-            ticks: {
-              color: 'rgba(255, 255, 255, 0.4)',
-              font: { size: 12 },
-              stepSize: 0.5,
-              precision: 2,
-              callback: (val) => val + '$'
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.4)',
+                maxTicksLimit: 6,
+                font: { size: 9 }
+              }
+            },
+            y: {
+              position: 'left',
+              grid: { color: 'rgba(255, 255, 255, 0.03)' },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.4)',
+                font: { size: 12 },
+                stepSize: 0.5,
+                precision: 2,
+                callback: (val) => val + '$'
+              }
             }
           }
         }
-      }
-    });
+      });
+    }, 50);
   }
 
   private updateChart() {
