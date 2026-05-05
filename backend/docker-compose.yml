@@ -1,0 +1,75 @@
+services:
+  postgres:
+    image: 'postgres:16'
+    container_name: dashboard-db
+    restart: always
+    environment:
+      - 'POSTGRES_DB=dokkcorp_db'
+      - 'POSTGRES_USER=dokkadmin'
+      - 'POSTGRES_PASSWORD=dokksecret'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 1G # Plus de cache pour Postgres
+    networks:
+      - dashboard-network
+
+  backend:
+    image: ${DOCKER_USERNAME}/dashboard-backend:latest
+    container_name: dashboard-backend
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - POSTGRES_USER=dokkadmin
+      - POSTGRES_PASSWORD=dokksecret
+      - COINGECKO_API_KEY=${COINGECKO_API_KEY}
+      - BLOCKCHAIN_RPC_URL=${BLOCKCHAIN_RPC_URL}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - JAVA_OPTS=-Xmx1g -Xms512m # Confortable pour Java sur 4Go
+    ports:
+      - '8080:8080'
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G # Marge pour le container Java
+    networks:
+      - dashboard-network
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 --cleanup
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+    networks:
+      - dashboard-network
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    restart: always
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+    networks:
+      - dashboard-network
+
+networks:
+  dashboard-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

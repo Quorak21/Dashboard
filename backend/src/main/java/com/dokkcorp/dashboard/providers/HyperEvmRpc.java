@@ -8,9 +8,12 @@ import org.web3j.protocol.http.HttpService;
 @Configuration
 public class HyperEvmRpc {
 
+    @org.springframework.beans.factory.annotation.Value("${app.blockchain.rpc-url}")
+    private String rpcUrl;
+
     @Bean
     public Web3j web3j() {
-        return Web3j.build(new HttpService("https://hyperliquid-mainnet.g.alchemy.com/v2/2GJ2xHyFi8xCaBv0sUHPj"));
+        return Web3j.build(new HttpService(rpcUrl));
     }
 
 }
