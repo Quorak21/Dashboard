@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 @EnableScheduling
 public class DashboardApplication {
 
-	@Bean
+	@Bean //test
 	public static RestClient.Builder restClientBuilder() {
 		return RestClient.builder();
 	}
