@@ -25,8 +25,8 @@ public class AssetSyncJob {
     @Autowired
     private HypeService hypeService;
 
-    // toutes les 10 minutes
-    @Scheduled(fixedRate = 600000)
+    // toutes les 10 minutes sur des chiffres ronds (00, 10, 20...)
+    @Scheduled(cron = "0 0/10 * * * ?")
     public void autoSync() {
         this.hypeService.getData();
     }

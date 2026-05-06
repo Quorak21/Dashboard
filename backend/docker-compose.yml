@@ -31,7 +31,7 @@ services:
       - CORS_ORIGINS=${CORS_ORIGINS}
       - JAVA_OPTS=-Xmx1g -Xms512m # Confortable pour Java sur 4Go
     ports:
-      - '8080:8080'
+      - '127.0.0.1:8080:8080'
     deploy:
       resources:
         limits:
@@ -52,8 +52,6 @@ services:
           memory: 100M
     networks:
       - dashboard-network
-
-
 
 networks:
   dashboard-network:
