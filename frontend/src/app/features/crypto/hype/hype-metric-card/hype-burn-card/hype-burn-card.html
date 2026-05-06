@@ -23,7 +23,7 @@
                     d="M12 10.5C11.17 10.5 10.5 11.17 10.5 12C10.5 12.83 11.17 13.5 12 13.5C12.83 13.5 13.5 12.83 13.5 12C13.5 11.17 12.83 10.5 12 10.5Z"
                     fill="#fb923c" />
             </svg>
-            Burn 24h
+            Last 24h
         </h3>
     </div>
 
@@ -58,11 +58,15 @@
                     class="text-4xl font-mono font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 drop-shadow-[0_0_20px_rgba(249,115,22,0.5)]">
                     {{ formatNumber(burned24h()) }}
                 </span>
+                <!-- Valeur USD secondaire -->
+                <span class="text-orange-200/50 text-sm font-medium mt-[-4px] mb-1">
+                    ≈ {{ burnedValueUsd() }}$
+                </span>
                 <span class="text-orange-200/70 text-[11px] font-bold tracking-[0.2em] uppercase mt-2">
                     Tokens Destroyed
                 </span>
                 <span class="text-orange-200/40 text-[9px] font-medium tracking-wider mt-1">
-                    Total: <span class="text-orange-500/80 font-bold">{{ formatNumber(+hypeBurned()) }}%</span>
+                    Total: <span class="text-orange-500/80 font-bold">{{ hypeBurned() | number:'1.0-2'}}%</span>
                 </span>
             </div>
         </div>

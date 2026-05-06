@@ -10,3 +10,9 @@ spring:
     properties:
       hibernate:
         "[format_sql]": true
+        
+app:
+  coingecko:
+    api-key: "CG-gBtnBs7mGnnAz7um2zXPZ6dM"
+  blockchain:
+    rpc-url: "https://hyperliquid-mainnet.g.alchemy.com/v2/B4SAn481iE-LW5A9fu9m_"

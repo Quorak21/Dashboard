@@ -10,7 +10,7 @@ import { signal } from '@angular/core';
 import { timer, Subscription } from 'rxjs';
 import type { MetricCard } from './metric-card-model-hype';
 import { HypeMetricCard } from './hype-metric-card/hype-metric-card';
-import { HypeBurnCard } from './hype-burn-card/hype-burn-card';
+import { HypeBurnCard } from './hype-metric-card/hype-burn-card/hype-burn-card';
 
 @Component({
   selector: 'app-hype',
@@ -169,7 +169,7 @@ export class Hype implements OnDestroy {
       metrics: [
         { label: "24h (Est.)", value: this.formatNumber(Number(this.feesDaily())) + "$", colorClass: "text-emerald-400", variation: this.volatFees() },
         { label: "Annualized", value: this.formatNumber(Number(this.feesAnnual())) + "$", colorClass: "text-emerald-400" },
-        { label: "P/F Ratio", value: this.formatNumber(Number(this.ratioPriceFees())) + "x", colorClass: "text-amber-400" }
+        { label: "Price to Fees Ratio", value: this.formatNumber(Number(this.ratioPriceFees())) + "x", colorClass: "text-amber-400" }
       ],
     },
 
