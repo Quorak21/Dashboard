@@ -58,7 +58,7 @@ public record HypeDto(
 
                 String ratioMcapFdv,
 
-                String hypeBurned,
+                String hypeBurned100,
 
                 String ratioPriceFees,
 
@@ -82,6 +82,12 @@ public record HypeDto(
 
                 String flux30d,
 
-                double burned24h) {
+                double burned24h,
+                
+                List<Double> historyBurned,
+                
+                List<Double> historyIssued,
+                
+                List<Double> historyNetFlow) {
 
 }

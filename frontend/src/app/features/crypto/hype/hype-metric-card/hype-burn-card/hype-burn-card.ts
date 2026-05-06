@@ -11,7 +11,7 @@ import { formatNumber } from '../../../services/format-number';
 export class HypeBurnCard {
   public formatNumber = formatNumber;
   burned24h = input.required<number>();
-  hypeBurned = input<string>('0');
+  hypeBurned100 = input<string>('0');
   currentPrice = input<number>(0);
 
   // Valeur en USD calculée
@@ -23,7 +23,7 @@ export class HypeBurnCard {
   totalLength = 174;
 
   dashArrayStyle = computed(() => {
-    const burnedStr = this.hypeBurned() || '0';
+    const burnedStr = this.hypeBurned100() || '0';
     const percent = parseFloat(burnedStr);
     const validPercent = isNaN(percent) ? 0 : percent;
     // ratio is out of 100

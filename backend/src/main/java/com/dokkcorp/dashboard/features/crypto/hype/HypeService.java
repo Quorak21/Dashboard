@@ -143,7 +143,7 @@ public class HypeService {
 
                 // Hype brulé
                 double hypeBurnedtemp = (Double.parseDouble(hyperliquidData.hypeBurned()) / 1000000000) * 100;
-                String hypeBurned = String.valueOf(hypeBurnedtemp);
+                String hypeBurned100 = String.valueOf(hypeBurnedtemp);
 
                 // Estimation fees
                 double feesDaily = volume * 0.00022;
@@ -177,7 +177,8 @@ public class HypeService {
                                 / Double.parseDouble(hyperliquidData.circulatingSupply())) * 100;
                 String stakedEvmCore = String.valueOf(stakedEvmCoreTemp);
 
-                // Récup les données h24 (le premier élément après reverse est celui d'il y a 24h)
+                // Récup les données h24 (le premier élément après reverse est celui d'il y a
+                // 24h)
                 AssetDaily h24 = daily.get(0);
                 // burn 24h
                 double oldBurned = h24.getBurnedHype() != null
@@ -255,6 +256,30 @@ public class HypeService {
 
                 }
 
+                // Données pour la chart des flux
+                List<Double> historyBurned = new ArrayList<>();
+                List<Double> historyIssued = new ArrayList<>();
+                List<Double> historyNetFlow = new ArrayList<>();
+
+                for (int i = 1; i < history.size(); i++) {
+                        AssetSnapshot current = history.get(i);
+                        AssetSnapshot previous = history.get(i - 1);
+
+                        if (current.getBurnedHype() != null && previous.getBurnedHype() != null
+                                        && current.getCirculatingSupply() != null
+                                        && previous.getCirculatingSupply() != null) {
+                                double burnedDelta = Double.parseDouble(current.getBurnedHype())
+                                                - Double.parseDouble(previous.getBurnedHype());
+                                double issuedDelta = Double.parseDouble(current.getCirculatingSupply())
+                                                - Double.parseDouble(previous.getCirculatingSupply());
+                                double netFlow = issuedDelta - burnedDelta;
+
+                                historyBurned.add(burnedDelta);
+                                historyIssued.add(issuedDelta);
+                                historyNetFlow.add(netFlow);
+                        }
+                }
+
                 return new HypeDto(
                                 entity.getSymbol(),
                                 entity.getCurrentPrice(),
@@ -283,7 +308,7 @@ public class HypeService {
                                 circulation100,
                                 fdv,
                                 ratioMcapFdv,
-                                hypeBurned,
+                                hypeBurned100,
                                 ratioPriceFees,
                                 ratioOImcap,
                                 hyperliquidData.totalStakedHype(),
@@ -295,6 +320,9 @@ public class HypeService {
                                 burned30d,
                                 circulating30d,
                                 flux30d,
-                                burned24h);
+                                burned24h,
+                                historyBurned,
+                                historyIssued,
+                                historyNetFlow);
         }
 }

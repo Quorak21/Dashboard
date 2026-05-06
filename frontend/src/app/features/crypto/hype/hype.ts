@@ -11,11 +11,12 @@ import { timer, Subscription } from 'rxjs';
 import type { MetricCard } from './metric-card-model-hype';
 import { HypeMetricCard } from './hype-metric-card/hype-metric-card';
 import { HypeBurnCard } from './hype-metric-card/hype-burn-card/hype-burn-card';
+import { HypeFluxChart } from './hype-flux-chart/hype-flux-chart';
 
 @Component({
   selector: 'app-hype',
   standalone: true,
-  imports: [AssetMainCard, PriceChart, DailyChart, HypeMetricCard, HypeBurnCard],
+  imports: [AssetMainCard, PriceChart, DailyChart, HypeMetricCard, HypeBurnCard, HypeFluxChart],
   templateUrl: './hype.html',
   styleUrl: './hype.css',
 })
@@ -38,6 +39,8 @@ export class Hype implements OnDestroy {
   livePrices = signal<number[]>([]);
   liveDays = signal<number[]>([]);
 
+
+
   // Chiffre venant de l'api hyperliquid
   circulatingSupply = signal<string>('');
   totalValueLocked = signal<string>('');
@@ -56,7 +59,7 @@ export class Hype implements OnDestroy {
   circulation100 = signal<string>('');
   fdv = signal<string>('');
   ratioMcapFdv = signal<string>('');
-  hypeBurned = signal<string>('');
+  hypeBurned100 = signal<string>('');
   ratioPriceFees = signal<string>('');
   ratioOImcap = signal<string>('');
   totalStakedHype = signal<string>('');
@@ -65,6 +68,9 @@ export class Hype implements OnDestroy {
   circulating30d = signal<string>('');
   flux30d = signal<string>('');
   burned24h = signal<number>(0);
+  historyBurned = signal<number[]>([]);
+  historyIssued = signal<number[]>([]);
+  historyNetFlow = signal<number[]>([]);
 
   // Chiffre blockchain
   bridgedHype = signal<string>('');
@@ -103,7 +109,7 @@ export class Hype implements OnDestroy {
       this.circulation100.set(data.circulation100);
       this.fdv.set(data.fdv);
       this.ratioMcapFdv.set(data.ratioMcapFdv);
-      this.hypeBurned.set(data.hypeBurned);
+      this.hypeBurned100.set(data.hypeBurned100);
       this.ratioPriceFees.set(data.ratioPriceFees);
       this.ratioOImcap.set(data.ratioOImcap);
       this.totalStakedHype.set(data.totalStakedHype);
@@ -116,6 +122,9 @@ export class Hype implements OnDestroy {
       this.circulating30d.set(data.circulating30d);
       this.flux30d.set(data.flux30d);
       this.burned24h.set(data.burned24h);
+      this.historyBurned.set(data.historyBurned);
+      this.historyIssued.set(data.historyIssued);
+      this.historyNetFlow.set(data.historyNetFlow);
     });
 
 
@@ -133,7 +142,7 @@ export class Hype implements OnDestroy {
       metrics: [
         { label: "Circulating", value: this.formatNumber(Number(this.circulatingSupply())), colorClass: "text-orange-300" },
         { label: "Maximum", value: this.formatNumber(Number(this.maxSupply())), colorClass: "text-orange-300" },
-        { label: "Burned", value: this.formatNumber(Number(this.hypeBurned())) + "%", colorClass: "text-blue-400" }
+        { label: "Burned", value: this.formatNumber(Number(this.hypeBurned100())) + "%", colorClass: "text-blue-400" }
       ],
     },
 
