@@ -10,7 +10,7 @@ import { signal } from '@angular/core';
 import { timer, Subscription } from 'rxjs';
 import type { MetricCard } from './metric-card-model-hype';
 import { HypeMetricCard } from './hype-metric-card/hype-metric-card';
-import { HypeBurnCard } from './hype-metric-card/hype-burn-card/hype-burn-card';
+import { HypeBurnCard } from './hype-burn-card/hype-burn-card';
 import { HypeFluxChart } from './hype-flux-chart/hype-flux-chart';
 
 @Component({
@@ -34,10 +34,17 @@ export class Hype implements OnDestroy {
   symbol = signal<string>('HYPE');
   lastRefresh = signal<number>(0);
 
+  // Chart annuel et daily
   historyPrices = signal<number[]>([]);
   historyDays = signal<number[]>([]);
   livePrices = signal<number[]>([]);
   liveDays = signal<number[]>([]);
+
+  // Chart flux
+  fluxBurned = signal<number[]>([]);
+  fluxIssued = signal<number[]>([]);
+  fluxNetFlow = signal<number[]>([]);
+  fluxDays = signal<number[]>([]);
 
 
 
@@ -68,9 +75,7 @@ export class Hype implements OnDestroy {
   circulating30d = signal<string>('');
   flux30d = signal<string>('');
   burned24h = signal<number>(0);
-  historyBurned = signal<number[]>([]);
-  historyIssued = signal<number[]>([]);
-  historyNetFlow = signal<number[]>([]);
+
 
   // Chiffre blockchain
   bridgedHype = signal<string>('');
@@ -122,9 +127,10 @@ export class Hype implements OnDestroy {
       this.circulating30d.set(data.circulating30d);
       this.flux30d.set(data.flux30d);
       this.burned24h.set(data.burned24h);
-      this.historyBurned.set(data.historyBurned);
-      this.historyIssued.set(data.historyIssued);
-      this.historyNetFlow.set(data.historyNetFlow);
+      this.fluxBurned.set(data.fluxBurned);
+      this.fluxIssued.set(data.fluxIssued);
+      this.fluxNetFlow.set(data.fluxNetFlow);
+      this.fluxDays.set(data.fluxDays);
     });
 
 
@@ -156,11 +162,11 @@ export class Hype implements OnDestroy {
     },
 
     {
-      title: "Issuance",
+      title: "Issuance (Daily Avg)",
       metrics: [
-        { label: "30D Burn", value: this.formatNumber(Number(this.burned30d())), colorClass: "text-orange-300" },
-        { label: "30D Issued", value: this.formatNumber(Number(this.circulating30d())), colorClass: "text-orange-300" },
-        { label: "30D Net", value: this.formatNumber(Number(this.flux30d())), colorClass: "text-orange-300" }
+        { label: "Burn (30D avg)", value: this.formatNumber(Number(this.burned30d())), colorClass: "text-orange-300" },
+        { label: "Issued (30D avg)", value: this.formatNumber(Number(this.circulating30d())), colorClass: "text-orange-300" },
+        { label: "Net (30D avg)", value: this.formatNumber(Number(this.flux30d())), colorClass: "text-orange-300" }
       ],
     },
 

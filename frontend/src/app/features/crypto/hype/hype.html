@@ -38,12 +38,9 @@
                 [currentPrice]="currentPrice()"></app-hype-burn-card>
 
             <!-- Flux Chart (Burn vs Issued) -->
-            <app-hype-flux-chart 
-                class="md:col-span-2"
-                [burned]="historyBurned()" 
-                [issued]="historyIssued()" 
-                [netFlow]="historyNetFlow()" 
-                [labels]="historyDays()">
+            <app-hype-flux-chart class="md:col-span-2" [burned]="fluxBurned()" [issued]="fluxIssued()"
+                [netFlow]="fluxNetFlow()" [labels]="fluxDays()"
+                [historyPrices]="historyPrices().slice(-fluxBurned().length)">
             </app-hype-flux-chart>
         </div>
 

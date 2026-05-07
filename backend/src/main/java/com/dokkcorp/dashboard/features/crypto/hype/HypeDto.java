@@ -4,90 +4,92 @@ import java.util.List;
 
 public record HypeDto(
 
-                String symbol,
+        String symbol,
 
-                double currentPrice,
+        double currentPrice,
 
-                double marketCap,
+        double marketCap,
 
-                double priceChangePercentage24h,
+        double priceChangePercentage24h,
 
-                double totalVolume,
+        double totalVolume,
 
-                double lastRefresh,
+        double lastRefresh,
 
-                List<Double> historyPrices,
+        List<Double> historyPrices,
 
-                List<Long> historyDays,
+        List<Long> historyDays,
 
-                List<Double> livePrices,
+        List<Double> livePrices,
 
-                List<Long> liveDays,
+        List<Long> liveDays,
 
-                String circulatingSupply,
+        String circulatingSupply,
 
-                String totalValueLocked,
+        String totalValueLocked,
 
-                String apr,
+        String apr,
 
-                String dailyVolume,
+        String dailyVolume,
 
-                String ratioProvider,
+        String ratioProvider,
 
-                String openInterest,
+        String openInterest,
 
-                String feesDaily,
+        String feesDaily,
 
-                String feesAnnual,
+        String feesAnnual,
 
-                double volatVolume,
+        double volatVolume,
 
-                double volatOpenInterest,
+        double volatOpenInterest,
 
-                double volatFees,
+        double volatFees,
 
-                double volatHlpProvider,
+        double volatHlpProvider,
 
-                String stakingApr,
+        String stakingApr,
 
-                String maxSupply,
+        String maxSupply,
 
-                String circulation100,
+        String circulation100,
 
-                String fdv,
+        String fdv,
 
-                String ratioMcapFdv,
+        String ratioMcapFdv,
 
-                String hypeBurned100,
+        String hypeBurned100,
 
-                String ratioPriceFees,
+        String ratioPriceFees,
 
-                String ratioOImcap,
+        String ratioOImcap,
 
-                String totalStakedHype,
+        String totalStakedHype,
 
-                String ratioStaked,
+        String ratioStaked,
 
-                String bridgedHype,
+        String bridgedHype,
 
-                String ratioBridged,
+        String ratioBridged,
 
-                String liquidStaked,
+        String liquidStaked,
 
-                String stakedEvmCore,
+        String stakedEvmCore,
 
-                String burned30d,
+        String burned30d,
 
-                String circulating30d,
+        String circulating30d,
 
-                String flux30d,
+        String flux30d,
 
-                double burned24h,
-                
-                List<Double> historyBurned,
-                
-                List<Double> historyIssued,
-                
-                List<Double> historyNetFlow) {
+        double burned24h,
+
+        List<Double> fluxBurned,
+
+        List<Double> fluxIssued,
+
+        List<Double> fluxNetFlow,
+
+        List<Long> fluxDays) {
 
 }

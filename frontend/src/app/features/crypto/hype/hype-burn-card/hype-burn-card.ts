@@ -1,6 +1,6 @@
 import { Component, input, computed } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { formatNumber } from '../../../services/format-number';
+import { formatNumber } from '../../services/format-number';
 
 @Component({
   selector: 'app-hype-burn-card',

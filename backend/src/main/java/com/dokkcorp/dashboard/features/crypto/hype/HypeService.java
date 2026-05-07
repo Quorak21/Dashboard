@@ -225,21 +225,28 @@ public class HypeService {
 
                         if (!historyWithData.isEmpty()) {
                                 int size = historyWithData.size();
-                                int period = Math.min(size, 30);
+                                int period = Math.min(size, 31);
 
                                 AssetSnapshot reference = historyWithData.get(size - period);
+                                AssetSnapshot latest = historyWithData.get(size - 1);
 
-                                double currentBurned = Double.parseDouble(hyperliquidData.hypeBurned());
+                                double latestBurned = Double.parseDouble(latest.getBurnedHype());
                                 double refBurned = Double.parseDouble(reference.getBurnedHype());
-
-                                double burnedAvg = (currentBurned - refBurned) / period;
-                                burned30d = String.valueOf(burnedAvg);
-
-                                double currentCirc = Double.parseDouble(hyperliquidData.circulatingSupply());
+                                double latestCirc = Double.parseDouble(latest.getCirculatingSupply());
                                 double refCirc = Double.parseDouble(reference.getCirculatingSupply());
-                                double circAvg = (currentCirc - refCirc) / period;
-                                circulating30d = String.valueOf(circAvg);
 
+                                double burnedAvg, circAvg;
+
+                                if (period > 1) {
+                                        burnedAvg = (latestBurned - refBurned) / (period - 1);
+                                        circAvg = (latestCirc - refCirc) / (period - 1);
+                                } else {
+                                        burnedAvg = Double.parseDouble(hyperliquidData.hypeBurned()) - latestBurned;
+                                        circAvg = Double.parseDouble(hyperliquidData.circulatingSupply()) - latestCirc;
+                                }
+
+                                burned30d = String.valueOf(burnedAvg);
+                                circulating30d = String.valueOf(circAvg);
                                 flux30d = String.valueOf(circAvg - burnedAvg);
                         }
                 } catch (Exception e) {
@@ -247,9 +254,10 @@ public class HypeService {
                 }
 
                 // Données pour la chart des flux
-                List<Double> historyBurned = new ArrayList<>();
-                List<Double> historyIssued = new ArrayList<>();
-                List<Double> historyNetFlow = new ArrayList<>();
+                List<Double> fluxBurned = new ArrayList<>();
+                List<Double> fluxIssued = new ArrayList<>();
+                List<Double> fluxNetFlow = new ArrayList<>();
+                List<Long> fluxDays = new ArrayList<>();
 
                 for (int i = 1; i < history.size(); i++) {
                         AssetSnapshot current = history.get(i);
@@ -264,9 +272,10 @@ public class HypeService {
                                                 - Double.parseDouble(previous.getCirculatingSupply());
                                 double netFlow = issuedDelta - burnedDelta;
 
-                                historyBurned.add(burnedDelta);
-                                historyIssued.add(issuedDelta);
-                                historyNetFlow.add(netFlow);
+                                fluxBurned.add(burnedDelta);
+                                fluxIssued.add(issuedDelta);
+                                fluxNetFlow.add(netFlow);
+                                fluxDays.add(current.getDay());
                         }
                 }
 
@@ -311,8 +320,9 @@ public class HypeService {
                                 circulating30d,
                                 flux30d,
                                 burned24h,
-                                historyBurned,
-                                historyIssued,
-                                historyNetFlow);
+                                fluxBurned,
+                                fluxIssued,
+                                fluxNetFlow,
+                                fluxDays);
         }
 }
