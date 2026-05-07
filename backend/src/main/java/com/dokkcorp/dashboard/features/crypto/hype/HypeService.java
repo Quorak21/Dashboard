@@ -141,7 +141,7 @@ public class HypeService {
                 double ratioMcapFdvtemp = marketCap / fdvtemp;
                 String ratioMcapFdv = String.valueOf(ratioMcapFdvtemp);
 
-                // Hype brulé
+                // Hype brulé % pourcentage
                 double hypeBurnedtemp = (Double.parseDouble(hyperliquidData.hypeBurned()) / 1000000000) * 100;
                 String hypeBurned100 = String.valueOf(hypeBurnedtemp);
 
@@ -179,7 +179,7 @@ public class HypeService {
 
                 // Récup les données h24 (le premier élément après reverse est celui d'il y a
                 // 24h)
-                AssetDaily h24 = daily.get(0);
+                AssetDaily h24 = !daily.isEmpty() ? daily.get(0) : entity;
                 // burn 24h
                 double oldBurned = h24.getBurnedHype() != null
                                 ? Double.parseDouble(h24.getBurnedHype())
@@ -219,41 +219,31 @@ public class HypeService {
                 String circulating30d = "0";
                 String flux30d = "0";
                 try {
+                        List<AssetSnapshot> historyWithData = history.stream()
+                                        .filter(s -> s.getBurnedHype() != null && s.getCirculatingSupply() != null)
+                                        .toList();
 
-                        if (history.size() >= 30) {
-                                double burned30dTemp = Double
-                                                .parseDouble(history.get(history.size() - 30).getBurnedHype());
-                                double burned30dTemp2 = ((Double.parseDouble(hyperliquidData.hypeBurned())
-                                                - burned30dTemp)
-                                                / 30);
-                                burned30d = String.valueOf(burned30dTemp2);
+                        if (!historyWithData.isEmpty()) {
+                                int size = historyWithData.size();
+                                int period = Math.min(size, 30);
 
-                                double circulating30dTemp = Double
-                                                .parseDouble(history.get(history.size() - 30).getCirculatingSupply());
-                                double circulating30dTemp2 = ((Double.parseDouble(hyperliquidData.circulatingSupply())
-                                                - circulating30dTemp) / 30);
-                                circulating30d = String.valueOf(circulating30dTemp2);
+                                AssetSnapshot reference = historyWithData.get(size - period);
 
-                                double flux30dTemp = circulating30dTemp2 - burned30dTemp2;
-                                flux30d = String.valueOf(flux30dTemp);
+                                double currentBurned = Double.parseDouble(hyperliquidData.hypeBurned());
+                                double refBurned = Double.parseDouble(reference.getBurnedHype());
 
-                        } else {
-                                double burned30dTemp = Double.parseDouble(history.get(0).getBurnedHype());
-                                double burned30dTemp2 = ((Double.parseDouble(hyperliquidData.hypeBurned())
-                                                - burned30dTemp)
-                                                / history.size());
-                                burned30d = String.valueOf(burned30dTemp2);
+                                double burnedAvg = (currentBurned - refBurned) / period;
+                                burned30d = String.valueOf(burnedAvg);
 
-                                double circulating30dTemp = Double.parseDouble(history.get(0).getCirculatingSupply());
-                                double circulating30dTemp2 = ((Double.parseDouble(hyperliquidData.circulatingSupply())
-                                                - circulating30dTemp) / history.size());
-                                circulating30d = String.valueOf(circulating30dTemp2);
+                                double currentCirc = Double.parseDouble(hyperliquidData.circulatingSupply());
+                                double refCirc = Double.parseDouble(reference.getCirculatingSupply());
+                                double circAvg = (currentCirc - refCirc) / period;
+                                circulating30d = String.valueOf(circAvg);
 
-                                double flux30dTemp = circulating30dTemp2 - burned30dTemp2;
-                                flux30d = String.valueOf(flux30dTemp);
+                                flux30d = String.valueOf(circAvg - burnedAvg);
                         }
                 } catch (Exception e) {
-
+                        e.printStackTrace();
                 }
 
                 // Données pour la chart des flux
