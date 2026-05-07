@@ -55,7 +55,7 @@ services:
     restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 30 --cleanup
+    command: --interval 300 --cleanup
     deploy:
       resources:
         limits:
@@ -69,3 +69,4 @@ networks:
 
 volumes:
   postgres_data:
+
