@@ -49,7 +49,7 @@ export class HypeFluxChart implements AfterViewInit {
   private getSymmetricBounds() {
     const values = this.netFlow();
     const max = values.length > 0 ? Math.max(...values.map(Math.abs)) : 100000;
-    return Math.max(max * 1.2, 1000);
+    return Math.max(max * 1.10, 1000);
   }
 
   private updateChart() {
@@ -86,14 +86,17 @@ export class HypeFluxChart implements AfterViewInit {
           {
             label: 'Flow',
             data: this.netFlow(),
-            borderColor: '#3b82f6',
+            borderColor: '#c08210ff',
             backgroundColor: 'rgba(59, 130, 246, 0.1)',
             borderWidth: 3,
             pointRadius: 0,
             pointHoverRadius: 6,
             tension: 0.4,
-            fill: true,
-            yAxisID: 'y'
+            fill: {
+              target: 'origin',
+              below: 'rgba(255, 0, 0, 0.1)',
+              above: 'rgba(0, 255, 0, 0.1)'
+            }
           },
         ]
       },
@@ -145,7 +148,7 @@ export class HypeFluxChart implements AfterViewInit {
             suggestedMax: finalYMax,
             grid: {
               drawOnChartArea: true,
-              color: (context) => context.tick.value === 0 ? 'rgba(211, 33, 10, 0.5)' : 'transparent',
+              color: (context) => context.tick.value === 0 ? 'rgba(75, 37, 2, 0.88)' : 'transparent',
               lineWidth: (context) => context.tick.value === 0 ? 3 : 0
             },
             ticks: {
