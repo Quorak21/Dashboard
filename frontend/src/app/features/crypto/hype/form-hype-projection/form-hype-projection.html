@@ -1,0 +1,106 @@
+<div
+    class="relative w-full bg-dark-800/40 backdrop-blur-md border border-copper-500/20 rounded-2xl p-6 shadow-xl shadow-black/50 overflow-hidden group hover:border-copper-500/40 hover:bg-dark-800/60 transition-all duration-500 flex flex-col h-full">
+
+    <!-- Lueur subtile en fond au hover -->
+    <div
+        class="absolute -top-16 -right-16 w-32 h-32 bg-copper-500/5 rounded-full blur-[40px] pointer-events-none group-hover:bg-copper-500/15 transition-all duration-700">
+    </div>
+
+    <h3
+        class="text-copper-300 text-xs font-black uppercase tracking-[0.2em] mb-5 pb-3 border-b border-copper-500/20 drop-shadow-sm flex items-center relative z-10">
+        <span class="w-1.5 h-1.5 bg-copper-500 mr-2 rounded-sm shadow-[0_0_8px_rgba(184,115,51,0.6)]"></span>
+        Staking Projection
+    </h3>
+
+    <!-- Input section -->
+    <div class="relative z-10 mb-6 flex flex-col gap-4">
+        
+        <div class="grid grid-cols-2 gap-4">
+            <!-- HYPE Amount -->
+            <div class="flex flex-col gap-2">
+                <label for="hypeAmount" class="text-copper-300/60 text-xs font-semibold tracking-wide uppercase">
+                    Hype staked
+                </label>
+                <div class="relative">
+                    <input id="hypeAmount" type="number"
+                        class="w-full bg-dark-900/50 border border-copper-500/30 rounded-lg px-4 py-3 text-copper-100 font-mono text-lg focus:outline-none focus:border-copper-500 focus:ring-1 focus:ring-copper-500/50 transition-all placeholder-copper-500/30"
+                        style="-moz-appearance: textfield; appearance: textfield;" placeholder="0"
+                        [formControl]="hypeProjection" autocomplete="off" />
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 text-copper-400/50 font-bold text-sm">HYPE</div>
+                </div>
+            </div>
+
+            <!-- Projected Price -->
+            <div class="flex flex-col gap-2">
+                <label for="projectedPrice" class="text-copper-300/60 text-xs font-semibold tracking-wide uppercase">
+                    Projected Price
+                </label>
+                <div class="relative">
+                    <input id="projectedPrice" type="number" step="0.01"
+                        class="w-full bg-dark-900/50 border border-copper-500/30 rounded-lg px-4 py-3 text-copper-100 font-mono text-lg focus:outline-none focus:border-copper-500 focus:ring-1 focus:ring-copper-500/50 transition-all placeholder-copper-500/30"
+                        style="-moz-appearance: textfield; appearance: textfield;" [placeholder]="currentPrice()"
+                        [formControl]="priceProjection" autocomplete="off" />
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 text-copper-400/50 font-bold text-sm">$</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mt-2 px-1 text-[11px] font-medium text-copper-300/50">
+            <span>Current APR: <span class="text-blue-400">{{ stakingAprStr }}%</span></span>
+            <span>Projected value: <span class="text-emerald-400">{{ projectedValueUsd() }} $</span></span>
+            <span>Current price : <span class="text-emerald-400">{{ currentPrice() }} $</span></span>
+        </div>
+    </div>
+
+    <!-- Results section -->
+    <div class="relative z-10 flex flex-col gap-2 mt-auto">
+
+        <!-- Yearly -->
+        <div
+            class="flex justify-between items-center bg-white/[0.02] p-3 rounded-lg border border-white/[0.02] hover:bg-white/[0.04] transition-colors">
+            <span class="text-copper-300/80 text-sm font-medium">Yearly</span>
+            <div class="flex flex-col items-end">
+                <span class="font-mono font-bold text-copper-100">{{hypeProjectionYearly()}} <span
+                        class="text-[10px] text-copper-300/50">HYPE</span></span>
+                <span class="font-mono text-sm text-emerald-400 font-medium">≈ {{hypeProjectionYearlyUsd()}}
+                    $</span>
+            </div>
+        </div>
+
+        <!-- Monthly -->
+        <div
+            class="flex justify-between items-center bg-white/[0.02] p-3 rounded-lg border border-white/[0.02] hover:bg-white/[0.04] transition-colors">
+            <span class="text-copper-300/80 text-sm font-medium">Monthly</span>
+            <div class="flex flex-col items-end">
+                <span class="font-mono font-bold text-copper-100">{{hypeProjectionMonthly()}} <span
+                        class="text-[10px] text-copper-300/50">HYPE</span></span>
+                <span class="font-mono text-sm text-emerald-400 font-medium">≈ {{hypeProjectionMonthlyUsd()}}
+                    $</span>
+            </div>
+        </div>
+
+        <!-- Weekly -->
+        <div
+            class="flex justify-between items-center bg-white/[0.02] p-3 rounded-lg border border-white/[0.02] hover:bg-white/[0.04] transition-colors">
+            <span class="text-copper-300/80 text-sm font-medium">Weekly</span>
+            <div class="flex flex-col items-end">
+                <span class="font-mono font-bold text-copper-100">{{hypeProjectionWeekly()}} <span
+                        class="text-[10px] text-copper-300/50">HYPE</span></span>
+                <span class="font-mono text-sm text-emerald-400 font-medium">≈ {{hypeProjectionWeeklyUsd()}}
+                    $</span>
+            </div>
+        </div>
+
+        <!-- Daily -->
+        <div
+            class="flex justify-between items-center bg-white/[0.02] p-3 rounded-lg border border-white/[0.02] hover:bg-white/[0.04] transition-colors">
+            <span class="text-copper-300/80 text-sm font-medium">Daily</span>
+            <div class="flex flex-col items-end">
+                <span class="font-mono font-bold text-copper-100">{{hypeProjectionDaily()}} <span
+                        class="text-[10px] text-copper-300/50">HYPE</span></span>
+                <span class="font-mono text-sm text-emerald-400 font-medium">≈ {{hypeProjectionDailyUsd()}} $</span>
+            </div>
+        </div>
+
+    </div>
+</div>

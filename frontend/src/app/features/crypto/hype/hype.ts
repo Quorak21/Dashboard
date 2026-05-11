@@ -13,11 +13,12 @@ import { HypeMetricCard } from './hype-metric-card/hype-metric-card';
 import { HypeBurnCard } from './hype-burn-card/hype-burn-card';
 import { HypeFluxChart } from './hype-flux-chart/hype-flux-chart';
 import { HypeSupplyDistribution } from './hype-supply-distribution/hype-supply-distribution';
+import { FormHypeProjection } from './form-hype-projection/form-hype-projection';
 
 @Component({
   selector: 'app-hype',
   standalone: true,
-  imports: [AssetMainCard, PriceChart, DailyChart, HypeMetricCard, HypeBurnCard, HypeFluxChart, HypeSupplyDistribution],
+  imports: [AssetMainCard, PriceChart, DailyChart, HypeMetricCard, HypeBurnCard, HypeFluxChart, HypeSupplyDistribution, FormHypeProjection],
   templateUrl: './hype.html',
   styleUrl: './hype.css',
 })
