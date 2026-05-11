@@ -12,11 +12,12 @@ import type { MetricCard } from './metric-card-model-hype';
 import { HypeMetricCard } from './hype-metric-card/hype-metric-card';
 import { HypeBurnCard } from './hype-burn-card/hype-burn-card';
 import { HypeFluxChart } from './hype-flux-chart/hype-flux-chart';
+import { HypeSupplyDistribution } from './hype-supply-distribution/hype-supply-distribution';
 
 @Component({
   selector: 'app-hype',
   standalone: true,
-  imports: [AssetMainCard, PriceChart, DailyChart, HypeMetricCard, HypeBurnCard, HypeFluxChart],
+  imports: [AssetMainCard, PriceChart, DailyChart, HypeMetricCard, HypeBurnCard, HypeFluxChart, HypeSupplyDistribution],
   templateUrl: './hype.html',
   styleUrl: './hype.css',
 })
@@ -59,7 +60,6 @@ export class Hype implements OnDestroy {
   feesAnnual = signal<string>('');
   volatVolume = signal<number>(0);
   volatOpenInterest = signal<number>(0);
-  volatFees = signal<number>(0);
   volatHlpProvider = signal<number>(0);
   stakingApr = signal<string>('');
   maxSupply = signal<string>('');
@@ -107,7 +107,6 @@ export class Hype implements OnDestroy {
       this.feesAnnual.set(data.feesAnnual);
       this.volatVolume.set(data.volatVolume);
       this.volatOpenInterest.set(data.volatOpenInterest);
-      this.volatFees.set(data.volatFees);
       this.volatHlpProvider.set(data.volatHlpProvider);
       this.stakingApr.set(data.stakingApr);
       this.maxSupply.set(data.maxSupply);
@@ -146,76 +145,76 @@ export class Hype implements OnDestroy {
     {
       title: "Supply",
       metrics: [
-        { label: "Circulating", value: this.formatNumber(Number(this.circulatingSupply())), colorClass: "text-orange-300" },
-        { label: "Maximum", value: this.formatNumber(Number(this.maxSupply())), colorClass: "text-orange-300" },
-        { label: "Burned", value: this.formatNumber(Number(this.hypeBurned100())) + "%", colorClass: "text-blue-400" }
+        { label: "Circulating", value: this.formatNumber(Number(this.circulatingSupply())), },
+        { label: "Maximum", value: this.formatNumber(Number(this.maxSupply())) },
+        { label: "Burned", value: this.formatNumber(Number(this.hypeBurned100())) + "%" }
       ],
     },
 
     {
       title: "Valuation",
       metrics: [
-        { label: "Market Cap", value: this.formatNumber(Number(this.marketCap())) + "$", colorClass: "text-emerald-400" },
-        { label: "FDV", value: this.formatNumber(Number(this.fdv())) + "$", colorClass: "text-emerald-400" },
-        { label: "MCap / FDV", value: this.formatNumber(Number(this.ratioMcapFdv())) + "x", colorClass: "text-amber-400" }
+        { label: "Market Cap", value: this.formatNumber(Number(this.marketCap())) + "$" },
+        { label: "FDV", value: this.formatNumber(Number(this.fdv())) + "$" },
+        { label: "MCap / FDV", value: this.formatNumber(Number(this.ratioMcapFdv())) + "x" }
       ],
     },
 
     {
       title: "Issuance (Daily Avg)",
       metrics: [
-        { label: "Burn (30D avg)", value: this.formatNumber(Number(this.burned30d())), colorClass: "text-orange-300" },
-        { label: "Issued (30D avg)", value: this.formatNumber(Number(this.circulating30d())), colorClass: "text-orange-300" },
-        { label: "Net (30D avg)", value: this.formatNumber(Number(this.flux30d())), colorClass: "text-orange-300" }
+        { label: "Burn (30D avg)", value: this.formatNumber(Number(this.burned30d())) },
+        { label: "Issued (30D avg)", value: this.formatNumber(Number(this.circulating30d())) },
+        { label: "Net (30D avg)", value: this.formatNumber(Number(this.flux30d())) }
       ],
     },
 
     {
       title: "EVM Network",
       metrics: [
-        { label: "Bridged", value: this.formatNumber(Number(this.bridgedHype())), colorClass: "text-orange-300" },
-        { label: "Supply Share", value: this.formatNumber(Number(this.ratioBridged())) + "%", colorClass: "text-blue-400" },
-        { label: "Liquid Staked", value: this.formatNumber(Number(this.liquidStaked())), ratio: this.formatNumber(Number(this.stakedEvmCore())) + "%", colorClass: "text-orange-300" }
+        { label: "Bridged", value: this.formatNumber(Number(this.bridgedHype())) },
+        { label: "Supply Share", value: this.formatNumber(Number(this.ratioBridged())) },
+        { label: "Liquid Staked", value: this.formatNumber(Number(this.liquidStaked())), ratio: this.formatNumber(Number(this.stakedEvmCore())) + "%" }
       ],
     },
 
     {
       title: "Generated Fees",
       metrics: [
-        { label: "24h (Est.)", value: this.formatNumber(Number(this.feesDaily())) + "$", colorClass: "text-emerald-400", variation: this.volatFees() },
-        { label: "Annualized", value: this.formatNumber(Number(this.feesAnnual())) + "$", colorClass: "text-emerald-400" },
-        { label: "Price to Fees Ratio", value: this.formatNumber(Number(this.ratioPriceFees())) + "x", colorClass: "text-amber-400" }
+        { label: "24h (Est.)", value: this.formatNumber(Number(this.feesDaily())) },
+        { label: "Annualized", value: this.formatNumber(Number(this.feesAnnual())) },
+        { label: "Price to Fees Ratio", value: this.formatNumber(Number(this.ratioPriceFees())) }
       ],
     },
 
     {
       title: "Staking",
       metrics: [
-        { label: "Total Staked", value: this.formatNumber(Number(this.totalStakedHype())), colorClass: "text-orange-300" },
-        { label: "Staked Ratio", value: this.formatNumber(Number(this.ratioStaked())) + "%", colorClass: "text-blue-400" },
-        { label: "Avg. APR", value: this.formatNumber(Number(this.stakingApr())) + "%", colorClass: "text-blue-400" }
+        { label: "Total Staked", value: this.formatNumber(Number(this.totalStakedHype())) },
+        { label: "Staked Ratio", value: this.formatNumber(Number(this.ratioStaked())) },
+        { label: "Avg. APR", value: this.formatNumber(Number(this.stakingApr())) + "%" }
       ],
     },
 
     {
       title: "Activity",
       metrics: [
-        { label: "24h Volume", value: this.formatNumber(Number(this.dailyVolume())) + "$", colorClass: "text-emerald-400", variation: this.volatVolume() },
-        { label: "Open Interest", value: this.formatNumber(Number(this.openInterest())) + "$", colorClass: "text-emerald-400", variation: this.volatOpenInterest() },
-        { label: "OI / MCap", value: this.formatNumber(Number(this.ratioOImcap())) + "x", colorClass: "text-amber-400" }
+        { label: "24h Volume", value: this.formatNumber(Number(this.dailyVolume())) + "$", variation: this.volatVolume() },
+        { label: "Open Interest", value: this.formatNumber(Number(this.openInterest())) + "$", variation: this.volatOpenInterest() },
+        { label: "OI / MCap", value: this.formatNumber(Number(this.ratioOImcap())) + "x" }
       ],
     },
 
     {
       title: "HL Provider",
       metrics: [
-        { label: "TVL", value: this.formatNumber(Number(this.totalValueLocked())) + "$", colorClass: "text-emerald-400", variation: this.volatHlpProvider() },
+        { label: "TVL", value: this.formatNumber(Number(this.totalValueLocked())) + "$", variation: this.volatHlpProvider() },
         {
           label: "Current APR",
           value: this.formatNumber(Number(this.apr()) * 100) + "%",
           colorClass: Number(this.apr()) >= 0 ? "text-green-400" : "text-red-400"
         },
-        { label: "Vol / TVL", value: this.formatNumber(Number(this.ratioProvider())) + "x", colorClass: "text-amber-400" }
+        { label: "Vol / TVL", value: this.formatNumber(Number(this.ratioProvider())) + "x" }
       ],
     },
 

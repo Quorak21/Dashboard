@@ -15,8 +15,10 @@
 
     <div class="space-y-3 relative z-10">
         @for (metric of card.metrics; track metric.label) {
-        <div class="flex justify-between items-center group/item hover:bg-white/[0.03] p-1.5 -mx-1.5 rounded-lg transition-colors duration-300">
-            <span class="text-copper-300/60 text-sm font-medium tracking-wide group-hover/item:text-copper-300 transition-colors whitespace-nowrap mr-2">
+        <div
+            class="flex justify-between items-center group/item hover:bg-white/[0.03] p-1.5 -mx-1.5 rounded-lg transition-colors duration-300">
+            <span
+                class="text-copper-300/60 text-sm font-medium tracking-wide group-hover/item:text-copper-300 transition-colors whitespace-nowrap mr-2">
                 {{ metric.label }}
             </span>
 
@@ -27,11 +29,13 @@
                     {{ metric.variation > 0 ? '+' : '' }}{{ metric.variation | number:'1.2-2' }}%
                 </span>
                 }
-                <span class="font-mono font-semibold tracking-wider drop-shadow-sm flex items-center gap-1.5 whitespace-nowrap"
-                    [class]="metric.colorClass ? metric.colorClass : 'text-copper-300'">
+                <span
+                    class="font-mono font-semibold tracking-wider drop-shadow-sm flex items-center gap-1.5 whitespace-nowrap"
+                    [class]="metric.colorClass ? metric.colorClass : 'text-amber-500'">
                     {{ metric.value }}
                     @if (metric.ratio !== undefined) {
-                    <span class="text-copper-200/60 text-[9px] leading-none font-medium bg-copper-500/10 px-1 py-[3px] rounded-sm border border-copper-500/20 opacity-80">
+                    <span
+                        class="text-copper-200/60 text-[9px] leading-none font-medium bg-copper-500/10 px-1 py-[3px] rounded-sm border border-copper-500/20 opacity-80">
                         {{ metric.ratio }}
                     </span>
                     }

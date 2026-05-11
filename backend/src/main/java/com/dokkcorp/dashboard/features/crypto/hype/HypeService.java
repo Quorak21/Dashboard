@@ -185,16 +185,10 @@ public class HypeService {
                                 ? Double.parseDouble(h24.getBurnedHype())
                                 : Double.parseDouble(hyperliquidData.hypeBurned());
                 double burned24h = Double.parseDouble(hyperliquidData.hypeBurned()) - oldBurned;
-                // Issued 24h
-                double oldCirculating = h24.getCirculatingSupply() != null
-                                ? Double.parseDouble(h24.getCirculatingSupply())
-                                : Double.parseDouble(hyperliquidData.circulatingSupply());
-                double issued24h = Double.parseDouble(hyperliquidData.circulatingSupply()) - oldCirculating;
 
                 // Les volat dernières 24h
                 double volatVolume = 0;
                 double volatOpenInterest = 0;
-                double volatFees = 0;
                 double volatHlpProvider = 0;
                 if (this.assetSnapshotRepository.findFirstBySymbolOrderByDayDesc("HYPE").isEmpty()
                                 || this.assetSnapshotRepository.findFirstBySymbolOrderByDayDesc("HYPE").get()
@@ -207,7 +201,6 @@ public class HypeService {
                                                 / Double.parseDouble(h24.getOpenInterest()))
                                                 - 1)
                                                 * 100;
-                                volatFees = ((feesDaily / Double.parseDouble(h24.getFeesDaily())) - 1) * 100;
                                 volatHlpProvider = ((tvl / Double.parseDouble(h24.getTotalValueLocked())) - 1) * 100;
                         } catch (Exception e) {
 
@@ -300,7 +293,6 @@ public class HypeService {
                                 Double.toString(feesAnnual),
                                 volatVolume,
                                 volatOpenInterest,
-                                volatFees,
                                 volatHlpProvider,
                                 hyperliquidData.stakingApr(),
                                 hyperliquidData.maxSupply(),

@@ -44,10 +44,19 @@
             </app-hype-flux-chart>
         </div>
 
+        <!-- Metrics cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             @for (card of cards(); track card.title) {
             <app-hype-metric-card [card]="card"></app-hype-metric-card>
             }
+        </div>
+
+        <!-- Supply distribution -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Donut -->
+            <app-hype-supply-distribution [circulatingSupply]="circulatingSupply()" [maxSupply]="maxSupply()"
+                [hypeBurned100]="hypeBurned100()"></app-hype-supply-distribution>
+
         </div>
     </div>
 
