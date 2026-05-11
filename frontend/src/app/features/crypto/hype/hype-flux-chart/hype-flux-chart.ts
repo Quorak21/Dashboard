@@ -59,7 +59,7 @@ export class HypeFluxChart implements AfterViewInit {
       this.chart.options.scales['y'].suggestedMax = finalYMax;
       this.chart.options.scales['y'].suggestedMin = -finalYMax;
     }
-    this.chart.data.labels = this.labels().map(l => new Date(l).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }));
+    this.chart.data.labels = this.labels().map(l => new Date(l - 86400000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }));
     if (this.chart.data.datasets[0]) {
       this.chart.data.datasets[0].data = this.netFlow();
     }
@@ -81,7 +81,7 @@ export class HypeFluxChart implements AfterViewInit {
     this.chart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: this.labels().map(l => new Date(l).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })),
+        labels: this.labels().map(l => new Date(l - 86400000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })),
         datasets: [
           {
             label: 'Flow',
@@ -114,7 +114,7 @@ export class HypeFluxChart implements AfterViewInit {
             titleMarginBottom: 10,
             callbacks: {
               title: (items) => {
-                const date = new Date(this.labels()[items[0].dataIndex]);
+                const date = new Date(this.labels()[items[0].dataIndex] - 86400000);
                 return `📅 ${date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`;
               },
               label: (ctx) => {
