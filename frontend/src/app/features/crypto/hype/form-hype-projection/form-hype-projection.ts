@@ -46,12 +46,4 @@ export class FormHypeProjection {
   hypeProjectionWeeklyUsd = computed(() => formatNumber((this.yearlyRaw() / 52) * this.effectivePrice()));
   hypeProjectionDailyUsd = computed(() => formatNumber((this.yearlyRaw() / 365) * this.effectivePrice()));
 
-
-
-
-
-
-
-
-
 }

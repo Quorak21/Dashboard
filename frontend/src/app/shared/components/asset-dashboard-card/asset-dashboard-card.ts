@@ -1,30 +1,20 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-asset-dashboard-card',
-  imports: [RouterLink],
+  imports: [RouterLink, DecimalPipe],
   templateUrl: './asset-dashboard-card.html',
   styleUrl: './asset-dashboard-card.css',
 })
-export class AssetDashboardCard implements OnInit {
+export class AssetDashboardCard {
 
-  @Input() asset: string = "";
+  asset = input.required<string>();
+  price = input<number | null>(null);
 
-  logo: string = "";
-  name: string = "";
-  link: string = "";
-
-  ngOnInit() {
-    if (this.asset === "placeholder") {
-      this.logo = "assets/logos/placeholder.png";
-      this.name = "À venir !";
-      this.link = "/dashboard";
-    } else {
-      this.logo = "assets/logos/" + this.asset + ".png";
-      this.name = this.asset.toUpperCase();
-      this.link = "/" + this.asset;
-    }
-  }
+  logo = computed(() => this.asset() === "placeholder" ? "assets/logos/placeholder.png" : "assets/logos/" + this.asset() + ".png");
+  name = computed(() => this.asset() === "placeholder" ? "À venir !" : this.asset().toUpperCase());
+  link = computed(() => this.asset() === "placeholder" ? "/dashboard" : "/" + this.asset());
 
 }

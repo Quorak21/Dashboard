@@ -1,0 +1,4967 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.gitattributes
+.github/workflows/deploy.yml
+.gitignore
+backend/.gitattributes
+backend/.gitignore
+backend/.mvn/wrapper/maven-wrapper.properties
+backend/compose.yaml
+backend/docker-compose.yml
+backend/Dockerfile
+backend/mvnw
+backend/mvnw.cmd
+backend/pom.xml
+backend/src/main/java/com/dokkcorp/dashboard/common/AssetHistoryRepository.java
+backend/src/main/java/com/dokkcorp/dashboard/common/HttpFetchService.java
+backend/src/main/java/com/dokkcorp/dashboard/controller/DashboardController.java
+backend/src/main/java/com/dokkcorp/dashboard/DashboardApplication.java
+backend/src/main/java/com/dokkcorp/dashboard/features/crypto/btc/BtcDto.java
+backend/src/main/java/com/dokkcorp/dashboard/features/crypto/btc/BtcService.java
+backend/src/main/java/com/dokkcorp/dashboard/features/crypto/hype/HypeDto.java
+backend/src/main/java/com/dokkcorp/dashboard/features/crypto/hype/HypeService.java
+backend/src/main/java/com/dokkcorp/dashboard/jobs/AssetSyncJob.java
+backend/src/main/java/com/dokkcorp/dashboard/jobs/BlockChainRequest.java
+backend/src/main/java/com/dokkcorp/dashboard/model/entity/AssetDaily.java
+backend/src/main/java/com/dokkcorp/dashboard/model/entity/AssetSnapshot.java
+backend/src/main/java/com/dokkcorp/dashboard/providers/BlockChainClient.java
+backend/src/main/java/com/dokkcorp/dashboard/providers/CoinGeckoClient.java
+backend/src/main/java/com/dokkcorp/dashboard/providers/dto/BlockChainDto.java
+backend/src/main/java/com/dokkcorp/dashboard/providers/dto/CoinGeckoDto.java
+backend/src/main/java/com/dokkcorp/dashboard/providers/dto/CoinGeckoHistoryDto.java
+backend/src/main/java/com/dokkcorp/dashboard/providers/dto/HyperliquidDto.java
+backend/src/main/java/com/dokkcorp/dashboard/providers/HyperEvmRpc.java
+backend/src/main/java/com/dokkcorp/dashboard/providers/HyperliquidClient.java
+backend/src/main/java/com/dokkcorp/dashboard/repository/AssetDailyRepository.java
+backend/src/main/java/com/dokkcorp/dashboard/repository/AssetSnapshotRepository.java
+backend/src/main/resources/application-prod.yml
+backend/src/main/resources/application.yml
+backend/src/test/java/com/dokkcorp/dashboard/DashboardApplicationTests.java
+frontend/.editorconfig
+frontend/.gitignore
+frontend/.prettierrc
+frontend/angular.json
+frontend/package.json
+frontend/public/assets/images/background.png
+frontend/public/assets/images/burn.png
+frontend/public/assets/images/logoDokkCorp.png
+frontend/public/assets/logos/hype.png
+frontend/public/assets/logos/placeholder.png
+frontend/public/assets/sounds/notif.mp3
+frontend/README.md
+frontend/src/app/app.config.ts
+frontend/src/app/app.css
+frontend/src/app/app.html
+frontend/src/app/app.routes.ts
+frontend/src/app/app.spec.ts
+frontend/src/app/app.ts
+frontend/src/app/core/components/footer/footer.css
+frontend/src/app/core/components/footer/footer.html
+frontend/src/app/core/components/footer/footer.spec.ts
+frontend/src/app/core/components/footer/footer.ts
+frontend/src/app/core/components/navbar/navbar.css
+frontend/src/app/core/components/navbar/navbar.html
+frontend/src/app/core/components/navbar/navbar.spec.ts
+frontend/src/app/core/components/navbar/navbar.ts
+frontend/src/app/core/models/asset.model.ts
+frontend/src/app/core/services/api.ts
+frontend/src/app/features/crypto/btc/btc.css
+frontend/src/app/features/crypto/btc/btc.html
+frontend/src/app/features/crypto/btc/btc.ts
+frontend/src/app/features/crypto/hype/form-hype-projection/form-hype-projection.css
+frontend/src/app/features/crypto/hype/form-hype-projection/form-hype-projection.html
+frontend/src/app/features/crypto/hype/form-hype-projection/form-hype-projection.spec.ts
+frontend/src/app/features/crypto/hype/form-hype-projection/form-hype-projection.ts
+frontend/src/app/features/crypto/hype/hype-burn-card/hype-burn-card.css
+frontend/src/app/features/crypto/hype/hype-burn-card/hype-burn-card.html
+frontend/src/app/features/crypto/hype/hype-burn-card/hype-burn-card.spec.ts
+frontend/src/app/features/crypto/hype/hype-burn-card/hype-burn-card.ts
+frontend/src/app/features/crypto/hype/hype-flux-chart/hype-flux-chart.css
+frontend/src/app/features/crypto/hype/hype-flux-chart/hype-flux-chart.html
+frontend/src/app/features/crypto/hype/hype-flux-chart/hype-flux-chart.spec.ts
+frontend/src/app/features/crypto/hype/hype-flux-chart/hype-flux-chart.ts
+frontend/src/app/features/crypto/hype/hype-metric-card/hype-metric-card.css
+frontend/src/app/features/crypto/hype/hype-metric-card/hype-metric-card.html
+frontend/src/app/features/crypto/hype/hype-metric-card/hype-metric-card.spec.ts
+frontend/src/app/features/crypto/hype/hype-metric-card/hype-metric-card.ts
+frontend/src/app/features/crypto/hype/hype-supply-distribution/hype-supply-distribution.css
+frontend/src/app/features/crypto/hype/hype-supply-distribution/hype-supply-distribution.html
+frontend/src/app/features/crypto/hype/hype-supply-distribution/hype-supply-distribution.spec.ts
+frontend/src/app/features/crypto/hype/hype-supply-distribution/hype-supply-distribution.ts
+frontend/src/app/features/crypto/hype/hype.css
+frontend/src/app/features/crypto/hype/hype.html
+frontend/src/app/features/crypto/hype/hype.ts
+frontend/src/app/features/crypto/hype/metric-card-model-hype.ts
+frontend/src/app/features/crypto/services/crypto-api.ts
+frontend/src/app/features/crypto/services/format-dates.ts
+frontend/src/app/features/crypto/services/format-number.ts
+frontend/src/app/features/crypto/services/notif.ts
+frontend/src/app/features/dashboard/dashboard.css
+frontend/src/app/features/dashboard/dashboard.html
+frontend/src/app/features/dashboard/dashboard.ts
+frontend/src/app/shared/components/asset-dashboard-card/asset-dashboard-card.css
+frontend/src/app/shared/components/asset-dashboard-card/asset-dashboard-card.html
+frontend/src/app/shared/components/asset-dashboard-card/asset-dashboard-card.spec.ts
+frontend/src/app/shared/components/asset-dashboard-card/asset-dashboard-card.ts
+frontend/src/app/shared/components/asset-main-card/asset-main-card.css
+frontend/src/app/shared/components/asset-main-card/asset-main-card.html
+frontend/src/app/shared/components/asset-main-card/asset-main-card.spec.ts
+frontend/src/app/shared/components/asset-main-card/asset-main-card.ts
+frontend/src/app/shared/components/background/background.css
+frontend/src/app/shared/components/background/background.html
+frontend/src/app/shared/components/background/background.spec.ts
+frontend/src/app/shared/components/background/background.ts
+frontend/src/app/shared/components/daily-chart/daily-chart.css
+frontend/src/app/shared/components/daily-chart/daily-chart.html
+frontend/src/app/shared/components/daily-chart/daily-chart.spec.ts
+frontend/src/app/shared/components/daily-chart/daily-chart.ts
+frontend/src/app/shared/components/price-chart/price-chart.css
+frontend/src/app/shared/components/price-chart/price-chart.html
+frontend/src/app/shared/components/price-chart/price-chart.ts
+frontend/src/environments/environment.prod.ts
+frontend/src/environments/environment.ts
+frontend/src/index.html
+frontend/src/main.ts
+frontend/src/styles.css
+frontend/tailwind.config.js
+frontend/tsconfig.app.json
+frontend/tsconfig.json
+frontend/tsconfig.spec.json
+frontend/vercel.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".gitattributes">
+/mvnw text eol=lf
+*.cmd text eol=crlf
+</file>
+
+<file path="backend/.gitattributes">
+/mvnw text eol=lf
+*.cmd text eol=crlf
+</file>
+
+<file path="backend/.mvn/wrapper/maven-wrapper.properties">
+wrapperVersion=3.3.4
+distributionType=only-script
+distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.14/apache-maven-3.9.14-bin.zip
+</file>
+
+<file path="backend/compose.yaml">
+services:
+  postgres:
+    image: 'postgres:16'
+    environment:
+      - 'POSTGRES_DB=dokkcorp_db'
+      - 'POSTGRES_USER=dokkadmin'
+      - 'POSTGRES_PASSWORD=dokksecret'
+    ports:
+      - '5432:5432'
+    volumes:
+      - dokkcorp_pgdata:/var/lib/postgresql/data
+
+volumes:
+  dokkcorp_pgdata:
+</file>
+
+<file path="backend/Dockerfile">
+# Build stage
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Run stage
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
+</file>
+
+<file path="backend/mvnw">
+#!/bin/sh
+# ----------------------------------------------------------------------------
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+# Apache Maven Wrapper startup batch script, version 3.3.4
+#
+# Optional ENV vars
+# -----------------
+#   JAVA_HOME - location of a JDK home dir, required when download maven via java source
+#   MVNW_REPOURL - repo url base for downloading maven distribution
+#   MVNW_USERNAME/MVNW_PASSWORD - user and password for downloading maven
+#   MVNW_VERBOSE - true: enable verbose log; debug: trace the mvnw script; others: silence the output
+# ----------------------------------------------------------------------------
+
+set -euf
+[ "${MVNW_VERBOSE-}" != debug ] || set -x
+
+# OS specific support.
+native_path() { printf %s\\n "$1"; }
+case "$(uname)" in
+CYGWIN* | MINGW*)
+  [ -z "${JAVA_HOME-}" ] || JAVA_HOME="$(cygpath --unix "$JAVA_HOME")"
+  native_path() { cygpath --path --windows "$1"; }
+  ;;
+esac
+
+# set JAVACMD and JAVACCMD
+set_java_home() {
+  # For Cygwin and MinGW, ensure paths are in Unix format before anything is touched
+  if [ -n "${JAVA_HOME-}" ]; then
+    if [ -x "$JAVA_HOME/jre/sh/java" ]; then
+      # IBM's JDK on AIX uses strange locations for the executables
+      JAVACMD="$JAVA_HOME/jre/sh/java"
+      JAVACCMD="$JAVA_HOME/jre/sh/javac"
+    else
+      JAVACMD="$JAVA_HOME/bin/java"
+      JAVACCMD="$JAVA_HOME/bin/javac"
+
+      if [ ! -x "$JAVACMD" ] || [ ! -x "$JAVACCMD" ]; then
+        echo "The JAVA_HOME environment variable is not defined correctly, so mvnw cannot run." >&2
+        echo "JAVA_HOME is set to \"$JAVA_HOME\", but \"\$JAVA_HOME/bin/java\" or \"\$JAVA_HOME/bin/javac\" does not exist." >&2
+        return 1
+      fi
+    fi
+  else
+    JAVACMD="$(
+      'set' +e
+      'unset' -f command 2>/dev/null
+      'command' -v java
+    )" || :
+    JAVACCMD="$(
+      'set' +e
+      'unset' -f command 2>/dev/null
+      'command' -v javac
+    )" || :
+
+    if [ ! -x "${JAVACMD-}" ] || [ ! -x "${JAVACCMD-}" ]; then
+      echo "The java/javac command does not exist in PATH nor is JAVA_HOME set, so mvnw cannot run." >&2
+      return 1
+    fi
+  fi
+}
+
+# hash string like Java String::hashCode
+hash_string() {
+  str="${1:-}" h=0
+  while [ -n "$str" ]; do
+    char="${str%"${str#?}"}"
+    h=$(((h * 31 + $(LC_CTYPE=C printf %d "'$char")) % 4294967296))
+    str="${str#?}"
+  done
+  printf %x\\n $h
+}
+
+verbose() { :; }
+[ "${MVNW_VERBOSE-}" != true ] || verbose() { printf %s\\n "${1-}"; }
+
+die() {
+  printf %s\\n "$1" >&2
+  exit 1
+}
+
+trim() {
+  # MWRAPPER-139:
+  #   Trims trailing and leading whitespace, carriage returns, tabs, and linefeeds.
+  #   Needed for removing poorly interpreted newline sequences when running in more
+  #   exotic environments such as mingw bash on Windows.
+  printf "%s" "${1}" | tr -d '[:space:]'
+}
+
+scriptDir="$(dirname "$0")"
+scriptName="$(basename "$0")"
+
+# parse distributionUrl and optional distributionSha256Sum, requires .mvn/wrapper/maven-wrapper.properties
+while IFS="=" read -r key value; do
+  case "${key-}" in
+  distributionUrl) distributionUrl=$(trim "${value-}") ;;
+  distributionSha256Sum) distributionSha256Sum=$(trim "${value-}") ;;
+  esac
+done <"$scriptDir/.mvn/wrapper/maven-wrapper.properties"
+[ -n "${distributionUrl-}" ] || die "cannot read distributionUrl property in $scriptDir/.mvn/wrapper/maven-wrapper.properties"
+
+case "${distributionUrl##*/}" in
+maven-mvnd-*bin.*)
+  MVN_CMD=mvnd.sh _MVNW_REPO_PATTERN=/maven/mvnd/
+  case "${PROCESSOR_ARCHITECTURE-}${PROCESSOR_ARCHITEW6432-}:$(uname -a)" in
+  *AMD64:CYGWIN* | *AMD64:MINGW*) distributionPlatform=windows-amd64 ;;
+  :Darwin*x86_64) distributionPlatform=darwin-amd64 ;;
+  :Darwin*arm64) distributionPlatform=darwin-aarch64 ;;
+  :Linux*x86_64*) distributionPlatform=linux-amd64 ;;
+  *)
+    echo "Cannot detect native platform for mvnd on $(uname)-$(uname -m), use pure java version" >&2
+    distributionPlatform=linux-amd64
+    ;;
+  esac
+  distributionUrl="${distributionUrl%-bin.*}-$distributionPlatform.zip"
+  ;;
+maven-mvnd-*) MVN_CMD=mvnd.sh _MVNW_REPO_PATTERN=/maven/mvnd/ ;;
+*) MVN_CMD="mvn${scriptName#mvnw}" _MVNW_REPO_PATTERN=/org/apache/maven/ ;;
+esac
+
+# apply MVNW_REPOURL and calculate MAVEN_HOME
+# maven home pattern: ~/.m2/wrapper/dists/{apache-maven-<version>,maven-mvnd-<version>-<platform>}/<hash>
+[ -z "${MVNW_REPOURL-}" ] || distributionUrl="$MVNW_REPOURL$_MVNW_REPO_PATTERN${distributionUrl#*"$_MVNW_REPO_PATTERN"}"
+distributionUrlName="${distributionUrl##*/}"
+distributionUrlNameMain="${distributionUrlName%.*}"
+distributionUrlNameMain="${distributionUrlNameMain%-bin}"
+MAVEN_USER_HOME="${MAVEN_USER_HOME:-${HOME}/.m2}"
+MAVEN_HOME="${MAVEN_USER_HOME}/wrapper/dists/${distributionUrlNameMain-}/$(hash_string "$distributionUrl")"
+
+exec_maven() {
+  unset MVNW_VERBOSE MVNW_USERNAME MVNW_PASSWORD MVNW_REPOURL || :
+  exec "$MAVEN_HOME/bin/$MVN_CMD" "$@" || die "cannot exec $MAVEN_HOME/bin/$MVN_CMD"
+}
+
+if [ -d "$MAVEN_HOME" ]; then
+  verbose "found existing MAVEN_HOME at $MAVEN_HOME"
+  exec_maven "$@"
+fi
+
+case "${distributionUrl-}" in
+*?-bin.zip | *?maven-mvnd-?*-?*.zip) ;;
+*) die "distributionUrl is not valid, must match *-bin.zip or maven-mvnd-*.zip, but found '${distributionUrl-}'" ;;
+esac
+
+# prepare tmp dir
+if TMP_DOWNLOAD_DIR="$(mktemp -d)" && [ -d "$TMP_DOWNLOAD_DIR" ]; then
+  clean() { rm -rf -- "$TMP_DOWNLOAD_DIR"; }
+  trap clean HUP INT TERM EXIT
+else
+  die "cannot create temp dir"
+fi
+
+mkdir -p -- "${MAVEN_HOME%/*}"
+
+# Download and Install Apache Maven
+verbose "Couldn't find MAVEN_HOME, downloading and installing it ..."
+verbose "Downloading from: $distributionUrl"
+verbose "Downloading to: $TMP_DOWNLOAD_DIR/$distributionUrlName"
+
+# select .zip or .tar.gz
+if ! command -v unzip >/dev/null; then
+  distributionUrl="${distributionUrl%.zip}.tar.gz"
+  distributionUrlName="${distributionUrl##*/}"
+fi
+
+# verbose opt
+__MVNW_QUIET_WGET=--quiet __MVNW_QUIET_CURL=--silent __MVNW_QUIET_UNZIP=-q __MVNW_QUIET_TAR=''
+[ "${MVNW_VERBOSE-}" != true ] || __MVNW_QUIET_WGET='' __MVNW_QUIET_CURL='' __MVNW_QUIET_UNZIP='' __MVNW_QUIET_TAR=v
+
+# normalize http auth
+case "${MVNW_PASSWORD:+has-password}" in
+'') MVNW_USERNAME='' MVNW_PASSWORD='' ;;
+has-password) [ -n "${MVNW_USERNAME-}" ] || MVNW_USERNAME='' MVNW_PASSWORD='' ;;
+esac
+
+if [ -z "${MVNW_USERNAME-}" ] && command -v wget >/dev/null; then
+  verbose "Found wget ... using wget"
+  wget ${__MVNW_QUIET_WGET:+"$__MVNW_QUIET_WGET"} "$distributionUrl" -O "$TMP_DOWNLOAD_DIR/$distributionUrlName" || die "wget: Failed to fetch $distributionUrl"
+elif [ -z "${MVNW_USERNAME-}" ] && command -v curl >/dev/null; then
+  verbose "Found curl ... using curl"
+  curl ${__MVNW_QUIET_CURL:+"$__MVNW_QUIET_CURL"} -f -L -o "$TMP_DOWNLOAD_DIR/$distributionUrlName" "$distributionUrl" || die "curl: Failed to fetch $distributionUrl"
+elif set_java_home; then
+  verbose "Falling back to use Java to download"
+  javaSource="$TMP_DOWNLOAD_DIR/Downloader.java"
+  targetZip="$TMP_DOWNLOAD_DIR/$distributionUrlName"
+  cat >"$javaSource" <<-END
+	public class Downloader extends java.net.Authenticator
+	{
+	  protected java.net.PasswordAuthentication getPasswordAuthentication()
+	  {
+	    return new java.net.PasswordAuthentication( System.getenv( "MVNW_USERNAME" ), System.getenv( "MVNW_PASSWORD" ).toCharArray() );
+	  }
+	  public static void main( String[] args ) throws Exception
+	  {
+	    setDefault( new Downloader() );
+	    java.nio.file.Files.copy( java.net.URI.create( args[0] ).toURL().openStream(), java.nio.file.Paths.get( args[1] ).toAbsolutePath().normalize() );
+	  }
+	}
+	END
+  # For Cygwin/MinGW, switch paths to Windows format before running javac and java
+  verbose " - Compiling Downloader.java ..."
+  "$(native_path "$JAVACCMD")" "$(native_path "$javaSource")" || die "Failed to compile Downloader.java"
+  verbose " - Running Downloader.java ..."
+  "$(native_path "$JAVACMD")" -cp "$(native_path "$TMP_DOWNLOAD_DIR")" Downloader "$distributionUrl" "$(native_path "$targetZip")"
+fi
+
+# If specified, validate the SHA-256 sum of the Maven distribution zip file
+if [ -n "${distributionSha256Sum-}" ]; then
+  distributionSha256Result=false
+  if [ "$MVN_CMD" = mvnd.sh ]; then
+    echo "Checksum validation is not supported for maven-mvnd." >&2
+    echo "Please disable validation by removing 'distributionSha256Sum' from your maven-wrapper.properties." >&2
+    exit 1
+  elif command -v sha256sum >/dev/null; then
+    if echo "$distributionSha256Sum  $TMP_DOWNLOAD_DIR/$distributionUrlName" | sha256sum -c - >/dev/null 2>&1; then
+      distributionSha256Result=true
+    fi
+  elif command -v shasum >/dev/null; then
+    if echo "$distributionSha256Sum  $TMP_DOWNLOAD_DIR/$distributionUrlName" | shasum -a 256 -c >/dev/null 2>&1; then
+      distributionSha256Result=true
+    fi
+  else
+    echo "Checksum validation was requested but neither 'sha256sum' or 'shasum' are available." >&2
+    echo "Please install either command, or disable validation by removing 'distributionSha256Sum' from your maven-wrapper.properties." >&2
+    exit 1
+  fi
+  if [ $distributionSha256Result = false ]; then
+    echo "Error: Failed to validate Maven distribution SHA-256, your Maven distribution might be compromised." >&2
+    echo "If you updated your Maven version, you need to update the specified distributionSha256Sum property." >&2
+    exit 1
+  fi
+fi
+
+# unzip and move
+if command -v unzip >/dev/null; then
+  unzip ${__MVNW_QUIET_UNZIP:+"$__MVNW_QUIET_UNZIP"} "$TMP_DOWNLOAD_DIR/$distributionUrlName" -d "$TMP_DOWNLOAD_DIR" || die "failed to unzip"
+else
+  tar xzf${__MVNW_QUIET_TAR:+"$__MVNW_QUIET_TAR"} "$TMP_DOWNLOAD_DIR/$distributionUrlName" -C "$TMP_DOWNLOAD_DIR" || die "failed to untar"
+fi
+
+# Find the actual extracted directory name (handles snapshots where filename != directory name)
+actualDistributionDir=""
+
+# First try the expected directory name (for regular distributions)
+if [ -d "$TMP_DOWNLOAD_DIR/$distributionUrlNameMain" ]; then
+  if [ -f "$TMP_DOWNLOAD_DIR/$distributionUrlNameMain/bin/$MVN_CMD" ]; then
+    actualDistributionDir="$distributionUrlNameMain"
+  fi
+fi
+
+# If not found, search for any directory with the Maven executable (for snapshots)
+if [ -z "$actualDistributionDir" ]; then
+  # enable globbing to iterate over items
+  set +f
+  for dir in "$TMP_DOWNLOAD_DIR"/*; do
+    if [ -d "$dir" ]; then
+      if [ -f "$dir/bin/$MVN_CMD" ]; then
+        actualDistributionDir="$(basename "$dir")"
+        break
+      fi
+    fi
+  done
+  set -f
+fi
+
+if [ -z "$actualDistributionDir" ]; then
+  verbose "Contents of $TMP_DOWNLOAD_DIR:"
+  verbose "$(ls -la "$TMP_DOWNLOAD_DIR")"
+  die "Could not find Maven distribution directory in extracted archive"
+fi
+
+verbose "Found extracted Maven distribution directory: $actualDistributionDir"
+printf %s\\n "$distributionUrl" >"$TMP_DOWNLOAD_DIR/$actualDistributionDir/mvnw.url"
+mv -- "$TMP_DOWNLOAD_DIR/$actualDistributionDir" "$MAVEN_HOME" || [ -d "$MAVEN_HOME" ] || die "fail to move MAVEN_HOME"
+
+clean || :
+exec_maven "$@"
+</file>
+
+<file path="backend/mvnw.cmd">
+<# : batch portion
+@REM ----------------------------------------------------------------------------
+@REM Licensed to the Apache Software Foundation (ASF) under one
+@REM or more contributor license agreements.  See the NOTICE file
+@REM distributed with this work for additional information
+@REM regarding copyright ownership.  The ASF licenses this file
+@REM to you under the Apache License, Version 2.0 (the
+@REM "License"); you may not use this file except in compliance
+@REM with the License.  You may obtain a copy of the License at
+@REM
+@REM    http://www.apache.org/licenses/LICENSE-2.0
+@REM
+@REM Unless required by applicable law or agreed to in writing,
+@REM software distributed under the License is distributed on an
+@REM "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+@REM KIND, either express or implied.  See the License for the
+@REM specific language governing permissions and limitations
+@REM under the License.
+@REM ----------------------------------------------------------------------------
+
+@REM ----------------------------------------------------------------------------
+@REM Apache Maven Wrapper startup batch script, version 3.3.4
+@REM
+@REM Optional ENV vars
+@REM   MVNW_REPOURL - repo url base for downloading maven distribution
+@REM   MVNW_USERNAME/MVNW_PASSWORD - user and password for downloading maven
+@REM   MVNW_VERBOSE - true: enable verbose log; others: silence the output
+@REM ----------------------------------------------------------------------------
+
+@IF "%__MVNW_ARG0_NAME__%"=="" (SET __MVNW_ARG0_NAME__=%~nx0)
+@SET __MVNW_CMD__=
+@SET __MVNW_ERROR__=
+@SET __MVNW_PSMODULEP_SAVE=%PSModulePath%
+@SET PSModulePath=
+@FOR /F "usebackq tokens=1* delims==" %%A IN (`powershell -noprofile "& {$scriptDir='%~dp0'; $script='%__MVNW_ARG0_NAME__%'; icm -ScriptBlock ([Scriptblock]::Create((Get-Content -Raw '%~f0'))) -NoNewScope}"`) DO @(
+  IF "%%A"=="MVN_CMD" (set __MVNW_CMD__=%%B) ELSE IF "%%B"=="" (echo %%A) ELSE (echo %%A=%%B)
+)
+@SET PSModulePath=%__MVNW_PSMODULEP_SAVE%
+@SET __MVNW_PSMODULEP_SAVE=
+@SET __MVNW_ARG0_NAME__=
+@SET MVNW_USERNAME=
+@SET MVNW_PASSWORD=
+@IF NOT "%__MVNW_CMD__%"=="" ("%__MVNW_CMD__%" %*)
+@echo Cannot start maven from wrapper >&2 && exit /b 1
+@GOTO :EOF
+: end batch / begin powershell #>
+
+$ErrorActionPreference = "Stop"
+if ($env:MVNW_VERBOSE -eq "true") {
+  $VerbosePreference = "Continue"
+}
+
+# calculate distributionUrl, requires .mvn/wrapper/maven-wrapper.properties
+$distributionUrl = (Get-Content -Raw "$scriptDir/.mvn/wrapper/maven-wrapper.properties" | ConvertFrom-StringData).distributionUrl
+if (!$distributionUrl) {
+  Write-Error "cannot read distributionUrl property in $scriptDir/.mvn/wrapper/maven-wrapper.properties"
+}
+
+switch -wildcard -casesensitive ( $($distributionUrl -replace '^.*/','') ) {
+  "maven-mvnd-*" {
+    $USE_MVND = $true
+    $distributionUrl = $distributionUrl -replace '-bin\.[^.]*$',"-windows-amd64.zip"
+    $MVN_CMD = "mvnd.cmd"
+    break
+  }
+  default {
+    $USE_MVND = $false
+    $MVN_CMD = $script -replace '^mvnw','mvn'
+    break
+  }
+}
+
+# apply MVNW_REPOURL and calculate MAVEN_HOME
+# maven home pattern: ~/.m2/wrapper/dists/{apache-maven-<version>,maven-mvnd-<version>-<platform>}/<hash>
+if ($env:MVNW_REPOURL) {
+  $MVNW_REPO_PATTERN = if ($USE_MVND -eq $False) { "/org/apache/maven/" } else { "/maven/mvnd/" }
+  $distributionUrl = "$env:MVNW_REPOURL$MVNW_REPO_PATTERN$($distributionUrl -replace "^.*$MVNW_REPO_PATTERN",'')"
+}
+$distributionUrlName = $distributionUrl -replace '^.*/',''
+$distributionUrlNameMain = $distributionUrlName -replace '\.[^.]*$','' -replace '-bin$',''
+
+$MAVEN_M2_PATH = "$HOME/.m2"
+if ($env:MAVEN_USER_HOME) {
+  $MAVEN_M2_PATH = "$env:MAVEN_USER_HOME"
+}
+
+if (-not (Test-Path -Path $MAVEN_M2_PATH)) {
+    New-Item -Path $MAVEN_M2_PATH -ItemType Directory | Out-Null
+}
+
+$MAVEN_WRAPPER_DISTS = $null
+if ((Get-Item $MAVEN_M2_PATH).Target[0] -eq $null) {
+  $MAVEN_WRAPPER_DISTS = "$MAVEN_M2_PATH/wrapper/dists"
+} else {
+  $MAVEN_WRAPPER_DISTS = (Get-Item $MAVEN_M2_PATH).Target[0] + "/wrapper/dists"
+}
+
+$MAVEN_HOME_PARENT = "$MAVEN_WRAPPER_DISTS/$distributionUrlNameMain"
+$MAVEN_HOME_NAME = ([System.Security.Cryptography.SHA256]::Create().ComputeHash([byte[]][char[]]$distributionUrl) | ForEach-Object {$_.ToString("x2")}) -join ''
+$MAVEN_HOME = "$MAVEN_HOME_PARENT/$MAVEN_HOME_NAME"
+
+if (Test-Path -Path "$MAVEN_HOME" -PathType Container) {
+  Write-Verbose "found existing MAVEN_HOME at $MAVEN_HOME"
+  Write-Output "MVN_CMD=$MAVEN_HOME/bin/$MVN_CMD"
+  exit $?
+}
+
+if (! $distributionUrlNameMain -or ($distributionUrlName -eq $distributionUrlNameMain)) {
+  Write-Error "distributionUrl is not valid, must end with *-bin.zip, but found $distributionUrl"
+}
+
+# prepare tmp dir
+$TMP_DOWNLOAD_DIR_HOLDER = New-TemporaryFile
+$TMP_DOWNLOAD_DIR = New-Item -Itemtype Directory -Path "$TMP_DOWNLOAD_DIR_HOLDER.dir"
+$TMP_DOWNLOAD_DIR_HOLDER.Delete() | Out-Null
+trap {
+  if ($TMP_DOWNLOAD_DIR.Exists) {
+    try { Remove-Item $TMP_DOWNLOAD_DIR -Recurse -Force | Out-Null }
+    catch { Write-Warning "Cannot remove $TMP_DOWNLOAD_DIR" }
+  }
+}
+
+New-Item -Itemtype Directory -Path "$MAVEN_HOME_PARENT" -Force | Out-Null
+
+# Download and Install Apache Maven
+Write-Verbose "Couldn't find MAVEN_HOME, downloading and installing it ..."
+Write-Verbose "Downloading from: $distributionUrl"
+Write-Verbose "Downloading to: $TMP_DOWNLOAD_DIR/$distributionUrlName"
+
+$webclient = New-Object System.Net.WebClient
+if ($env:MVNW_USERNAME -and $env:MVNW_PASSWORD) {
+  $webclient.Credentials = New-Object System.Net.NetworkCredential($env:MVNW_USERNAME, $env:MVNW_PASSWORD)
+}
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$webclient.DownloadFile($distributionUrl, "$TMP_DOWNLOAD_DIR/$distributionUrlName") | Out-Null
+
+# If specified, validate the SHA-256 sum of the Maven distribution zip file
+$distributionSha256Sum = (Get-Content -Raw "$scriptDir/.mvn/wrapper/maven-wrapper.properties" | ConvertFrom-StringData).distributionSha256Sum
+if ($distributionSha256Sum) {
+  if ($USE_MVND) {
+    Write-Error "Checksum validation is not supported for maven-mvnd. `nPlease disable validation by removing 'distributionSha256Sum' from your maven-wrapper.properties."
+  }
+  Import-Module $PSHOME\Modules\Microsoft.PowerShell.Utility -Function Get-FileHash
+  if ((Get-FileHash "$TMP_DOWNLOAD_DIR/$distributionUrlName" -Algorithm SHA256).Hash.ToLower() -ne $distributionSha256Sum) {
+    Write-Error "Error: Failed to validate Maven distribution SHA-256, your Maven distribution might be compromised. If you updated your Maven version, you need to update the specified distributionSha256Sum property."
+  }
+}
+
+# unzip and move
+Expand-Archive "$TMP_DOWNLOAD_DIR/$distributionUrlName" -DestinationPath "$TMP_DOWNLOAD_DIR" | Out-Null
+
+# Find the actual extracted directory name (handles snapshots where filename != directory name)
+$actualDistributionDir = ""
+
+# First try the expected directory name (for regular distributions)
+$expectedPath = Join-Path "$TMP_DOWNLOAD_DIR" "$distributionUrlNameMain"
+$expectedMvnPath = Join-Path "$expectedPath" "bin/$MVN_CMD"
+if ((Test-Path -Path $expectedPath -PathType Container) -and (Test-Path -Path $expectedMvnPath -PathType Leaf)) {
+  $actualDistributionDir = $distributionUrlNameMain
+}
+
+# If not found, search for any directory with the Maven executable (for snapshots)
+if (!$actualDistributionDir) {
+  Get-ChildItem -Path "$TMP_DOWNLOAD_DIR" -Directory | ForEach-Object {
+    $testPath = Join-Path $_.FullName "bin/$MVN_CMD"
+    if (Test-Path -Path $testPath -PathType Leaf) {
+      $actualDistributionDir = $_.Name
+    }
+  }
+}
+
+if (!$actualDistributionDir) {
+  Write-Error "Could not find Maven distribution directory in extracted archive"
+}
+
+Write-Verbose "Found extracted Maven distribution directory: $actualDistributionDir"
+Rename-Item -Path "$TMP_DOWNLOAD_DIR/$actualDistributionDir" -NewName $MAVEN_HOME_NAME | Out-Null
+try {
+  Move-Item -Path "$TMP_DOWNLOAD_DIR/$MAVEN_HOME_NAME" -Destination $MAVEN_HOME_PARENT | Out-Null
+} catch {
+  if (! (Test-Path -Path "$MAVEN_HOME" -PathType Container)) {
+    Write-Error "fail to move MAVEN_HOME"
+  }
+} finally {
+  try { Remove-Item $TMP_DOWNLOAD_DIR -Recurse -Force | Out-Null }
+  catch { Write-Warning "Cannot remove $TMP_DOWNLOAD_DIR" }
+}
+
+Write-Output "MVN_CMD=$MAVEN_HOME/bin/$MVN_CMD"
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/common/AssetHistoryRepository.java">
+package com.dokkcorp.dashboard.common;
+
+public class AssetHistoryRepository {
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/common/HttpFetchService.java">
+package com.dokkcorp.dashboard.common;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class HttpFetchService {
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/features/crypto/btc/BtcDto.java">
+package com.dokkcorp.dashboard.features.crypto.btc;
+
+public class BtcDto {
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/features/crypto/btc/BtcService.java">
+package com.dokkcorp.dashboard.features.crypto.btc;
+
+public class BtcService {
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/jobs/BlockChainRequest.java">
+package com.dokkcorp.dashboard.jobs;
+
+import org.web3j.abi.FunctionEncoder;
+import org.web3j.abi.FunctionReturnDecoder;
+import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.Function;
+import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.generated.Uint256;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.Transaction;
+
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class BlockChainRequest {
+
+    public BigInteger readContract(Web3j web3j, String contractAddress, String functionName) throws Exception {
+
+        Function function = new Function(
+                functionName,
+                Collections.emptyList(),
+                Arrays.asList(new TypeReference<Uint256>() {
+                }));
+        String encodedData = FunctionEncoder.encode(function);
+
+        Transaction transaction = Transaction.createEthCallTransaction(null, contractAddress, encodedData);
+        String responseRaw = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST).send().getValue();
+
+        List<Type> decodedResponses = FunctionReturnDecoder.decode(responseRaw, function.getOutputParameters());
+
+        if (decodedResponses.isEmpty()) {
+            return BigInteger.ZERO;
+        } else {
+            return (BigInteger) decodedResponses.get(0).getValue();
+        }
+    }
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/providers/BlockChainClient.java">
+package com.dokkcorp.dashboard.providers;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.utils.Convert;
+import org.web3j.tx.ReadonlyTransactionManager;
+import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.contracts.eip20.generated.ERC20;
+
+import com.dokkcorp.dashboard.providers.dto.BlockChainDto;
+import com.dokkcorp.dashboard.jobs.BlockChainRequest;
+
+@Configuration
+public class BlockChainClient {
+
+        private final HyperEvmRpc hyperEvmRpc;
+
+        @Autowired
+        private Web3j web3j;
+
+        @Autowired
+        private BlockChainRequest blockChainRequest;
+
+        BlockChainClient(HyperEvmRpc hyperEvmRpc) {
+                this.hyperEvmRpc = hyperEvmRpc;
+        }
+
+        public BlockChainDto getBlockchainData() {
+
+                BridgedHype bridgedHype = fetchBridgedHype();
+                LiquidStaked liquidStaked = fetchLiquidStaked();
+
+                return new BlockChainDto(
+                                bridgedHype.bridgedHype(),
+                                liquidStaked.liquidStaked());
+        }
+
+        private BridgedHype fetchBridgedHype() {
+
+                BigInteger hypeWei = BigInteger.ZERO;
+                String bridgedHype = "0";
+
+                try {
+
+                        hypeWei = web3j
+                                        .ethGetBalance("0x2222222222222222222222222222222222222222",
+                                                        DefaultBlockParameterName.LATEST)
+                                        .send().getBalance();
+
+                        BigDecimal bridgedHypeTemp = new BigDecimal(1000000000)
+                                        .subtract(Convert.fromWei(hypeWei.toString(), Convert.Unit.ETHER));
+                        bridgedHype = bridgedHypeTemp.toPlainString();
+
+                } catch (Exception e) {
+
+                        return new BridgedHype("0");
+
+                }
+
+                return new BridgedHype(bridgedHype);
+
+        }
+
+        private LiquidStaked fetchLiquidStaked() {
+
+                // khype sthype kmhype
+
+                String liquidStaked = "0";
+                BigDecimal stHypeStaked = BigDecimal.ZERO;
+                BigDecimal khypeStaked = BigDecimal.ZERO;
+                BigDecimal mkhypeStaked = BigDecimal.ZERO;
+
+                // Création du manager en ReadOnly
+                ReadonlyTransactionManager txManager = new ReadonlyTransactionManager(web3j,
+                                "0x0000000000000000000000000000000000000000");
+
+                try {
+
+                        // sthype
+                        ERC20 stHypeContract = ERC20.load("0xfFaa4a3D97fE9107Cef8a3F48c069F577Ff76cC1", web3j,
+                                        txManager,
+                                        new DefaultGasProvider());
+                        BigInteger stHypeWei = stHypeContract.totalSupply().send();
+                        stHypeStaked = Convert.fromWei(stHypeWei.toString(), Convert.Unit.ETHER);
+
+                        // khype
+                        // buffer
+                        BigInteger bufferWei = web3j.ethGetBalance(
+                                        "0x393d0b87ed38fc779fd9611144ae649ba6082109",
+                                        DefaultBlockParameterName.LATEST)
+                                        .send()
+                                        .getBalance();
+                        BigDecimal khypeBuffer = Convert.fromWei(bufferWei.toString(), Convert.Unit.ETHER);
+
+                        // total staked
+                        BigInteger totalStakedWei = blockChainRequest.readContract(web3j,
+                                        "0x393D0B87Ed38fc779FD9611144aE649BA6082109", "totalStaked");
+                        BigDecimal khypeTotalStaked = Convert.fromWei(totalStakedWei.toString(), Convert.Unit.ETHER);
+
+                        // total claimed
+                        BigInteger totalClaimedWei = blockChainRequest.readContract(web3j,
+                                        "0x393D0B87Ed38fc779FD9611144aE649BA6082109", "totalClaimed");
+                        BigDecimal khypeTotalClaimed = Convert.fromWei(totalClaimedWei.toString(), Convert.Unit.ETHER);
+
+                        // In withdraw
+                        BigInteger inWithdrawWei = blockChainRequest.readContract(web3j,
+                                        "0x393D0B87Ed38fc779FD9611144aE649BA6082109", "totalQueuedWithdrawals");
+                        BigDecimal khypeInWithdraw = Convert.fromWei(inWithdrawWei.toString(), Convert.Unit.ETHER);
+
+                        // total
+                        khypeStaked = khypeTotalStaked.subtract(khypeTotalClaimed).add(khypeBuffer)
+                                        .add(khypeInWithdraw);
+
+                        // mkhype
+                        // total staked
+                        BigInteger mkhypeTotalStakedWei = blockChainRequest.readContract(web3j,
+                                        "0x5901e744759561C63309865Ef8822aBb041655E2", "totalStaked");
+                        BigDecimal mkhypeTotalStaked = Convert.fromWei(mkhypeTotalStakedWei.toString(),
+                                        Convert.Unit.ETHER);
+                        // total claimed
+                        BigInteger mkhypeTotalClaimedWei = blockChainRequest.readContract(web3j,
+                                        "0x5901e744759561C63309865Ef8822aBb041655E2", "totalClaimed");
+                        BigDecimal mkhypeTotalClaimed = Convert.fromWei(mkhypeTotalClaimedWei.toString(),
+                                        Convert.Unit.ETHER);
+
+                        mkhypeStaked = mkhypeTotalStaked.subtract(mkhypeTotalClaimed);
+
+                } catch (Exception e) {
+                        return new LiquidStaked("0");
+                }
+
+                // Compilation
+                BigDecimal liquidStakedTemp = stHypeStaked.add(khypeStaked).add(mkhypeStaked);
+                liquidStaked = liquidStakedTemp.toPlainString();
+
+                return new LiquidStaked(liquidStaked);
+
+        }
+
+        record BridgedHype(
+                        String bridgedHype) {
+        }
+
+        record LiquidStaked(
+                        String liquidStaked) {
+        }
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/providers/CoinGeckoClient.java">
+package com.dokkcorp.dashboard.providers;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+
+import com.dokkcorp.dashboard.providers.dto.CoinGeckoDto;
+import com.dokkcorp.dashboard.providers.dto.CoinGeckoHistoryDto;
+
+@Service
+public class CoinGeckoClient {
+
+    private final RestClient restClient;
+
+    public CoinGeckoClient(
+            RestClient.Builder builder,
+            @Value("${app.coingecko.api-key}") String apiKey,
+            @Value("${app.coingecko.base-url}") String baseUrl) {
+
+        this.restClient = builder
+                .baseUrl(baseUrl)
+                .defaultHeader("x-cg-demo-api-key", apiKey)
+                .build();
+    }
+
+    public CoinGeckoDto[] getData() {
+
+        CoinGeckoDto[] response = this.restClient
+                .get()
+                .uri("/coins/markets?vs_currency=usd&ids=hyperliquid")
+                .retrieve()
+                .body(CoinGeckoDto[].class);
+
+        return response;
+
+    }
+
+    public CoinGeckoHistoryDto getHistory() {
+
+        CoinGeckoHistoryDto response = this.restClient
+                .get()
+                .uri("/coins/hyperliquid/market_chart?vs_currency=usd&days=365&interval=daily")
+                .retrieve()
+                .body(CoinGeckoHistoryDto.class);
+
+        return response;
+
+    }
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/providers/dto/BlockChainDto.java">
+package com.dokkcorp.dashboard.providers.dto;
+
+public record BlockChainDto(
+        String bridgedHype,
+        String liquidStaked) {
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/providers/dto/CoinGeckoDto.java">
+package com.dokkcorp.dashboard.providers.dto;
+
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record CoinGeckoDto(
+
+        String symbol,
+
+        @JsonAlias("current_price") double currentPrice,
+
+        @JsonAlias("market_cap") double marketCap,
+
+        @JsonAlias("price_change_percentage_24h") double priceChangePercentage24h,
+
+        @JsonAlias("total_volume") double totalVolume) {
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/providers/dto/CoinGeckoHistoryDto.java">
+package com.dokkcorp.dashboard.providers.dto;
+
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record CoinGeckoHistoryDto(
+
+                List<List<Double>> prices
+
+) {
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/providers/dto/HyperliquidDto.java">
+package com.dokkcorp.dashboard.providers.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record HyperliquidDto(
+
+                String circulatingSupply,
+
+                String totalValueLocked,
+
+                String apr,
+
+                String dailyVolume,
+
+                String openInterest,
+
+                String stakingApr,
+
+                String maxSupply,
+
+                String hypeBurned,
+
+                String totalStakedHype) {
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/providers/HyperliquidClient.java">
+package com.dokkcorp.dashboard.providers;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+import tools.jackson.databind.JsonNode;
+
+import com.dokkcorp.dashboard.providers.dto.HyperliquidDto;
+
+@Service
+public class HyperliquidClient {
+
+        private final RestClient restClient;
+
+        public HyperliquidClient(RestClient.Builder builder) {
+
+                this.restClient = builder.baseUrl("https://api.hyperliquid.xyz").build();
+
+        }
+
+        public HyperliquidDto getHlData() {
+
+                CirculatingSupply supply = fetchTokenData();
+                ProviderHlp hlp = fetchProviderData();
+                Volume24H volume24H = fetchVolume24H();
+                OpenInterest openInterest = fetchOpenInterest();
+                Staking staking = fetchStaking();
+                MaxSupply maxSupply = fetchHypeBurned();
+
+                return new HyperliquidDto(
+                                supply.circulatingSupply(),
+                                hlp.totalValueLocked(),
+                                hlp.apr(),
+                                volume24H.dailyVolume(),
+                                openInterest.openInterest(),
+                                staking.stakingApr(),
+                                maxSupply.maxSupply(),
+                                maxSupply.hypeBurned(),
+                                staking.totalStakedHype());
+
+        }
+
+        private CirculatingSupply fetchTokenData() {
+                return this.restClient
+                                .post()
+                                .uri("/info")
+                                .header("Content-Type", "application/json")
+                                .body("{ \"type\": \"tokenDetails\", \"tokenId\": \"0x0d01dc56dcaaca66ad901c959b4011ec\" }")
+                                .retrieve()
+                                .body(CirculatingSupply.class);
+        }
+
+        private ProviderHlp fetchProviderData() {
+
+                JsonNode node = this.restClient
+                                .post()
+                                .uri("/info")
+                                .header("Content-Type", "application/json")
+                                .body("{ \"type\": \"vaultDetails\", \"vaultAddress\": \"0xdfc24b077bc1425ad1dea75bcb6f8158e10df303\" }")
+                                .retrieve()
+                                .body(JsonNode.class);
+
+                String apr = node.get("apr").asString();
+
+                JsonNode historyArray = node
+                                .get("portfolio")
+                                .get(0)
+                                .get(1)
+                                .get("accountValueHistory");
+
+                int lastIndex = historyArray.size() - 1;
+                String totalValueLocked = historyArray.get(lastIndex).get(1).asString();
+
+                return new ProviderHlp(totalValueLocked, apr);
+        }
+
+        private Volume24H fetchVolume24H() {
+                return this.restClient
+                                .post()
+                                .uri("/info")
+                                .header("Content-Type", "application/json")
+                                .body("{ \"type\": \"globalStats\"}")
+                                .retrieve()
+                                .body(Volume24H.class);
+        }
+
+        private OpenInterest fetchOpenInterest() {
+
+                double openInterest = 0;
+
+                JsonNode node = this.restClient
+                                .post()
+                                .uri("/info")
+                                .header("Content-Type", "application/json")
+                                .body("{ \"type\": \"metaAndAssetCtxs\"}")
+                                .retrieve()
+                                .body(JsonNode.class);
+
+                JsonNode assets = node.get(1);
+
+                for (int n = 0; n < assets.size(); n++) {
+                        JsonNode price = assets.get(n).get("oraclePx");
+                        JsonNode openInterestAsset = assets.get(n).get("openInterest");
+
+                        double openinterestDollar = price.asDouble() * openInterestAsset.asDouble();
+                        openInterest += openinterestDollar;
+                }
+
+                String totalOpenInterest = Double.toString(openInterest);
+
+                return new OpenInterest(totalOpenInterest);
+        }
+
+        private Staking fetchStaking() {
+
+                String stakingApr = "0";
+                double stakedHype = 0;
+                String totalStakedHype = "0";
+
+                JsonNode node = this.restClient
+                                .post()
+                                .uri("/info")
+                                .header("Content-Type", "application/json")
+                                .body("{ \"type\": \"validatorSummaries\"}")
+                                .retrieve()
+                                .body(JsonNode.class);
+
+                for (int n = 0; n < node.size(); n++) {
+                        if (node.get(n).get("name").asString().equals("CMI")) {
+                                stakingApr = Double.toString(
+                                                node.get(n).get("stats").get(2).get(1).get("predictedApr").asDouble()
+                                                                * 100);
+                        }
+                }
+
+                for (int n = 0; n < node.size(); n++) {
+
+                        if (node.get(n).get("isJailed").asBoolean() == false) {
+                                stakedHype += (node.get(n).get("stake").asDouble() / 100000000);
+                        }
+                }
+
+                totalStakedHype = Double.toString(stakedHype);
+
+                return new Staking(stakingApr, totalStakedHype);
+        }
+
+        private MaxSupply fetchHypeBurned() {
+
+                double burnedHype = 0;
+                String maxSupply = "";
+                String hypeBurned = "";
+
+                JsonNode node = this.restClient
+                                .post()
+                                .uri("/info")
+                                .header("Content-Type", "application/json")
+                                .body("{ \"type\": \"spotClearinghouseState\", \"user\": \"0xfefefefefefefefefefefefefefefefefefefefe\"}")
+                                .retrieve()
+                                .body(JsonNode.class);
+
+                JsonNode nodeBalance = node.get("balances");
+
+                for (int n = 0; n < nodeBalance.size(); n++) {
+                        if (nodeBalance.get(n).get("coin").asString().equals("HYPE")) {
+                                burnedHype = nodeBalance.get(n).get("total").asDouble();
+                                hypeBurned = String.valueOf(burnedHype);
+                                maxSupply = String.valueOf(1000000000 - burnedHype);
+                        }
+                }
+
+                return new MaxSupply(maxSupply, hypeBurned);
+        }
+
+        record CirculatingSupply(
+                        String circulatingSupply) {
+        }
+
+        record ProviderHlp(
+                        String totalValueLocked,
+                        String apr) {
+        }
+
+        record Volume24H(
+                        String dailyVolume) {
+        }
+
+        record OpenInterest(
+                        String openInterest) {
+        }
+
+        record Staking(
+                        String stakingApr,
+                        String totalStakedHype) {
+        }
+
+        record MaxSupply(
+                        String maxSupply,
+                        String hypeBurned) {
+        }
+
+}
+</file>
+
+<file path="backend/src/main/resources/application-prod.yml">
+spring:
+  docker:
+    compose:
+      enabled: false
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/dokkcorp_db
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+  jpa:
+    show-sql: false
+</file>
+
+<file path="backend/src/test/java/com/dokkcorp/dashboard/DashboardApplicationTests.java">
+package com.dokkcorp.dashboard;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class DashboardApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
+</file>
+
+<file path="frontend/.editorconfig">
+# Editor configuration, see https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.ts]
+quote_type = single
+ij_typescript_use_double_quotes = false
+
+[*.md]
+max_line_length = off
+trim_trailing_whitespace = false
+</file>
+
+<file path="frontend/.gitignore">
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# Node
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
+
+# System files
+.DS_Store
+Thumbs.db
+</file>
+
+<file path="frontend/.prettierrc">
+{
+  "printWidth": 100,
+  "singleQuote": true,
+  "overrides": [
+    {
+      "files": "*.html",
+      "options": {
+        "parser": "angular"
+      }
+    }
+  ]
+}
+</file>
+
+<file path="frontend/src/app/app.css">
+
+</file>
+
+<file path="frontend/src/app/core/components/footer/footer.css">
+
+</file>
+
+<file path="frontend/src/app/core/components/footer/footer.html">
+<footer
+    class="w-full bg-dark-900 border-t border-copper-500/20 py-3 mt-auto shadow-[0_-5px_15px_-3px_rgba(0,0,0,0.5)] relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col items-center justify-center space-y-2">
+            <!-- Logo + Nom -->
+            <div class="flex items-center space-x-2">
+                <img src="assets/images/logoDokkCorp.png" alt="Logo Dokk Corp." class="w-7 h-7 relative z-10">
+                <span
+                    class="md:text-lg text-md font-bold tracking-[0.2em] uppercase bg-gradient-to-r from-copper-500 via-copper-300 to-copper-500 text-transparent bg-clip-text drop-shadow-[0_0_5px_rgba(184,115,51,0.2)]">
+                    Dokk Corp.
+                </span>
+            </div>
+            <!-- Copyright xD -->
+            <p class="md:text-sm text-xs text-center text-copper-400/50 font-medium tracking-widest uppercase">
+                &copy; {{ currentYear }} Dokk Corp. Tous droits réservés.
+            </p>
+        </div>
+    </div>
+</footer>
+</file>
+
+<file path="frontend/src/app/core/components/footer/footer.spec.ts">
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { Footer } from './footer';
+
+describe('Footer', () => {
+  let component: Footer;
+  let fixture: ComponentFixture<Footer>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [Footer],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(Footer);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+</file>
+
+<file path="frontend/src/app/core/components/footer/footer.ts">
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-footer',
+  imports: [],
+  templateUrl: './footer.html',
+  styleUrl: './footer.css',
+})
+export class Footer {
+  currentYear = new Date().getFullYear();
+}
+</file>
+
+<file path="frontend/src/app/core/components/navbar/navbar.css">
+
+</file>
+
+<file path="frontend/src/app/core/components/navbar/navbar.html">
+<nav class="w-full bg-dark-900 border-b border-copper-500/20 shadow-lg shadow-black/50 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div class="flex items-center h-16 w-full justify-between">
+
+            <!-- Partie gauche -->
+            <div class="flex gap-2items-center relative z-10">
+                <!-- Home -->
+                <button routerLink=""
+                    class="p-2 rounded-lg text-copper-400 hover:text-copper-300 hover:bg-copper-600/20 hover:shadow-[0_0_15px_rgba(184,115,51,0.2)] transition-all duration-300 group cursor-pointer focus:outline-none">
+                    <lucide-icon [img]="Home"
+                        class="w-5 h-5 group-hover:-translate-y-0.5 group-hover:scale-110 transition-all duration-300"></lucide-icon>
+                </button>
+
+            </div>
+
+            <!-- Titre -->
+            <div class="flex items-center pointer-events-none z-10">
+                <span
+                    class="p-2 md:text-2xl text-xl font-black tracking-[0.25em] uppercase bg-gradient-to-r from-copper-500 via-copper-300 to-copper-500 bg-[length:200%_auto] text-transparent bg-clip-text">
+                    Dashboard
+                </span>
+            </div>
+
+            <!-- Partie droite -->
+            <div class="flex items-center z-10">
+                <!-- Menu burger -->
+                <button
+                    class="p-2 rounded-lg text-copper-400 hover:text-copper-300 hover:bg-copper-600/20 hover:shadow-[0_0_15px_rgba(184,115,51,0.2)] transition-all duration-300 group cursor-pointer focus:outline-none">
+                    <lucide-icon [img]="Menu"
+                        class="w-5 h-5 group-hover:-translate-y-0.5 group-hover:scale-110 transition-all duration-300"></lucide-icon>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</nav>
+</file>
+
+<file path="frontend/src/app/core/components/navbar/navbar.spec.ts">
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { Navbar } from './navbar';
+
+describe('Navbar', () => {
+  let component: Navbar;
+  let fixture: ComponentFixture<Navbar>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [Navbar],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(Navbar);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+</file>
+
+<file path="frontend/src/app/core/components/navbar/navbar.ts">
+import { Component } from '@angular/core';
+import { LucideAngularModule, Home, Menu } from 'lucide-angular';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-navbar',
+  imports: [LucideAngularModule, RouterLink],
+  templateUrl: './navbar.html',
+  styleUrl: './navbar.css',
+})
+export class Navbar {
+
+  readonly Home = Home;
+  readonly Menu = Menu;
+
+}
+</file>
+
+<file path="frontend/src/app/core/models/asset.model.ts">
+export interface AssetModel {
+    id: string;
+    name: string;
+    symbol: string;
+    logoPath: string;
+    type: 'CRYPTO' | 'STOCK' | 'ETF';
+    currentPrice: number;
+    variation24h: number;
+    volume24h: number;
+}
+</file>
+
+<file path="frontend/src/app/core/services/api.ts">
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class Api {}
+</file>
+
+<file path="frontend/src/app/features/crypto/btc/btc.css">
+
+</file>
+
+<file path="frontend/src/app/features/crypto/btc/btc.html">
+<p>btc-detail works!</p>
+</file>
+
+<file path="frontend/src/app/features/crypto/btc/btc.ts">
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-btc',
+  imports: [],
+  templateUrl: './btc.html',
+  styleUrl: './btc.css',
+})
+export class Btc { }
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/form-hype-projection/form-hype-projection.css">
+
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/form-hype-projection/form-hype-projection.html">
+<div
+    class="relative w-full bg-dark-800/40 backdrop-blur-md border border-copper-500/20 rounded-2xl p-6 shadow-xl shadow-black/50 overflow-hidden group hover:border-copper-500/40 hover:bg-dark-800/60 transition-all duration-500 flex flex-col h-full">
+
+    <!-- Lueur subtile en fond au hover -->
+    <div
+        class="absolute -top-16 -right-16 w-32 h-32 bg-copper-500/5 rounded-full blur-[40px] pointer-events-none group-hover:bg-copper-500/15 transition-all duration-700">
+    </div>
+
+    <h3
+        class="text-copper-300 text-xs font-black uppercase tracking-[0.2em] mb-5 pb-3 border-b border-copper-500/20 drop-shadow-sm flex items-center relative z-10">
+        <span class="w-1.5 h-1.5 bg-copper-500 mr-2 rounded-sm shadow-[0_0_8px_rgba(184,115,51,0.6)]"></span>
+        Staking Projection
+    </h3>
+
+    <!-- Input section -->
+    <div class="relative z-10 mb-6 flex flex-col gap-4">
+        
+        <div class="grid grid-cols-2 gap-4">
+            <!-- HYPE Amount -->
+            <div class="flex flex-col gap-2">
+                <label for="hypeAmount" class="text-copper-300/60 text-xs font-semibold tracking-wide uppercase">
+                    Hype staked
+                </label>
+                <div class="relative">
+                    <input id="hypeAmount" type="number"
+                        class="w-full bg-dark-900/50 border border-copper-500/30 rounded-lg px-4 py-3 text-copper-100 font-mono text-lg focus:outline-none focus:border-copper-500 focus:ring-1 focus:ring-copper-500/50 transition-all placeholder-copper-500/30"
+                        style="-moz-appearance: textfield; appearance: textfield;" placeholder="0"
+                        [formControl]="hypeProjection" autocomplete="off" />
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 text-copper-400/50 font-bold text-sm">HYPE</div>
+                </div>
+            </div>
+
+            <!-- Projected Price -->
+            <div class="flex flex-col gap-2">
+                <label for="projectedPrice" class="text-copper-300/60 text-xs font-semibold tracking-wide uppercase">
+                    Projected Price
+                </label>
+                <div class="relative">
+                    <input id="projectedPrice" type="number" step="0.01"
+                        class="w-full bg-dark-900/50 border border-copper-500/30 rounded-lg px-4 py-3 text-copper-100 font-mono text-lg focus:outline-none focus:border-copper-500 focus:ring-1 focus:ring-copper-500/50 transition-all placeholder-copper-500/30"
+                        style="-moz-appearance: textfield; appearance: textfield;" [placeholder]="currentPrice()"
+                        [formControl]="priceProjection" autocomplete="off" />
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 text-copper-400/50 font-bold text-sm">$</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mt-2 px-1 text-[11px] font-medium text-copper-300/50">
+            <span>Current APR: <span class="text-blue-400">{{ stakingAprStr }}%</span></span>
+            <span>Projected value: <span class="text-emerald-400">{{ projectedValueUsd() }} $</span></span>
+            <span>Current price : <span class="text-emerald-400">{{ currentPrice() }} $</span></span>
+        </div>
+    </div>
+
+    <!-- Results section -->
+    <div class="relative z-10 flex flex-col gap-2 mt-auto">
+
+        <!-- Yearly -->
+        <div
+            class="flex justify-between items-center bg-white/[0.02] p-3 rounded-lg border border-white/[0.02] hover:bg-white/[0.04] transition-colors">
+            <span class="text-copper-300/80 text-sm font-medium">Yearly</span>
+            <div class="flex flex-col items-end">
+                <span class="font-mono font-bold text-copper-100">{{hypeProjectionYearly()}} <span
+                        class="text-[10px] text-copper-300/50">HYPE</span></span>
+                <span class="font-mono text-sm text-emerald-400 font-medium">≈ {{hypeProjectionYearlyUsd()}}
+                    $</span>
+            </div>
+        </div>
+
+        <!-- Monthly -->
+        <div
+            class="flex justify-between items-center bg-white/[0.02] p-3 rounded-lg border border-white/[0.02] hover:bg-white/[0.04] transition-colors">
+            <span class="text-copper-300/80 text-sm font-medium">Monthly</span>
+            <div class="flex flex-col items-end">
+                <span class="font-mono font-bold text-copper-100">{{hypeProjectionMonthly()}} <span
+                        class="text-[10px] text-copper-300/50">HYPE</span></span>
+                <span class="font-mono text-sm text-emerald-400 font-medium">≈ {{hypeProjectionMonthlyUsd()}}
+                    $</span>
+            </div>
+        </div>
+
+        <!-- Weekly -->
+        <div
+            class="flex justify-between items-center bg-white/[0.02] p-3 rounded-lg border border-white/[0.02] hover:bg-white/[0.04] transition-colors">
+            <span class="text-copper-300/80 text-sm font-medium">Weekly</span>
+            <div class="flex flex-col items-end">
+                <span class="font-mono font-bold text-copper-100">{{hypeProjectionWeekly()}} <span
+                        class="text-[10px] text-copper-300/50">HYPE</span></span>
+                <span class="font-mono text-sm text-emerald-400 font-medium">≈ {{hypeProjectionWeeklyUsd()}}
+                    $</span>
+            </div>
+        </div>
+
+        <!-- Daily -->
+        <div
+            class="flex justify-between items-center bg-white/[0.02] p-3 rounded-lg border border-white/[0.02] hover:bg-white/[0.04] transition-colors">
+            <span class="text-copper-300/80 text-sm font-medium">Daily</span>
+            <div class="flex flex-col items-end">
+                <span class="font-mono font-bold text-copper-100">{{hypeProjectionDaily()}} <span
+                        class="text-[10px] text-copper-300/50">HYPE</span></span>
+                <span class="font-mono text-sm text-emerald-400 font-medium">≈ {{hypeProjectionDailyUsd()}} $</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/form-hype-projection/form-hype-projection.spec.ts">
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { FormHypeProjection } from './form-hype-projection';
+
+describe('FormHypeProjection', () => {
+  let component: FormHypeProjection;
+  let fixture: ComponentFixture<FormHypeProjection>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [FormHypeProjection],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(FormHypeProjection);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/form-hype-projection/form-hype-projection.ts">
+import { Component, computed, input } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { formatNumber } from '../../services/format-number';
+
+@Component({
+  selector: 'app-form-hype-projection',
+  imports: [ReactiveFormsModule,],
+  templateUrl: './form-hype-projection.html',
+  styleUrl: './form-hype-projection.css',
+})
+export class FormHypeProjection {
+
+  currentPrice = input<number>(0);
+  stakingApr = input<string>('0');
+
+  stakingAprRaw = computed(() => Number(this.stakingApr()) / 100);
+
+  get stakingAprStr(): string {
+    return formatNumber(this.stakingAprRaw() * 100);
+  }
+
+  hypeProjection = new FormControl<number | null>(null);
+  hypeProjectionAmount = toSignal(this.hypeProjection.valueChanges, { initialValue: null });
+
+  priceProjection = new FormControl<number | null>(null);
+  projectedPriceValue = toSignal(this.priceProjection.valueChanges, { initialValue: null });
+
+  effectivePrice = computed(() => {
+    const projected = this.projectedPriceValue();
+    const current = this.currentPrice();
+    return projected !== null && projected !== undefined && projected > 0 ? projected : current;
+  });
+
+  projectedValueUsd = computed(() => formatNumber((this.hypeProjectionAmount() || 0) * this.effectivePrice()));
+
+  private yearlyRaw = computed(() => (this.hypeProjectionAmount() || 0) * this.stakingAprRaw());
+
+  hypeProjectionYearly = computed(() => formatNumber(this.yearlyRaw()));
+  hypeProjectionMonthly = computed(() => formatNumber(this.yearlyRaw() / 12));
+  hypeProjectionWeekly = computed(() => formatNumber(this.yearlyRaw() / 52));
+  hypeProjectionDaily = computed(() => formatNumber(this.yearlyRaw() / 365));
+
+  hypeProjectionYearlyUsd = computed(() => formatNumber(this.yearlyRaw() * this.effectivePrice()));
+  hypeProjectionMonthlyUsd = computed(() => formatNumber((this.yearlyRaw() / 12) * this.effectivePrice()));
+  hypeProjectionWeeklyUsd = computed(() => formatNumber((this.yearlyRaw() / 52) * this.effectivePrice()));
+  hypeProjectionDailyUsd = computed(() => formatNumber((this.yearlyRaw() / 365) * this.effectivePrice()));
+
+
+
+
+
+
+
+
+
+}
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-flux-chart/hype-flux-chart.css">
+
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-flux-chart/hype-flux-chart.spec.ts">
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { HypeFluxChart } from './hype-flux-chart';
+
+describe('HypeFluxChart', () => {
+  let component: HypeFluxChart;
+  let fixture: ComponentFixture<HypeFluxChart>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [HypeFluxChart],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(HypeFluxChart);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-metric-card/hype-metric-card.css">
+
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-metric-card/hype-metric-card.spec.ts">
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { HypeMetricCard } from './hype-metric-card';
+
+describe('HypeMetricCard', () => {
+  let component: HypeMetricCard;
+  let fixture: ComponentFixture<HypeMetricCard>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [HypeMetricCard],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(HypeMetricCard);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-metric-card/hype-metric-card.ts">
+import { Component, Input } from '@angular/core';
+import { MetricCard } from '../metric-card-model-hype';
+import { DecimalPipe } from '@angular/common';
+
+@Component({
+  selector: 'app-hype-metric-card',
+  imports: [DecimalPipe],
+  templateUrl: './hype-metric-card.html',
+  styleUrl: './hype-metric-card.css',
+})
+export class HypeMetricCard {
+  @Input({ required: true }) card!: MetricCard;
+}
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-supply-distribution/hype-supply-distribution.css">
+
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-supply-distribution/hype-supply-distribution.html">
+<div
+    class="relative w-full bg-dark-800/40 backdrop-blur-md border border-copper-500/20 rounded-2xl p-6 shadow-xl shadow-black/50 overflow-hidden group hover:border-copper-500/40 hover:bg-dark-800/60 transition-all duration-500 h-full flex flex-col">
+
+    <!-- Lueur subtile en fond au hover -->
+    <div
+        class="absolute -top-16 -right-16 w-32 h-32 bg-copper-500/5 rounded-full blur-[40px] pointer-events-none group-hover:bg-copper-500/15 transition-all duration-700">
+    </div>
+
+    <h3
+        class="text-copper-300 text-xs font-black uppercase tracking-[0.2em] mb-5 pb-3 border-b border-copper-500/20 drop-shadow-sm flex items-center relative z-10">
+        <!-- Petit carré d'accent -->
+        <span class="w-1.5 h-1.5 bg-copper-500 mr-2 rounded-sm shadow-[0_0_8px_rgba(184,115,51,0.6)]"></span>
+        Supply Distribution
+    </h3>
+
+    <div class="relative z-10 flex-grow min-h-[250px] w-full flex items-center justify-center">
+        <canvas #chartCanvas></canvas>
+    </div>
+</div>
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-supply-distribution/hype-supply-distribution.spec.ts">
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { HypeSupplyDistribution } from './hype-supply-distribution';
+
+describe('HypeSupplyDistribution', () => {
+  let component: HypeSupplyDistribution;
+  let fixture: ComponentFixture<HypeSupplyDistribution>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [HypeSupplyDistribution],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(HypeSupplyDistribution);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-supply-distribution/hype-supply-distribution.ts">
+import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Chart, registerables } from 'chart.js';
+import { formatNumber } from '../../services/format-number';
+
+Chart.register(...registerables);
+
+@Component({
+  selector: 'app-hype-supply-distribution',
+  imports: [],
+  templateUrl: './hype-supply-distribution.html',
+  styleUrl: './hype-supply-distribution.css',
+})
+export class HypeSupplyDistribution implements AfterViewInit, OnChanges {
+
+  @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
+  @Input() circulatingSupply: string = '';
+  @Input() maxSupply: string = '';
+  @Input() hypeBurned100: string = '';
+
+  private chart: Chart | undefined;
+
+  ngAfterViewInit() {
+    this.createChart();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (this.chart) {
+      this.updateChart();
+    }
+  }
+
+  private updateChart() {
+    if (!this.chart) return;
+
+    const ORIGINAL_TOTAL_SUPPLY = 1000000000;
+    const currentMaxSupply = parseFloat(this.maxSupply) || ORIGINAL_TOTAL_SUPPLY;
+    const circulating = parseFloat(this.circulatingSupply) || 0;
+
+    const burned = Math.max(0, ORIGINAL_TOTAL_SUPPLY - currentMaxSupply);
+    const unissued = Math.max(0, currentMaxSupply - circulating);
+
+    this.chart.data.datasets[0].data = [circulating, burned, unissued];
+    this.chart.update();
+  }
+
+  private createChart() {
+    const ctx = this.chartCanvas.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const ORIGINAL_TOTAL_SUPPLY = 1000000000;
+    const currentMaxSupply = parseFloat(this.maxSupply) || ORIGINAL_TOTAL_SUPPLY;
+    const circulating = parseFloat(this.circulatingSupply) || 0;
+
+    const burned = Math.max(0, ORIGINAL_TOTAL_SUPPLY - currentMaxSupply);
+    const unissued = Math.max(0, currentMaxSupply - circulating);
+
+    this.chart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: [
+          'Circulating',
+          'Burned',
+          'Unissued'
+        ],
+        datasets: [{
+          data: [circulating, burned, unissued],
+          backgroundColor: [
+            'rgba(217, 119, 54, 0.85)', // Vibrant Copper
+            'rgba(122, 46, 13, 0.85)',  // Dark Burnt Copper
+            'rgba(184, 115, 51, 0.1)'   // Transparent/Hollow Copper
+          ],
+          borderColor: [
+            'rgba(253, 186, 116, 1)',   // Bright highlight
+            'rgba(217, 119, 54, 1)',    // Medium highlight
+            'rgba(184, 115, 51, 0.4)'   // Subtle highlight
+          ],
+          borderWidth: 2,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: 'rgba(253, 186, 116, 0.8)',
+              padding: 20,
+              font: {
+                family: "'Inter', sans-serif",
+                size: 11
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+            titleColor: 'rgba(253, 186, 116, 1)',
+            bodyColor: '#f0e5e2ff',
+            borderColor: 'rgba(184, 115, 51, 0.3)',
+            borderWidth: 1,
+            padding: 10,
+            callbacks: {
+              label: function (context) {
+                let label = context.label || '';
+                if (label) {
+                  label += ': ';
+                }
+                if (context.parsed !== null) {
+                  label += formatNumber(context.parsed) + ' HYPE';
+                }
+                return label;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype.css">
+
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/metric-card-model-hype.ts">
+export interface MetricRow {
+    label: string;
+    value: string;
+    colorClass?: string;
+    variation?: number;
+    ratio?: string;
+}
+
+export interface MetricCard {
+    title: string;
+    metrics: MetricRow[];
+
+}
+</file>
+
+<file path="frontend/src/app/features/crypto/services/crypto-api.ts">
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class CryptoApi {}
+</file>
+
+<file path="frontend/src/app/features/crypto/services/format-dates.ts">
+export function formatTime(timestamp: number | undefined | null): string {
+    if (!timestamp) return '--:--';
+
+    const date = new Date(timestamp);
+
+    // On récupère les heures et minutes et on s'assure d'avoir 2 chiffres (ex: 09:05)
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+    return `${hours}:${minutes}`;
+}
+</file>
+
+<file path="frontend/src/app/features/crypto/services/format-number.ts">
+export function formatNumber(num: number | undefined | null): string {
+    if (num === null || num === undefined) return '0';
+
+    const absNum = Math.abs(num);
+
+    if (absNum >= 1.0e+9) {
+        return (num / 1.0e+9).toFixed(2).replace(/\.00$/, '') + 'B';
+    }
+    if (absNum >= 1.0e+6) {
+        return (num / 1.0e+6).toFixed(2).replace(/\.00$/, '') + 'M';
+    }
+    if (absNum >= 1.0e+3) {
+        return (num / 1.0e+3).toFixed(2).replace(/\.00$/, '') + 'K';
+    }
+
+
+    return num.toFixed(2).replace(/\.00$/, '');
+}
+</file>
+
+<file path="frontend/src/app/features/crypto/services/notif.ts">
+export class NotificationService {
+    private notificationSound: HTMLAudioElement;
+
+    constructor() {
+        this.notificationSound = new Audio();
+        this.notificationSound.src = 'assets/sounds/notif.mp3';
+    }
+
+    playNotification() {
+        this.notificationSound.currentTime = 0;
+        this.notificationSound.play();
+    }
+}
+</file>
+
+<file path="frontend/src/app/features/dashboard/dashboard.css">
+
+</file>
+
+<file path="frontend/src/app/features/dashboard/dashboard.html">
+<div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col flex-grow">
+
+    <div class="flex flex-col items-center gap-2 mb-8">
+        <h1 class="text-4xl font-bold">Assets disponibles</h1>
+    </div>
+
+    <div class="flex flex-wrap gap-8 justify-center">
+        <app-asset-dashboard-card asset="hype"></app-asset-dashboard-card>
+        <app-asset-dashboard-card asset="placeholder"></app-asset-dashboard-card>
+        <app-asset-dashboard-card asset="placeholder"></app-asset-dashboard-card>
+        <app-asset-dashboard-card asset="placeholder"></app-asset-dashboard-card>
+        <app-asset-dashboard-card asset="placeholder"></app-asset-dashboard-card>
+        <app-asset-dashboard-card asset="placeholder"></app-asset-dashboard-card>
+        <app-asset-dashboard-card asset="placeholder"></app-asset-dashboard-card>
+        <app-asset-dashboard-card asset="placeholder"></app-asset-dashboard-card>
+        <app-asset-dashboard-card asset="placeholder"></app-asset-dashboard-card>
+        <app-asset-dashboard-card asset="placeholder"></app-asset-dashboard-card>
+        <app-asset-dashboard-card asset="placeholder"></app-asset-dashboard-card>
+        <app-asset-dashboard-card asset="placeholder"></app-asset-dashboard-card>
+    </div>
+</div>
+</file>
+
+<file path="frontend/src/app/features/dashboard/dashboard.ts">
+import { Component } from '@angular/core';
+import { AssetDashboardCard } from '../../shared/components/asset-dashboard-card/asset-dashboard-card';
+
+@Component({
+  selector: 'app-dashboard',
+  imports: [AssetDashboardCard],
+  templateUrl: './dashboard.html',
+  styleUrl: './dashboard.css',
+})
+export class Dashboard { }
+</file>
+
+<file path="frontend/src/app/shared/components/asset-dashboard-card/asset-dashboard-card.css">
+
+</file>
+
+<file path="frontend/src/app/shared/components/asset-dashboard-card/asset-dashboard-card.html">
+<button routerLink="/{{asset}}"
+    class="group relative w-60 flex flex-col items-center p-6 rounded-2xl bg-dark-800/40 backdrop-blur-md border border-copper-500/20 shadow-lg shadow-black/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(184,115,51,0.2)] hover:border-copper-500/50 cursor-pointer overflow-hidden">
+
+
+
+    <!-- Lueur au survol -->
+    <div
+        class="absolute inset-0 bg-gradient-to-b from-transparent to-copper-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+    </div>
+
+    <!-- Logo -->
+    <div
+        class="relative w-16 h-16 flex items-center justify-center mb-2 transform transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-1 z-10">
+        <!-- Effet de halo cuivré autour du logo -->
+        <div
+            class="absolute inset-0 rounded-full bg-copper-500/20 blur-md group-hover:bg-copper-500/40 transition-all duration-300">
+        </div>
+        <img [src]="logo" alt="Logo de {{asset}}"
+            class="relative z-10 w-full h-full object-contain filter drop-shadow-[0_0_4px_rgba(255,255,255,0.1)]">
+    </div>
+
+    <!-- Nom -->
+    <h3 class="text-lg font-bold text-white tracking-widest uppercase mb-1 z-10 drop-shadow-sm">
+        {{name}}
+    </h3>
+
+    <!-- Ligne de séparation élégante -->
+    <div
+        class="w-8 h-[2px] bg-copper-500/40 rounded-full mb-3 z-10 transition-all duration-300 group-hover:w-16 group-hover:bg-copper-400">
+    </div>
+
+    <!-- Prix -->
+    <p
+        class="text-2xl font-black bg-gradient-to-r from-copper-300 to-copper-500 text-transparent bg-clip-text drop-shadow-sm z-10">
+        0.00 CHF
+    </p>
+
+    <!-- Placeholder de variation a voir
+    <span class="text-xs font-semibold mt-2 text-green-400 bg-green-400/10 border border-green-400/20 px-3 py-1 rounded-full z-10 tracking-widest">
+      +0.0%
+    </span>
+    -->
+
+</button>
+</file>
+
+<file path="frontend/src/app/shared/components/asset-dashboard-card/asset-dashboard-card.spec.ts">
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { AssetDashboardCard } from './asset-dashboard-card';
+
+describe('AssetDashboardCard', () => {
+  let component: AssetDashboardCard;
+  let fixture: ComponentFixture<AssetDashboardCard>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [AssetDashboardCard],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(AssetDashboardCard);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+</file>
+
+<file path="frontend/src/app/shared/components/asset-dashboard-card/asset-dashboard-card.ts">
+import { Component, Input, OnInit } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-asset-dashboard-card',
+  imports: [RouterLink],
+  templateUrl: './asset-dashboard-card.html',
+  styleUrl: './asset-dashboard-card.css',
+})
+export class AssetDashboardCard implements OnInit {
+
+  @Input() asset: string = "";
+
+  logo: string = "";
+  name: string = "";
+  link: string = "";
+
+  ngOnInit() {
+    if (this.asset === "placeholder") {
+      this.logo = "assets/logos/placeholder.png";
+      this.name = "À venir !";
+      this.link = "/dashboard";
+    } else {
+      this.logo = "assets/logos/" + this.asset + ".png";
+      this.name = this.asset.toUpperCase();
+      this.link = "/" + this.asset;
+    }
+  }
+
+}
+</file>
+
+<file path="frontend/src/app/shared/components/asset-main-card/asset-main-card.css">
+
+</file>
+
+<file path="frontend/src/app/shared/components/asset-main-card/asset-main-card.spec.ts">
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { AssetMainCard } from './asset-main-card';
+
+describe('AssetMainCard', () => {
+  let component: AssetMainCard;
+  let fixture: ComponentFixture<AssetMainCard>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [AssetMainCard],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(AssetMainCard);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+</file>
+
+<file path="frontend/src/app/shared/components/asset-main-card/asset-main-card.ts">
+import { Component, Input } from '@angular/core';
+import { formatTime } from '../../../features/crypto/services/format-dates';
+import { formatNumber } from '../../../features/crypto/services/format-number';
+import { DecimalPipe } from '@angular/common';
+
+@Component({
+  selector: 'app-asset-main-card',
+  imports: [DecimalPipe],
+  templateUrl: './asset-main-card.html',
+  styleUrl: './asset-main-card.css',
+})
+export class AssetMainCard {
+
+  public formatTime = formatTime;
+  public formatNumber = formatNumber;
+
+  @Input() asset: string = "";
+  @Input() symbol: string = "";
+  @Input() change24h: number = 0;
+  @Input() volume24h: number = 0;
+  @Input() marketCap: number = 0;
+  @Input() actualPrice: number = 0;
+  @Input() lastRefresh: number = 0;
+}
+</file>
+
+<file path="frontend/src/app/shared/components/background/background.css">
+
+</file>
+
+<file path="frontend/src/app/shared/components/background/background.html">
+<div class="absolute inset-0 w-full h-full z-0 overflow-hidden">
+    <img src="assets/images/background.png" alt="background noir avec zébrures en cuivre"
+        class="w-full h-full object-cover object-center opacity-60">
+
+    <!-- effet filtre dégradé -->
+    <div class="absolute inset-0 bg-gradient-to-b from-dark-900/60 via-dark-900/30 to-dark-900/90 pointer-events-none">
+    </div>
+</div>
+</file>
+
+<file path="frontend/src/app/shared/components/background/background.spec.ts">
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { Background } from './background';
+
+describe('Background', () => {
+  let component: Background;
+  let fixture: ComponentFixture<Background>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [Background],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(Background);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+</file>
+
+<file path="frontend/src/app/shared/components/background/background.ts">
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-background',
+  imports: [],
+  templateUrl: './background.html',
+  styleUrl: './background.css',
+})
+export class Background {}
+</file>
+
+<file path="frontend/src/app/shared/components/daily-chart/daily-chart.html">
+<div class="daily-chart-container">
+  <canvas #chartCanvas></canvas>
+</div>
+</file>
+
+<file path="frontend/src/app/shared/components/daily-chart/daily-chart.spec.ts">
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { DailyChart } from './daily-chart';
+
+describe('DailyChart', () => {
+  let component: DailyChart;
+  let fixture: ComponentFixture<DailyChart>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DailyChart],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(DailyChart);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+</file>
+
+<file path="frontend/src/app/shared/components/price-chart/price-chart.html">
+<div class="chart-container">
+  <canvas #chartCanvas></canvas>
+</div>
+</file>
+
+<file path="frontend/src/environments/environment.ts">
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8080'
+};
+</file>
+
+<file path="frontend/src/styles.css">
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+</file>
+
+<file path="frontend/tsconfig.json">
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve"
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
+}
+</file>
+
+<file path=".gitignore">
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Securite ###
+.env
+/backend/src/main/resources/application-local.yml
+/backend/src/main/resources/application-dev.yml
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/DashboardApplication.java">
+package com.dokkcorp.dashboard;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.client.RestClient;
+
+@SpringBootApplication
+@EnableScheduling
+public class DashboardApplication {
+
+	@Bean //test
+	public static RestClient.Builder restClientBuilder() {
+		return RestClient.builder();
+	}
+
+	public static void main(String[] args) {
+		SpringApplication.run(DashboardApplication.class, args);
+	}
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/model/entity/AssetDaily.java">
+package com.dokkcorp.dashboard.model.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name = "asset_daily")
+public class AssetDaily {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String symbol;
+    private Double currentPrice;
+    private Double marketCap;
+    private Double priceChangePercentage24h;
+    private Double totalVolume;
+    private Long lastRefresh;
+    private String burnedHype;
+    private String circulatingSupply;
+    private String feesDaily;
+    private String dailyVolume;
+    private String openInterest;
+    private String totalValueLocked;
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/model/entity/AssetSnapshot.java">
+package com.dokkcorp.dashboard.model.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name = "asset_snapshot")
+public class AssetSnapshot {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String symbol;
+    private Double price;
+    private Long day;
+    private Double volume24h;
+    private Double fees24h;
+    private Double hlpProvider;
+    private Double openInterest;
+    private String burnedHype;
+    private String circulatingSupply;
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/providers/HyperEvmRpc.java">
+package com.dokkcorp.dashboard.providers;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.http.HttpService;
+
+@Configuration
+public class HyperEvmRpc {
+
+    @org.springframework.beans.factory.annotation.Value("${app.blockchain.rpc-url}")
+    private String rpcUrl;
+
+    @Bean
+    public Web3j web3j() {
+        return Web3j.build(new HttpService(rpcUrl));
+    }
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/repository/AssetDailyRepository.java">
+package com.dokkcorp.dashboard.repository;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.dokkcorp.dashboard.model.entity.AssetDaily;
+
+import jakarta.transaction.Transactional;
+
+@Repository
+public interface AssetDailyRepository extends JpaRepository<AssetDaily, Long> {
+
+    Optional<AssetDaily> findFirstBySymbolOrderByLastRefreshDesc(String symbol);
+
+    List<AssetDaily> findTop144BySymbolOrderByLastRefreshDesc(String symbol);
+
+    @Transactional
+    void deleteByLastRefreshBefore(Long timestamp);
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/repository/AssetSnapshotRepository.java">
+package com.dokkcorp.dashboard.repository;
+
+import java.util.Optional;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
+
+@Repository
+public interface AssetSnapshotRepository extends JpaRepository<AssetSnapshot, Long> {
+
+    Optional<AssetSnapshot> findFirstByOrderByDayDesc();
+
+    Optional<AssetSnapshot> findFirstBySymbolOrderByDayDesc(String symbol);
+
+    List<AssetSnapshot> findTop365BySymbolOrderByDayDesc(String symbol);
+
+    void deleteByDayBefore(Long timestamp);
+}
+</file>
+
+<file path="frontend/package.json">
+{
+  "name": "dokkcorp-frontend",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "private": true,
+  "packageManager": "npm@11.6.2",
+  "dependencies": {
+    "@angular/common": "^21.2.0",
+    "@angular/compiler": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/forms": "^21.2.0",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/router": "^21.2.0",
+    "chart.js": "^4.5.1",
+    "lucide-angular": "^1.0.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.2.7",
+    "@angular/cli": "^21.2.7",
+    "@angular/compiler-cli": "^21.2.0",
+    "autoprefixer": "^10.5.0",
+    "jsdom": "^28.0.0",
+    "postcss": "^8.5.10",
+    "prettier": "^3.8.1",
+    "tailwindcss": "^3.4.19",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
+  }
+}
+</file>
+
+<file path="frontend/README.md">
+# DokkcorpFrontend
+
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
+
+## Development server
+
+To start a local development server, run:
+
+```bash
+ng serve
+```
+
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+
+## Code scaffolding
+
+Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+
+```bash
+ng generate component component-name
+```
+
+For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+
+```bash
+ng generate --help
+```
+
+## Building
+
+To build the project run:
+
+```bash
+ng build
+```
+
+This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+
+## Running unit tests
+
+To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+
+```bash
+ng test
+```
+
+## Running end-to-end tests
+
+For end-to-end (e2e) testing, run:
+
+```bash
+ng e2e
+```
+
+Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+
+## Additional Resources
+
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+</file>
+
+<file path="frontend/src/app/app.config.ts">
+import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideBrowserGlobalErrorListeners(), 
+    provideRouter(routes),
+    provideHttpClient()
+  ],
+};
+</file>
+
+<file path="frontend/src/app/app.html">
+<div class="flex flex-col min-h-screen bg-dark-900 text-white font-sans">
+  <app-navbar></app-navbar>
+
+  <main class="flex-grow relative flex flex-col w-full overflow-x-hidden">
+    <app-background></app-background>
+    <router-outlet></router-outlet>
+  </main>
+
+  <app-footer></app-footer>
+</div>
+</file>
+
+<file path="frontend/src/app/app.routes.ts">
+import { Routes } from '@angular/router';
+import { Dashboard } from './features/dashboard/dashboard';
+import { Hype } from './features/crypto/hype/hype';
+
+
+export const routes: Routes = [
+    {
+        path: '', component: Dashboard
+    },
+    {
+        path: 'hype', component: Hype
+    }
+
+];
+</file>
+
+<file path="frontend/src/app/app.spec.ts">
+import { TestBed } from '@angular/core/testing';
+import { App } from './app';
+
+describe('App', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [App],
+    }).compileComponents();
+  });
+
+  it('should create the app', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    expect(app).toBeTruthy();
+  });
+
+  it('should render title', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, dokkcorp-frontend');
+  });
+});
+</file>
+
+<file path="frontend/src/app/app.ts">
+import { Component, signal } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { Navbar } from './core/components/navbar/navbar';
+import { Footer } from './core/components/footer/footer';
+import { Background } from './shared/components/background/background';
+
+
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet, Navbar, Footer, Background],
+  templateUrl: './app.html',
+  styleUrl: './app.css',
+})
+export class App {
+  protected readonly title = signal('Dashboard');
+}
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-burn-card/hype-burn-card.css">
+
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-burn-card/hype-burn-card.spec.ts">
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { HypeBurnCard } from './hype-burn-card';
+
+describe('HypeBurnCard', () => {
+  let component: HypeBurnCard;
+  let fixture: ComponentFixture<HypeBurnCard>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [HypeBurnCard],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(HypeBurnCard);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-burn-card/hype-burn-card.ts">
+import { Component, input, computed } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import { formatNumber } from '../../services/format-number';
+
+@Component({
+  selector: 'app-hype-burn-card',
+  standalone: true,
+  imports: [DecimalPipe],
+  templateUrl: './hype-burn-card.html',
+})
+export class HypeBurnCard {
+  public formatNumber = formatNumber;
+  burned24h = input.required<number>();
+  hypeBurned100 = input<string>('0');
+  currentPrice = input<number>(0);
+
+  // Valeur en USD calculée
+  burnedValueUsd = computed(() => {
+    return formatNumber(this.burned24h() * this.currentPrice());
+  });
+
+  // Longueur de l'arc de l'ellipse M 10 50 A 35 50 0 0 1 100 50
+  totalLength = 174;
+
+  dashArrayStyle = computed(() => {
+    const burnedStr = this.hypeBurned100() || '0';
+    const percent = parseFloat(burnedStr);
+    const validPercent = isNaN(percent) ? 0 : percent;
+    // ratio is out of 100
+    let ratio = validPercent / 100;
+    if (ratio > 1) ratio = 1;
+    if (ratio < 0) ratio = 0;
+
+    // Le premier chiffre est la partie visible (remplie), le deuxième est le vide (la partie restante)
+    const filledLength = this.totalLength * ratio;
+    return `${filledLength} ${this.totalLength}`;
+  });
+}
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-metric-card/hype-metric-card.html">
+<div
+    class="relative w-full bg-dark-800/40 backdrop-blur-md border border-copper-500/20 rounded-2xl p-6 shadow-xl shadow-black/50 overflow-hidden group hover:border-copper-500/40 hover:bg-dark-800/60 transition-all duration-500">
+
+    <!-- Lueur subtile en fond au hover -->
+    <div
+        class="absolute -top-16 -right-16 w-32 h-32 bg-copper-500/5 rounded-full blur-[40px] pointer-events-none group-hover:bg-copper-500/15 transition-all duration-700">
+    </div>
+
+    <h3
+        class="text-copper-300 text-xs font-black uppercase tracking-[0.2em] mb-5 pb-3 border-b border-copper-500/20 drop-shadow-sm flex items-center relative z-10">
+        <!-- Petit carré d'accent -->
+        <span class="w-1.5 h-1.5 bg-copper-500 mr-2 rounded-sm shadow-[0_0_8px_rgba(184,115,51,0.6)]"></span>
+        {{ card.title }}
+    </h3>
+
+    <div class="space-y-3 relative z-10">
+        @for (metric of card.metrics; track metric.label) {
+        <div
+            class="flex justify-between items-center group/item hover:bg-white/[0.03] p-1.5 -mx-1.5 rounded-lg transition-colors duration-300">
+            <span
+                class="text-copper-300/60 text-sm font-medium tracking-wide group-hover/item:text-copper-300 transition-colors whitespace-nowrap mr-2">
+                {{ metric.label }}
+            </span>
+
+            <div class="flex items-center gap-2 whitespace-nowrap text-right">
+                @if (metric.variation !== undefined) {
+                <span class="flex items-center text-[10px] font-bold px-2 py-0.5 rounded-md border shadow-sm"
+                    [class]="metric.variation >= 0 ? 'text-green-400 bg-green-400/10 border-green-400/20' : 'text-red-400 bg-red-400/10 border-red-400/20'">
+                    {{ metric.variation > 0 ? '+' : '' }}{{ metric.variation | number:'1.2-2' }}%
+                </span>
+                }
+                <span
+                    class="font-mono font-semibold tracking-wider drop-shadow-sm flex items-center gap-1.5 whitespace-nowrap"
+                    [class]="metric.colorClass ? metric.colorClass : 'text-amber-500'">
+                    {{ metric.value }}
+                    @if (metric.ratio !== undefined) {
+                    <span
+                        class="text-copper-200/60 text-[9px] leading-none font-medium bg-copper-500/10 px-1 py-[3px] rounded-sm border border-copper-500/20 opacity-80">
+                        {{ metric.ratio }}
+                    </span>
+                    }
+                </span>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+</file>
+
+<file path="frontend/src/app/shared/components/asset-main-card/asset-main-card.html">
+<!-- Header Card (Titre de la page Asset) -->
+<div
+    class="w-full bg-dark-800/40 backdrop-blur-md border border-copper-500/30 rounded-2xl p-6 md:p-8 shadow-xl shadow-black/50 relative overflow-hidden group">
+
+    <!-- Lueur subtile en fond pour donner un aspect premium 3D -->
+    <div
+        class="absolute -top-32 -right-32 w-64 h-64 bg-copper-500/10 rounded-full blur-[80px] pointer-events-none group-hover:bg-copper-500/20 transition-all duration-700">
+    </div>
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center relative z-10 gap-6">
+
+        <!-- SECTION GAUCHE : Identité de l'asset -->
+        <div class="flex items-center gap-5 md:gap-6">
+
+            <!-- Logo Container -->
+            <div class="relative w-24 h-24 flex items-center justify-center shrink-0">
+                <!-- Halo de lumière -->
+                <div
+                    class="absolute inset-0 rounded-full bg-copper-500/15 blur-md group-hover:bg-copper-400/30 transition-all duration-500">
+                </div>
+                <!-- On suppose que asset="hype" par exemple pour le src -->
+                <img src="assets/logos/{{asset || 'placeholder'}}.png" alt="Logo"
+                    class="relative z-10 w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.15)]">
+            </div>
+
+            <!-- Noms & Tag -->
+            <div class="flex flex-col">
+                <div class="flex flex-wrap items-center gap-3">
+                    <h1 class="text-3xl md:text-5xl font-black text-white tracking-widest uppercase drop-shadow-md">
+                        {{asset || 'NOM ASSET'}}
+                    </h1>
+                    <!-- Tag / Type -->
+                    <span
+                        class="px-3 py-1 text-xs font-bold tracking-widest uppercase rounded-full bg-copper-600/20 text-copper-300 border border-copper-500/40 shadow-inner">
+                        CRYPTO
+                    </span>
+                </div>
+                <!-- Symbole -->
+                <span
+                    class="text-copper-400 font-bold tracking-[0.2em] mt-2 text-lg drop-shadow-sm uppercase">{{symbol}}</span>
+            </div>
+
+        </div>
+
+        <!-- SECTION DROITE : Prix & Données -->
+        <div
+            class="flex flex-col md:items-end items-start border-t md:border-t-0 md:border-l border-copper-500/20 pt-6 md:pt-0 pl-0 md:pl-10 w-full md:w-auto">
+
+            <!-- Prix et Variation -->
+            <div class="flex flex-wrap md:flex-nowrap items-baseline gap-3 md:gap-4 md:justify-end w-full">
+                <span
+                    class="text-4xl md:text-5xl font-black bg-gradient-to-r from-copper-300 to-copper-500 text-transparent bg-clip-text drop-shadow-[0_0_10px_rgba(184,115,51,0.2)]">
+                    {{actualPrice}}$
+                </span>
+
+                <!-- Variation 24h -->
+                <span
+                    class="flex items-center text-sm font-bold {{ change24h > 0 ? 'text-green-400 bg-green-400/10 border-green-400/20' : 'text-red-400 bg-red-400/10 border-red-400/20' }}  px-2 py-1 rounded-lg border shadow-sm shrink-0">
+                    <!-- Flèche dynamique (Haut ou Bas) -->
+                    @if (change24h > 0) {
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    } @else {
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6"></path>
+                    </svg>
+                    }
+                    {{change24h > 0 ? '+' : ''}}{{change24h | number : '1.2-2'}}%
+                </span>
+            </div>
+
+            <!-- Stats Secondaires : Volume & Mise à jour -->
+            <div
+                class="mt-4 flex flex-wrap md:flex-row items-start justify-center md:items-center gap-3 text-xs font-medium text-copper-400/70 tracking-wider w-full md:justify-end">
+
+                <!-- Market Cap -->
+                <div
+                    class="flex items-center justify-center bg-dark-900/60 px-3 py-1.5 rounded-lg border border-copper-500/20 shadow-inner shrink-0 border-l-2 border-l-copper-500 w-full md:w-auto">
+                    <span class="opacity-70 mr-2 uppercase text-[10px] ">Cap:</span>
+                    <span
+                        class="text-copper-300 font-bold tracking-widest drop-shadow-sm">{{formatNumber(marketCap)}}$</span>
+                </div>
+
+                <!-- Volume 24h -->
+                <div
+                    class="flex items-center justify-center bg-dark-900/60 px-3 py-1.5 rounded-lg border border-copper-500/20 shadow-inner shrink-0 border-l-2 border-l-copper-500 w-full md:w-auto">
+                    <span class="opacity-70 mr-2 uppercase text-[10px]">Vol 24h:</span>
+                    <span
+                        class="text-copper-300 font-bold tracking-widest drop-shadow-sm">{{formatNumber(volume24h)}}$</span>
+                </div>
+
+                <!-- Dernière mise à jour -->
+                <div
+                    class="flex items-center justify-center bg-dark-900/40 px-3 py-1.5 rounded-lg border border-copper-500/10 flex shrink-0 w-full md:w-auto">
+                    <svg class="w-3.5 h-3.5 mr-1.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    MàJ: {{formatTime(lastRefresh)}}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+</file>
+
+<file path="frontend/src/main.ts">
+import { bootstrapApplication } from '@angular/platform-browser';
+import { appConfig } from './app/app.config';
+import { App } from './app/app';
+
+bootstrapApplication(App, appConfig).catch((err) => console.error(err));
+</file>
+
+<file path="frontend/tailwind.config.js">
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/**/*.{html,ts}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        dark: {
+          900: '#0a0a0a',
+          800: '#141414',
+          700: '#1a1a1a',
+        },
+        copper: {
+          300: '#e5a075',
+          400: '#d58554',
+          500: '#b87333',
+          600: '#a35f24',
+          700: '#854614',
+        }
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      }
+    },
+  },
+  plugins: [],
+}
+</file>
+
+<file path="frontend/tsconfig.app.json">
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app",
+    "types": []
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts"]
+}
+</file>
+
+<file path="frontend/tsconfig.spec.json">
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/spec",
+    "types": ["vitest/globals"]
+  },
+  "include": ["src/**/*.d.ts", "src/**/*.spec.ts"]
+}
+</file>
+
+<file path=".github/workflows/deploy.yml">
+name: Build and Push Backend
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/**'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/dashboard-backend:latest
+</file>
+
+<file path="backend/.gitignore">
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+.env
+src/main/resources/application-local.yml
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/controller/DashboardController.java">
+package com.dokkcorp.dashboard.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.dokkcorp.dashboard.features.crypto.hype.HypeDto;
+import com.dokkcorp.dashboard.features.crypto.hype.HypeService;
+
+@RestController
+@CrossOrigin(origins = "${app.cors.allowed-origins}")
+@RequestMapping("/api/dashboard")
+public class DashboardController {
+
+    @Autowired
+    private HypeService hypeService;
+
+    @GetMapping("/hype")
+    public HypeDto getLastHypeData() {
+
+        return this.hypeService.getLastHypeData();
+
+    }
+
+}
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/jobs/AssetSyncJob.java">
+package com.dokkcorp.dashboard.jobs;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import com.dokkcorp.dashboard.features.crypto.hype.HypeService;
+import com.dokkcorp.dashboard.features.crypto.hype.HypeDto;
+
+import com.dokkcorp.dashboard.model.entity.AssetDaily;
+import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
+import com.dokkcorp.dashboard.repository.AssetDailyRepository;
+import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
+
+import jakarta.transaction.Transactional;
+
+@Component
+public class AssetSyncJob {
+
+    @Autowired
+    private AssetSnapshotRepository assetSnapshotRepository;
+
+    @Autowired
+    private AssetDailyRepository assetDailyRepository;
+
+    @Autowired
+    private HypeService hypeService;
+
+    // toutes les 10 minutes sur des chiffres ronds (00, 10, 20...)
+    @Scheduled(cron = "0 0/10 * * * ?")
+    public void autoSync() {
+        this.hypeService.getData();
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?", zone = "UTC")
+    public void sendDailySnapshotToDb() {
+        AssetDaily ad = this.assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE").get();
+        HypeDto data = this.hypeService.getData();
+
+        double volume24H = Double.parseDouble(data.dailyVolume());
+        double fees24H = Double.parseDouble(data.feesDaily());
+        double hlpProvider = Double.parseDouble(data.totalValueLocked());
+        double openInterest = Double.parseDouble(data.openInterest());
+
+        AssetSnapshot s = new AssetSnapshot();
+        s.setSymbol("HYPE");
+        s.setPrice(ad.getCurrentPrice());
+        s.setDay(ad.getLastRefresh());
+        s.setVolume24h(volume24H);
+        s.setFees24h(fees24H);
+        s.setHlpProvider(hlpProvider);
+        s.setOpenInterest(openInterest);
+        s.setBurnedHype(ad.getBurnedHype());
+        s.setCirculatingSupply(ad.getCirculatingSupply());
+        this.assetSnapshotRepository.save(s);
+    }
+
+    @Scheduled(cron = "0 0 0 * * SUN")
+    @Transactional
+    public void cleanDB() {
+        long sevenDayAgo = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000);
+        long oneYearAgo = System.currentTimeMillis() - (365L * 24 * 60 * 60 * 1000);
+
+        this.assetDailyRepository.deleteByLastRefreshBefore(sevenDayAgo);
+        this.assetSnapshotRepository.deleteByDayBefore(oneYearAgo);
+    }
+
+}
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-burn-card/hype-burn-card.html">
+<div
+    class="relative w-full h-full min-h-[280px] bg-dark-800/60 rounded-3xl border border-orange-500/30 shadow-2xl shadow-black overflow-hidden group hover:border-orange-500/60 transition-all duration-700 flex flex-col p-6">
+
+    <!-- Background Image (Plus visible) -->
+    <div
+        class="absolute inset-0 bg-[url('/assets/images/burn.png')] bg-cover bg-center group-hover:scale-110 transition-all duration-1000">
+    </div>
+
+    <!-- Dark Gradient Overlay for readability -->
+    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/70 to-dark-800/30 pointer-events-none">
+    </div>
+
+    <!-- Header -->
+    <div class="flex justify-center relative z-10">
+        <h3 class="text-orange-400 text-xl font-black uppercase tracking-[0.2em] drop-shadow-md flex items-center">
+            <!-- Flame Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg"
+                class="h-8 w-8 mr-2 text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,1)] animate-pulse"
+                viewBox="0 0 24 24" fill="currentColor">
+                <path
+                    d="M12 2C12 2 7 7.08 7 12C7 15.6 9.17 18.66 12 20.34C14.83 18.66 17 15.6 17 12C17 7.08 12 2 12 2ZM11.1 18.17C9.36 17.22 8.1 15.22 8.1 13C8.1 10.36 10.16 8 12 6.1C13.84 8 15.9 10.36 15.9 13C15.9 15.22 14.64 17.22 12.9 18.17C12.82 17.13 12.44 16.15 11.83 15.34C11.66 16.32 11.23 17.25 10.59 18.06C10.74 18.1 10.92 18.13 11.1 18.17Z" />
+                <path
+                    d="M12 10.5C11.17 10.5 10.5 11.17 10.5 12C10.5 12.83 11.17 13.5 12 13.5C12.83 13.5 13.5 12.83 13.5 12C13.5 11.17 12.83 10.5 12 10.5Z"
+                    fill="#fb923c" />
+            </svg>
+            Last 24h
+        </h3>
+    </div>
+
+    <!-- Gauge Section (Plus large et centrée) -->
+    <div class="relative z-10 flex-grow flex items-center justify-center mt-6">
+        <div class="relative w-full max-w-[350px] aspect-[4/3]">
+            <!-- Semi-Circle SVG (stroke-width augmenté à 12) -->
+            <svg viewBox="0 0 110 40" class="w-full h-full drop-shadow-2xl overflow-visible">
+                <!-- Background Track -->
+                <path d="M 10 50 A 35 50 0 0 1 100 50" fill="none" stroke="currentColor" stroke-width="12"
+                    stroke-linecap="round" class="text-orange-950/60" />
+
+                <!-- Foreground Gauge (Dynamic) -->
+                <path d="M 10 50 A 35 50 0 0 1 100 50" fill="none" stroke="url(#flameGradient)" stroke-width="12"
+                    stroke-linecap="round"
+                    class="drop-shadow-[0_0_15px_rgba(249,115,22,0.8)] transition-all duration-1000 ease-out"
+                    [style.stroke-dasharray]="dashArrayStyle()" />
+
+                <!-- Gradient Definition -->
+                <defs>
+                    <linearGradient id="flameGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#ef4444" /> <!-- Red -->
+                        <stop offset="50%" stop-color="#f97316" /> <!-- Orange -->
+                        <stop offset="100%" stop-color="#eab308" /> <!-- Yellow -->
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <!-- Burned 24h Text Inside Gauge -->
+            <div class="absolute inset-0 flex flex-col items-center justify-end pb-0">
+                <span
+                    class="text-4xl font-mono font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 drop-shadow-[0_0_20px_rgba(249,115,22,0.5)]">
+                    {{ formatNumber(burned24h()) }}
+                </span>
+                <!-- Valeur USD secondaire -->
+                <span class="text-orange-200/50 text-sm font-medium mt-[-4px] mb-1">
+                    ≈ {{ burnedValueUsd() }}$
+                </span>
+                <span class="text-orange-200/70 text-[11px] font-bold tracking-[0.2em] uppercase mt-2">
+                    Tokens Destroyed
+                </span>
+                <span class="text-orange-200/40 text-[9px] font-medium tracking-wider mt-1">
+                    Total: <span class="text-orange-500/80 font-bold">{{ hypeBurned100() | number:'1.0-2'}}%</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+</div>
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-flux-chart/hype-flux-chart.html">
+<div
+    class="relative w-full h-full min-h-[280px] bg-dark-800/40 rounded-3xl border border-orange-500/30 p-6 flex flex-col group hover:border-orange-500/60 transition-all duration-500 overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-4 relative z-10">
+        <h3 class="text-orange-400 text-xs font-black uppercase tracking-[0.2em] flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+            Net Flux (30D)
+        </h3>
+    </div>
+
+    <!-- Chart Container -->
+    <div class="flex-grow relative min-h-[180px]">
+        <canvas #chartCanvas></canvas>
+    </div>
+</div>
+</file>
+
+<file path="frontend/src/app/shared/components/daily-chart/daily-chart.css">
+.daily-chart-container {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background: rgba(10, 10, 10, 0.4);
+  border: 1px solid rgba(184, 115, 51, 0.1);
+  border-radius: 16px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .daily-chart-container {
+    height: 400px;
+  }
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+</file>
+
+<file path="frontend/src/app/shared/components/daily-chart/daily-chart.ts">
+import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges, HostListener } from '@angular/core';
+import { Chart, registerables } from 'chart.js';
+
+Chart.register(...registerables);
+
+@Component({
+  selector: 'app-daily-chart',
+  standalone: true,
+  templateUrl: './daily-chart.html',
+  styleUrl: './daily-chart.css',
+})
+export class DailyChart implements AfterViewInit, OnChanges {
+  @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
+  @Input() prices: number[] = [];
+  @Input() labels: number[] = [];
+
+  private chart: Chart | undefined;
+
+  @HostListener('window:resize')
+  onResize() {
+    if (this.chart) {
+      this.chart.resize();
+    }
+  }
+
+  ngAfterViewInit() {
+    this.createChart();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (this.chart && (changes['prices'] || changes['labels'])) {
+      this.updateChart();
+    }
+  }
+
+  private createChart() {
+    setTimeout(() => {
+      const ctx = this.chartCanvas.nativeElement.getContext('2d');
+      if (!ctx) return;
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, this.chartCanvas.nativeElement.clientHeight);
+      gradient.addColorStop(0, 'rgba(229, 160, 117, 0.2)'); // Light Copper
+      gradient.addColorStop(1, 'rgba(229, 160, 117, 0)');
+
+      this.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: this.labels.map(l => new Date(l).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })),
+          datasets: [{
+            data: this.prices,
+            borderColor: '#e5a075', // Light Copper
+            backgroundColor: gradient,
+            fill: true,
+            tension: 0.3,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            pointHoverBackgroundColor: '#e5a075',
+            pointHoverBorderColor: '#fff',
+            pointHoverBorderWidth: 1,
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          devicePixelRatio: window.devicePixelRatio,
+          layout: { padding: { right: 5 } },
+          interaction: { intersect: false, mode: 'index' },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1a1a1a',
+              titleColor: '#e5a075',
+              borderColor: 'rgba(184, 115, 51, 0.3)',
+              borderWidth: 1,
+              padding: { top: 10, bottom: 10, left: 15, right: 15 },
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 14 },
+              titleAlign: 'center',
+              bodyAlign: 'center',
+              displayColors: false,
+              callbacks: {
+                label: (ctx) => `${ctx.parsed.y?.toFixed(2)}$`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.4)',
+                maxTicksLimit: 6,
+                font: { size: 9 }
+              }
+            },
+            y: {
+              position: 'left',
+              grid: { color: 'rgba(255, 255, 255, 0.03)' },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.4)',
+                font: { size: 12 },
+                stepSize: 0.5,
+                precision: 2,
+                callback: (val) => val + '$'
+              }
+            }
+          }
+        }
+      });
+    }, 50);
+  }
+
+  private updateChart() {
+    if (!this.chart) return;
+    this.chart.data.labels = this.labels.map(l => new Date(l).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }));
+    this.chart.data.datasets[0].data = this.prices;
+    this.chart.update('none'); // Update without animation for "live" feel
+  }
+}
+</file>
+
+<file path="frontend/src/app/shared/components/price-chart/price-chart.css">
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background: rgba(10, 10, 10, 0.4);
+  border: 1px solid rgba(184, 115, 51, 0.1);
+  border-radius: 16px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .chart-container {
+    height: 400px;
+  }
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+</file>
+
+<file path="frontend/src/app/shared/components/price-chart/price-chart.ts">
+import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges, HostListener } from '@angular/core';
+import { Chart, registerables } from 'chart.js';
+
+Chart.register(...registerables);
+
+@Component({
+  selector: 'app-price-chart',
+  standalone: true,
+  templateUrl: './price-chart.html',
+  styleUrl: './price-chart.css',
+})
+export class PriceChart implements AfterViewInit, OnChanges {
+  @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
+  @Input() prices: number[] = [];
+  @Input() labels: number[] = [];
+
+  private chart: Chart | undefined;
+
+  @HostListener('window:resize')
+  onResize() {
+    if (this.chart) {
+      this.chart.resize();
+    }
+  }
+
+  ngAfterViewInit() {
+    this.createChart();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (this.chart && (changes['prices'] || changes['labels'])) {
+      this.updateChart();
+    }
+  }
+
+  private createChart() {
+    setTimeout(() => {
+      const ctx = this.chartCanvas.nativeElement.getContext('2d');
+      if (!ctx) return;
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, this.chartCanvas.nativeElement.clientHeight);
+      gradient.addColorStop(0, 'rgba(184, 115, 51, 0.3)');
+      gradient.addColorStop(1, 'rgba(184, 115, 51, 0)');
+
+      this.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: this.labels.map(l => new Date(l).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })),
+          datasets: [{
+            data: this.prices,
+            borderColor: '#b87333',
+            backgroundColor: gradient,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointHoverBackgroundColor: '#b87333',
+            pointHoverBorderColor: '#fff',
+            pointHoverBorderWidth: 2,
+            borderWidth: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          devicePixelRatio: window.devicePixelRatio,
+          layout: { padding: { right: 10 } },
+          interaction: { intersect: false, mode: 'index' },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1a1a1a',
+              titleColor: '#e5a075',
+              borderColor: 'rgba(184, 115, 51, 0.3)',
+              borderWidth: 1,
+              padding: { top: 10, bottom: 10, left: 20, right: 20 },
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 14 },
+              titleAlign: 'center',
+              bodyAlign: 'center',
+              displayColors: false,
+              callbacks: {
+                label: (ctx) => `${ctx.parsed.y?.toFixed(2)}$`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.4)',
+                maxTicksLimit: 8,
+                font: { size: 10 }
+              }
+            },
+            y: {
+              position: 'left',
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.4)',
+                font: { size: 10 },
+                callback: (val) => '$' + Number(val)
+              }
+            }
+          }
+        }
+      });
+    }, 50);
+  }
+
+  private updateChart() {
+    if (!this.chart) return;
+    this.chart.data.labels = this.labels.map(l => new Date(l).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }));
+    this.chart.data.datasets[0].data = this.prices;
+    this.chart.update();
+  }
+}
+</file>
+
+<file path="frontend/src/index.html">
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard</title>
+  <base href="/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="assets/images/logoDokkCorp.png" />
+</head>
+
+<body>
+  <app-root></app-root>
+</body>
+
+</html>
+</file>
+
+<file path="backend/pom.xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.0.5</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.dokkcorp</groupId>
+	<artifactId>dashboard</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name/>
+	<description/>
+	<url/>
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
+	<properties>
+		<java.version>21</java.version>
+	</properties>
+	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<!--
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-docker-compose</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.web3j</groupId>
+			<artifactId>core</artifactId>
+			<version>4.12.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.web3j</groupId>
+			<artifactId>contracts</artifactId>
+			<version>4.12.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+</file>
+
+<file path="backend/src/main/resources/application.yml">
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  web:
+    error:
+      include-message: always
+  application:
+    name: dokkcorp-dashboard
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+app:
+  coingecko:
+    api-key: "${COINGECKO_API_KEY:}"
+    base-url: "https://api.coingecko.com/api/v3"
+  blockchain:
+    rpc-url: "${BLOCKCHAIN_RPC_URL:}"
+  cors:
+    allowed-origins: "${CORS_ORIGINS:http://localhost:4200,https://dashboard-six-pink-56.vercel.app,https://dashboard.dokkcorp.ch}"
+</file>
+
+<file path="frontend/angular.json">
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm",
+    "analytics": false
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "dokkcorp-frontend": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "src/styles.css"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {},
+          "configurations": {
+            "production": {
+              "buildTarget": "dokkcorp-frontend:build:production"
+            },
+            "development": {
+              "buildTarget": "dokkcorp-frontend:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test"
+        }
+      }
+    }
+  }
+}
+</file>
+
+<file path="frontend/vercel.json">
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+</file>
+
+<file path="backend/docker-compose.yml">
+services:
+  postgres:
+    image: 'postgres:16'
+    container_name: dashboard-db
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      - 'POSTGRES_DB=dokkcorp_db'
+      - 'POSTGRES_USER=dokkadmin'
+      - 'POSTGRES_PASSWORD=dokksecret'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 1G # Plus de cache pour Postgres
+    networks:
+      - dashboard-network
+
+  backend:
+    image: ${DOCKER_USERNAME}/dashboard-backend:latest
+    container_name: dashboard-backend
+    restart: always
+    depends_on:
+      - postgres
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - POSTGRES_USER=dokkadmin
+      - POSTGRES_PASSWORD=dokksecret
+      - COINGECKO_API_KEY=${COINGECKO_API_KEY}
+      - BLOCKCHAIN_RPC_URL=${BLOCKCHAIN_RPC_URL}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - JAVA_OPTS=-Xmx1g -Xms512m # Confortable pour Java sur 4Go
+    ports:
+      - '127.0.0.1:8080:8080'
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G # Marge pour le container Java
+    networks:
+      - dashboard-network
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 300 --cleanup
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+    networks:
+      - dashboard-network
+
+networks:
+  dashboard-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/features/crypto/hype/HypeDto.java">
+package com.dokkcorp.dashboard.features.crypto.hype;
+
+import java.util.List;
+
+public record HypeDto(
+
+                String symbol,
+
+                double currentPrice,
+
+                double marketCap,
+
+                double priceChangePercentage24h,
+
+                double totalVolume,
+
+                double lastRefresh,
+
+                List<Double> historyPrices,
+
+                List<Long> historyDays,
+
+                List<Double> livePrices,
+
+                List<Long> liveDays,
+
+                String circulatingSupply,
+
+                String totalValueLocked,
+
+                String apr,
+
+                String dailyVolume,
+
+                String ratioProvider,
+
+                String openInterest,
+
+                String feesDaily,
+
+                String feesAnnual,
+
+                double volatVolume,
+
+                double volatOpenInterest,
+
+                double volatHlpProvider,
+
+                String stakingApr,
+
+                String maxSupply,
+
+                String circulation100,
+
+                String fdv,
+
+                String ratioMcapFdv,
+
+                String hypeBurned100,
+
+                String ratioPriceFees,
+
+                String ratioOImcap,
+
+                String totalStakedHype,
+
+                String ratioStaked,
+
+                String bridgedHype,
+
+                String ratioBridged,
+
+                String liquidStaked,
+
+                String stakedEvmCore,
+
+                String burned30d,
+
+                String circulating30d,
+
+                String flux30d,
+
+                double burned24h,
+
+                List<Double> fluxBurned,
+
+                List<Double> fluxIssued,
+
+                List<Double> fluxNetFlow,
+
+                List<Long> fluxDays) {
+
+}
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype-flux-chart/hype-flux-chart.ts">
+import { Component, input, ViewChild, ElementRef, AfterViewInit, effect, HostListener } from '@angular/core';
+import { Chart, registerables } from 'chart.js';
+import { formatNumber } from '../../services/format-number';
+
+Chart.register(...registerables);
+
+@Component({
+  selector: 'app-hype-flux-chart',
+  standalone: true,
+  templateUrl: './hype-flux-chart.html',
+  styleUrl: './hype-flux-chart.css',
+})
+export class HypeFluxChart implements AfterViewInit {
+  @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
+
+  burned = input<number[]>([]);
+  issued = input<number[]>([]);
+  netFlow = input<number[]>([]);
+  labels = input<number[]>([]);
+  historyPrices = input<number[]>([]);
+
+  private chart: Chart | undefined;
+  private viewInitialized = false;
+
+  constructor() {
+    effect(() => {
+      const labels = this.labels();
+      if (this.viewInitialized && labels.length > 0) {
+        if (!this.chart) {
+          this.createChart();
+        } else {
+          this.updateChart();
+        }
+      }
+    });
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    if (this.chart) {
+      this.chart.resize();
+    }
+  }
+
+  ngAfterViewInit() {
+    this.viewInitialized = true;
+  }
+
+  private getSymmetricBounds() {
+    const values = this.netFlow();
+    const max = values.length > 0 ? Math.max(...values.map(Math.abs)) : 100000;
+    return Math.max(max * 1.10, 1000);
+  }
+
+  private updateChart() {
+    if (!this.chart) return;
+    const finalYMax = this.getSymmetricBounds();
+    if (this.chart.options.scales?.['y']) {
+      this.chart.options.scales['y'].suggestedMax = finalYMax;
+      this.chart.options.scales['y'].suggestedMin = -finalYMax;
+    }
+    this.chart.data.labels = this.labels().map(l => new Date(l - 86400000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }));
+    if (this.chart.data.datasets[0]) {
+      this.chart.data.datasets[0].data = this.netFlow();
+    }
+    this.chart.update('none');
+  }
+
+  private createChart() {
+    const canvas = this.chartCanvas?.nativeElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (this.chart) {
+      this.chart.destroy();
+    }
+
+    const finalYMax = this.getSymmetricBounds();
+
+    this.chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: this.labels().map(l => new Date(l - 86400000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })),
+        datasets: [
+          {
+            label: 'Flow',
+            data: this.netFlow(),
+            borderColor: '#c08210ff',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderWidth: 3,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            tension: 0.4,
+            fill: {
+              target: 'origin',
+              below: 'rgba(255, 0, 0, 0.1)',
+              above: 'rgba(0, 255, 0, 0.1)'
+            }
+          },
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { intersect: false, mode: 'index' },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1a1a1a',
+            titleColor: '#e5a075',
+            borderColor: 'rgba(249, 115, 22, 0.3)',
+            borderWidth: 1,
+            padding: 14,
+            displayColors: false,
+            bodySpacing: 8,
+            titleMarginBottom: 10,
+            callbacks: {
+              title: (items) => {
+                const date = new Date(this.labels()[items[0].dataIndex] - 86400000);
+                return `📅 ${date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+              },
+              label: (ctx) => {
+                const i = ctx.dataIndex;
+                const b = Math.abs(this.burned()[i]);
+                const e = this.issued()[i];
+                const f = this.netFlow()[i];
+                const p = this.historyPrices()[i];
+                return [
+                  `🔥 Burned: ${formatNumber(b)}`,
+                  `📦 Emitted: ${formatNumber(e)}`,
+                  `🌊 Net Flow: ${formatNumber(f)}`,
+                  `💰 Price: ${formatNumber(p)} $`
+                ];
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: 'rgba(255, 255, 255, 0.4)', font: { size: 10 }, maxTicksLimit: 10 }
+          },
+          y: {
+            type: 'linear',
+            position: 'left',
+            suggestedMin: -finalYMax,
+            suggestedMax: finalYMax,
+            grid: {
+              drawOnChartArea: true,
+              color: (context) => context.tick.value === 0 ? 'rgba(75, 37, 2, 0.88)' : 'transparent',
+              lineWidth: (context) => context.tick.value === 0 ? 3 : 0
+            },
+            ticks: {
+              color: 'rgba(59, 130, 246, 0.6)',
+              font: { size: 10 },
+              callback: (val) => Number(val).toLocaleString()
+            },
+          }
+        }
+      }
+    });
+  }
+}
+</file>
+
+<file path="frontend/src/environments/environment.prod.ts">
+export const environment = {
+  production: true,
+  apiUrl: 'https://api.dokkcorp.ch'
+};
+</file>
+
+<file path="backend/src/main/java/com/dokkcorp/dashboard/features/crypto/hype/HypeService.java">
+package com.dokkcorp.dashboard.features.crypto.hype;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.dokkcorp.dashboard.providers.CoinGeckoClient;
+import com.dokkcorp.dashboard.providers.dto.CoinGeckoDto;
+import com.dokkcorp.dashboard.providers.dto.CoinGeckoHistoryDto;
+
+import com.dokkcorp.dashboard.providers.HyperliquidClient;
+import com.dokkcorp.dashboard.providers.dto.HyperliquidDto;
+
+import com.dokkcorp.dashboard.providers.BlockChainClient;
+import com.dokkcorp.dashboard.providers.dto.BlockChainDto;
+
+import com.dokkcorp.dashboard.model.entity.AssetDaily;
+import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
+
+import com.dokkcorp.dashboard.repository.AssetDailyRepository;
+import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
+
+@Service
+public class HypeService {
+
+        @Autowired
+        private CoinGeckoClient client;
+
+        @Autowired
+        private HyperliquidClient hyperliquidClient;
+
+        @Autowired
+        private BlockChainClient blockChainClient;
+
+        @Autowired
+        private AssetDailyRepository assetDailyRepository;
+
+        @Autowired
+        private AssetSnapshotRepository assetSnapshotRepository;
+
+        private HypeDto cachedData;
+
+        public HypeDto getLastHypeData() {
+                if (this.cachedData != null) {
+                        return this.cachedData;
+                }
+                this.cachedData = this.assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")
+                                .map(this::mapToDto)
+                                .orElseGet(this::getData);
+                return this.cachedData;
+        }
+
+        public HypeDto getData() {
+
+                HyperliquidDto hyperliquidData = this.hyperliquidClient.getHlData();
+
+                CoinGeckoDto[] data = this.client.getData();
+                CoinGeckoDto hypeRaw = data[0];
+
+                AssetDaily newPoint = new AssetDaily();
+                newPoint.setSymbol("HYPE");
+                newPoint.setCurrentPrice(hypeRaw.currentPrice());
+                newPoint.setMarketCap(hypeRaw.marketCap());
+                newPoint.setPriceChangePercentage24h(hypeRaw.priceChangePercentage24h());
+                newPoint.setTotalVolume(hypeRaw.totalVolume());
+                newPoint.setLastRefresh(System.currentTimeMillis());
+                newPoint.setBurnedHype(hyperliquidData.hypeBurned());
+                newPoint.setCirculatingSupply(hyperliquidData.circulatingSupply());
+                newPoint.setFeesDaily(String.valueOf(Double.parseDouble(hyperliquidData.dailyVolume()) * 0.00022));
+                newPoint.setDailyVolume(hyperliquidData.dailyVolume());
+                newPoint.setOpenInterest(hyperliquidData.openInterest());
+                newPoint.setTotalValueLocked(hyperliquidData.totalValueLocked());
+
+                if (this.assetSnapshotRepository.findFirstByOrderByDayDesc().isEmpty()) {
+                        initializeHistory();
+                }
+
+                AssetDaily savedEntity = this.assetDailyRepository.save(newPoint);
+                this.cachedData = mapToDto(savedEntity);
+                return this.cachedData;
+        }
+
+        private void initializeHistory() {
+
+                CoinGeckoHistoryDto history = this.client.getHistory();
+
+                List<AssetSnapshot> snapshots = new ArrayList<>();
+                for (int n = 0; n < history.prices().size(); n++) {
+                        AssetSnapshot s = new AssetSnapshot();
+
+                        s.setSymbol("HYPE");
+                        s.setPrice(history.prices().get(n).get(1));
+                        s.setDay(history.prices().get(n).get(0).longValue());
+
+                        snapshots.add(s);
+
+                }
+                this.assetSnapshotRepository.saveAll(snapshots);
+
+        }
+
+        private HypeDto mapToDto(AssetDaily entity) {
+
+                List<AssetSnapshot> history = new java.util.ArrayList<>(
+                                this.assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE"));
+                java.util.Collections.reverse(history);
+                List<Double> historicalPrice = history.stream().map(AssetSnapshot::getPrice).toList();
+                List<Long> historicalDays = history.stream().map(AssetSnapshot::getDay).toList();
+
+                List<AssetDaily> daily = new java.util.ArrayList<>(
+                                this.assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE"));
+                java.util.Collections.reverse(daily);
+                List<Double> livePrice = daily.stream().map(AssetDaily::getCurrentPrice).toList();
+                List<Long> liveDay = daily.stream().map(AssetDaily::getLastRefresh).toList();
+
+                HyperliquidDto hyperliquidData = this.hyperliquidClient.getHlData();
+                BlockChainDto blockchainData = this.blockChainClient.getBlockchainData();
+
+                // Les calculs
+                // Ratio Vol/TVL provider
+                double volume = Double.parseDouble(hyperliquidData.dailyVolume());
+                double tvl = Double.parseDouble(hyperliquidData.totalValueLocked());
+                double ratioVolTvl = volume / tvl;
+                String ratioProvider = Double.toString(ratioVolTvl);
+
+                // % en circulation
+                double circulation100temp = Double.parseDouble(hyperliquidData.circulatingSupply())
+                                / Double.parseDouble(hyperliquidData.maxSupply()) * 100;
+                String circulation100 = String.valueOf(circulation100temp);
+
+                // Marketcap
+                double marketCap = Double.parseDouble(hyperliquidData.circulatingSupply()) * entity.getCurrentPrice();
+
+                // FDV
+                double fdvtemp = Double.parseDouble(hyperliquidData.maxSupply()) * entity.getCurrentPrice();
+                String fdv = String.valueOf(fdvtemp);
+
+                // Ratio Mcap/FDV
+                double ratioMcapFdvtemp = marketCap / fdvtemp;
+                String ratioMcapFdv = String.valueOf(ratioMcapFdvtemp);
+
+                // Hype brulé % pourcentage
+                double hypeBurnedtemp = (Double.parseDouble(hyperliquidData.hypeBurned()) / 1000000000) * 100;
+                String hypeBurned100 = String.valueOf(hypeBurnedtemp);
+
+                // Estimation fees
+                double feesDaily = volume * 0.00022;
+                double averageDailyFees = history.stream()
+                                .filter(snapshot -> snapshot.getFees24h() != null)
+                                .mapToDouble(AssetSnapshot::getFees24h)
+                                .average()
+                                .orElse(feesDaily);
+                double feesAnnual = averageDailyFees * 365;
+
+                // Ratio Price to Fees
+                double ratioPriceFeesTemp = marketCap / feesAnnual;
+                String ratioPriceFees = String.valueOf(ratioPriceFeesTemp);
+
+                // Ratio OI/Mcap
+                double ratioOImcapTemp = Double.parseDouble(hyperliquidData.openInterest()) / marketCap;
+                String ratioOImcap = String.valueOf(ratioOImcapTemp);
+
+                // Ratio % staké
+                double ratioStakedTemp = Double.parseDouble(hyperliquidData.totalStakedHype())
+                                / Double.parseDouble(hyperliquidData.maxSupply()) * 100;
+                String ratioStaked = String.valueOf(ratioStakedTemp);
+
+                // % bridged hype sur EVM
+                double ratioBridgedTemp = Double.parseDouble(blockchainData.bridgedHype())
+                                / Double.parseDouble(hyperliquidData.circulatingSupply()) * 100;
+                String ratioBridged = String.valueOf(ratioBridgedTemp);
+
+                // % staké evm vs core
+                double stakedEvmCoreTemp = (Double.parseDouble(blockchainData.liquidStaked())
+                                / Double.parseDouble(hyperliquidData.circulatingSupply())) * 100;
+                String stakedEvmCore = String.valueOf(stakedEvmCoreTemp);
+
+                // Récup les données h24 (le premier élément après reverse est celui d'il y a
+                // 24h)
+                AssetDaily h24 = !daily.isEmpty() ? daily.get(0) : entity;
+                // burn 24h
+                double oldBurned = h24.getBurnedHype() != null
+                                ? Double.parseDouble(h24.getBurnedHype())
+                                : Double.parseDouble(hyperliquidData.hypeBurned());
+                double burned24h = Double.parseDouble(hyperliquidData.hypeBurned()) - oldBurned;
+
+                // Les volat dernières 24h
+                double volatVolume = 0;
+                double volatOpenInterest = 0;
+                double volatHlpProvider = 0;
+                if (this.assetSnapshotRepository.findFirstBySymbolOrderByDayDesc("HYPE").isEmpty()
+                                || this.assetSnapshotRepository.findFirstBySymbolOrderByDayDesc("HYPE").get()
+                                                .getVolume24h() == null) {
+
+                } else {
+                        try {
+                                volatVolume = ((volume / Double.parseDouble(h24.getDailyVolume())) - 1) * 100;
+                                volatOpenInterest = ((Double.parseDouble(hyperliquidData.openInterest())
+                                                / Double.parseDouble(h24.getOpenInterest()))
+                                                - 1)
+                                                * 100;
+                                volatHlpProvider = ((tvl / Double.parseDouble(h24.getTotalValueLocked())) - 1) * 100;
+                        } catch (Exception e) {
+
+                        }
+                }
+
+                // data 30j
+                String burned30d = "0";
+                String circulating30d = "0";
+                String flux30d = "0";
+                try {
+                        List<AssetSnapshot> historyWithData = history.stream()
+                                        .filter(s -> s.getBurnedHype() != null && s.getCirculatingSupply() != null)
+                                        .toList();
+
+                        if (!historyWithData.isEmpty()) {
+                                int size = historyWithData.size();
+                                int period = Math.min(size, 31);
+
+                                AssetSnapshot reference = historyWithData.get(size - period);
+                                AssetSnapshot latest = historyWithData.get(size - 1);
+
+                                double latestBurned = Double.parseDouble(latest.getBurnedHype());
+                                double refBurned = Double.parseDouble(reference.getBurnedHype());
+                                double latestCirc = Double.parseDouble(latest.getCirculatingSupply());
+                                double refCirc = Double.parseDouble(reference.getCirculatingSupply());
+
+                                double burnedAvg, circAvg;
+
+                                if (period > 1) {
+                                        burnedAvg = (latestBurned - refBurned) / (period - 1);
+                                        circAvg = (latestCirc - refCirc) / (period - 1);
+                                } else {
+                                        burnedAvg = Double.parseDouble(hyperliquidData.hypeBurned()) - latestBurned;
+                                        circAvg = Double.parseDouble(hyperliquidData.circulatingSupply()) - latestCirc;
+                                }
+
+                                burned30d = String.valueOf(burnedAvg);
+                                circulating30d = String.valueOf(circAvg);
+                                flux30d = String.valueOf(circAvg - burnedAvg);
+                        }
+                } catch (Exception e) {
+                        e.printStackTrace();
+                }
+
+                // Données pour la chart des flux
+                List<Double> fluxBurned = new ArrayList<>();
+                List<Double> fluxIssued = new ArrayList<>();
+                List<Double> fluxNetFlow = new ArrayList<>();
+                List<Long> fluxDays = new ArrayList<>();
+
+                for (int i = 1; i < history.size(); i++) {
+                        AssetSnapshot current = history.get(i);
+                        AssetSnapshot previous = history.get(i - 1);
+
+                        if (current.getBurnedHype() != null && previous.getBurnedHype() != null
+                                        && current.getCirculatingSupply() != null
+                                        && previous.getCirculatingSupply() != null) {
+                                double burnedDelta = Double.parseDouble(current.getBurnedHype())
+                                                - Double.parseDouble(previous.getBurnedHype());
+                                double issuedDelta = Double.parseDouble(current.getCirculatingSupply())
+                                                - Double.parseDouble(previous.getCirculatingSupply());
+                                double netFlow = issuedDelta - burnedDelta;
+
+                                fluxBurned.add(burnedDelta);
+                                fluxIssued.add(issuedDelta);
+                                fluxNetFlow.add(netFlow);
+                                fluxDays.add(current.getDay());
+                        }
+                }
+
+                return new HypeDto(
+                                entity.getSymbol(),
+                                entity.getCurrentPrice(),
+                                marketCap,
+                                entity.getPriceChangePercentage24h(),
+                                entity.getTotalVolume(),
+                                entity.getLastRefresh(),
+                                historicalPrice,
+                                historicalDays,
+                                livePrice,
+                                liveDay,
+                                hyperliquidData.circulatingSupply(),
+                                hyperliquidData.totalValueLocked(),
+                                hyperliquidData.apr(),
+                                hyperliquidData.dailyVolume(),
+                                ratioProvider,
+                                hyperliquidData.openInterest(),
+                                Double.toString(feesDaily),
+                                Double.toString(feesAnnual),
+                                volatVolume,
+                                volatOpenInterest,
+                                volatHlpProvider,
+                                hyperliquidData.stakingApr(),
+                                hyperliquidData.maxSupply(),
+                                circulation100,
+                                fdv,
+                                ratioMcapFdv,
+                                hypeBurned100,
+                                ratioPriceFees,
+                                ratioOImcap,
+                                hyperliquidData.totalStakedHype(),
+                                ratioStaked,
+                                blockchainData.bridgedHype(),
+                                ratioBridged,
+                                blockchainData.liquidStaked(),
+                                stakedEvmCore,
+                                burned30d,
+                                circulating30d,
+                                flux30d,
+                                burned24h,
+                                fluxBurned,
+                                fluxIssued,
+                                fluxNetFlow,
+                                fluxDays);
+        }
+}
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype.html">
+<div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col flex-grow gap-8">
+
+    <!-- Carte titre -->
+    <div class="flex flex-wrap gap-8 justify-center">
+        <app-asset-main-card asset="hype" [symbol]="symbol()" [actualPrice]="currentPrice()"
+            [change24h]="priceChangePercentage24h()" [volume24h]="totalVolume()" [marketCap]="marketCap()"
+            [lastRefresh]="lastRefresh()">
+        </app-asset-main-card>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="flex flex-col gap-8 w-full mt-4">
+
+
+        <!-- Les deux chart -->
+        <div class="flex flex-col md:flex-row gap-4 w-full">
+            <!-- Chart annuelle-->
+            <div class="flex flex-col w-full md:w-3/5">
+                <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+                    Performance Annuelle
+                </h3>
+                <app-price-chart [prices]="historyPrices()" [labels]="historyDays()"></app-price-chart>
+            </div>
+            <!-- Live 24h Chart -->
+            <div class="flex flex-col w-full md:w-2/5">
+                <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+                    Live 24h
+                </h3>
+                <app-daily-chart [prices]="livePrices()" [labels]="liveDays()"></app-daily-chart>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Burn Card -->
+            <app-hype-burn-card [burned24h]="burned24h()" [hypeBurned100]="hypeBurned100()"
+                [currentPrice]="currentPrice()"></app-hype-burn-card>
+
+            <!-- Flux Chart (Burn vs Issued) -->
+            <app-hype-flux-chart class="md:col-span-2" [burned]="fluxBurned()" [issued]="fluxIssued()"
+                [netFlow]="fluxNetFlow()" [labels]="fluxDays()"
+                [historyPrices]="historyPrices().slice(-fluxBurned().length)">
+            </app-hype-flux-chart>
+        </div>
+
+        <!-- Metrics cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            @for (card of cards(); track card.title) {
+            <app-hype-metric-card [card]="card"></app-hype-metric-card>
+            }
+        </div>
+
+        <!-- Supply distribution -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Donut -->
+            <app-hype-supply-distribution [circulatingSupply]="circulatingSupply()" [maxSupply]="maxSupply()"
+                [hypeBurned100]="hypeBurned100()"></app-hype-supply-distribution>
+            <!-- Form -->
+            <app-form-hype-projection [currentPrice]="currentPrice()"
+                [stakingApr]="stakingApr()"></app-form-hype-projection>
+
+        </div>
+    </div>
+
+</div>
+</file>
+
+<file path="frontend/src/app/features/crypto/hype/hype.ts">
+import { Component, inject, OnDestroy, computed } from '@angular/core';
+import { environment } from '../../../../environments/environment';
+import { AssetMainCard } from '../../../shared/components/asset-main-card/asset-main-card';
+import { PriceChart } from '../../../shared/components/price-chart/price-chart';
+import { DailyChart } from '../../../shared/components/daily-chart/daily-chart';
+import { HttpClient } from '@angular/common/http';
+import { formatNumber } from '../services/format-number';
+import { formatTime } from '../services/format-dates';
+import { signal } from '@angular/core';
+import { timer, Subscription } from 'rxjs';
+import type { MetricCard } from './metric-card-model-hype';
+import { HypeMetricCard } from './hype-metric-card/hype-metric-card';
+import { HypeBurnCard } from './hype-burn-card/hype-burn-card';
+import { HypeFluxChart } from './hype-flux-chart/hype-flux-chart';
+import { HypeSupplyDistribution } from './hype-supply-distribution/hype-supply-distribution';
+import { FormHypeProjection } from './form-hype-projection/form-hype-projection';
+
+@Component({
+  selector: 'app-hype',
+  standalone: true,
+  imports: [AssetMainCard, PriceChart, DailyChart, HypeMetricCard, HypeBurnCard, HypeFluxChart, HypeSupplyDistribution, FormHypeProjection],
+  templateUrl: './hype.html',
+  styleUrl: './hype.css',
+})
+export class Hype implements OnDestroy {
+
+  public formatNumber = formatNumber;
+  public formatTime = formatTime;
+
+  private http = inject(HttpClient);
+  private timerSub: Subscription = timer(0, 60000).subscribe(() => this.refresh());
+  currentPrice = signal<number>(0);
+  priceChangePercentage24h = signal<number>(0);
+  totalVolume = signal<number>(0);
+  marketCap = signal<number>(0);
+  symbol = signal<string>('HYPE');
+  lastRefresh = signal<number>(0);
+
+  // Chart annuel et daily
+  historyPrices = signal<number[]>([]);
+  historyDays = signal<number[]>([]);
+  livePrices = signal<number[]>([]);
+  liveDays = signal<number[]>([]);
+
+  // Chart flux
+  fluxBurned = signal<number[]>([]);
+  fluxIssued = signal<number[]>([]);
+  fluxNetFlow = signal<number[]>([]);
+  fluxDays = signal<number[]>([]);
+
+
+
+  // Chiffre venant de l'api hyperliquid
+  circulatingSupply = signal<string>('');
+  totalValueLocked = signal<string>('');
+  apr = signal<string>('');
+  dailyVolume = signal<string>('');
+  ratioProvider = signal<string>('');
+  openInterest = signal<string>('');
+  feesDaily = signal<string>('');
+  feesAnnual = signal<string>('');
+  volatVolume = signal<number>(0);
+  volatOpenInterest = signal<number>(0);
+  volatHlpProvider = signal<number>(0);
+  stakingApr = signal<string>('');
+  maxSupply = signal<string>('');
+  circulation100 = signal<string>('');
+  fdv = signal<string>('');
+  ratioMcapFdv = signal<string>('');
+  hypeBurned100 = signal<string>('');
+  ratioPriceFees = signal<string>('');
+  ratioOImcap = signal<string>('');
+  totalStakedHype = signal<string>('');
+  ratioStaked = signal<string>('');
+  burned30d = signal<string>('');
+  circulating30d = signal<string>('');
+  flux30d = signal<string>('');
+  burned24h = signal<number>(0);
+
+
+  // Chiffre blockchain
+  bridgedHype = signal<string>('');
+  ratioBridged = signal<string>('');
+  liquidStaked = signal<string>('');
+  stakedEvmCore = signal<string>('');
+
+
+
+  refresh() {
+    this.http.get<any>(`${environment.apiUrl}/api/dashboard/hype`).subscribe((data: any) => {
+      this.currentPrice.set(data.currentPrice);
+      this.priceChangePercentage24h.set(data.priceChangePercentage24h);
+      this.totalVolume.set(data.totalVolume);
+      this.marketCap.set(data.marketCap);
+      this.symbol.set(data.symbol);
+      this.lastRefresh.set(data.lastRefresh);
+      this.historyPrices.set(data.historyPrices);
+      this.historyDays.set(data.historyDays);
+      this.livePrices.set(data.livePrices);
+      this.liveDays.set(data.liveDays);
+      this.circulatingSupply.set(data.circulatingSupply);
+      this.totalValueLocked.set(data.totalValueLocked);
+      this.apr.set(data.apr);
+      this.dailyVolume.set(data.dailyVolume);
+      this.ratioProvider.set(data.ratioProvider);
+      this.openInterest.set(data.openInterest);
+      this.feesDaily.set(data.feesDaily);
+      this.feesAnnual.set(data.feesAnnual);
+      this.volatVolume.set(data.volatVolume);
+      this.volatOpenInterest.set(data.volatOpenInterest);
+      this.volatHlpProvider.set(data.volatHlpProvider);
+      this.stakingApr.set(data.stakingApr);
+      this.maxSupply.set(data.maxSupply);
+      this.circulation100.set(data.circulation100);
+      this.fdv.set(data.fdv);
+      this.ratioMcapFdv.set(data.ratioMcapFdv);
+      this.hypeBurned100.set(data.hypeBurned100);
+      this.ratioPriceFees.set(data.ratioPriceFees);
+      this.ratioOImcap.set(data.ratioOImcap);
+      this.totalStakedHype.set(data.totalStakedHype);
+      this.ratioStaked.set(data.ratioStaked);
+      this.bridgedHype.set(data.bridgedHype);
+      this.ratioBridged.set(data.ratioBridged);
+      this.liquidStaked.set(data.liquidStaked);
+      this.stakedEvmCore.set(data.stakedEvmCore);
+      this.burned30d.set(data.burned30d);
+      this.circulating30d.set(data.circulating30d);
+      this.flux30d.set(data.flux30d);
+      this.burned24h.set(data.burned24h);
+      this.fluxBurned.set(data.fluxBurned);
+      this.fluxIssued.set(data.fluxIssued);
+      this.fluxNetFlow.set(data.fluxNetFlow);
+      this.fluxDays.set(data.fluxDays);
+    });
+
+
+
+  }
+
+  ngOnDestroy() {
+    this.timerSub.unsubscribe();
+  }
+
+  cards = computed<MetricCard[]>(() => [
+
+    {
+      title: "Supply",
+      metrics: [
+        { label: "Circulating", value: this.formatNumber(Number(this.circulatingSupply())), },
+        { label: "Maximum", value: this.formatNumber(Number(this.maxSupply())) },
+        { label: "Burned", value: this.formatNumber(Number(this.hypeBurned100())) + "%" }
+      ],
+    },
+
+    {
+      title: "Valuation",
+      metrics: [
+        { label: "Market Cap", value: this.formatNumber(Number(this.marketCap())) + "$" },
+        { label: "FDV", value: this.formatNumber(Number(this.fdv())) + "$" },
+        { label: "MCap / FDV", value: this.formatNumber(Number(this.ratioMcapFdv())) + "x" }
+      ],
+    },
+
+    {
+      title: "Issuance (Daily Avg)",
+      metrics: [
+        { label: "Burn (30D avg)", value: this.formatNumber(Number(this.burned30d())) },
+        { label: "Issued (30D avg)", value: this.formatNumber(Number(this.circulating30d())) },
+        { label: "Net (30D avg)", value: this.formatNumber(Number(this.flux30d())) }
+      ],
+    },
+
+    {
+      title: "EVM Network",
+      metrics: [
+        { label: "Bridged", value: this.formatNumber(Number(this.bridgedHype())) },
+        { label: "Supply Share", value: this.formatNumber(Number(this.ratioBridged())) },
+        { label: "Liquid Staked", value: this.formatNumber(Number(this.liquidStaked())), ratio: this.formatNumber(Number(this.stakedEvmCore())) + "%" }
+      ],
+    },
+
+    {
+      title: "Generated Fees",
+      metrics: [
+        { label: "24h (Est.)", value: this.formatNumber(Number(this.feesDaily())) },
+        { label: "Annualized", value: this.formatNumber(Number(this.feesAnnual())) },
+        { label: "Price to Fees Ratio", value: this.formatNumber(Number(this.ratioPriceFees())) }
+      ],
+    },
+
+    {
+      title: "Staking",
+      metrics: [
+        { label: "Total Staked", value: this.formatNumber(Number(this.totalStakedHype())) },
+        { label: "Staked Ratio", value: this.formatNumber(Number(this.ratioStaked())) },
+        { label: "Avg. APR", value: this.formatNumber(Number(this.stakingApr())) + "%" }
+      ],
+    },
+
+    {
+      title: "Activity",
+      metrics: [
+        { label: "24h Volume", value: this.formatNumber(Number(this.dailyVolume())) + "$", variation: this.volatVolume() },
+        { label: "Open Interest", value: this.formatNumber(Number(this.openInterest())) + "$", variation: this.volatOpenInterest() },
+        { label: "OI / MCap", value: this.formatNumber(Number(this.ratioOImcap())) + "x" }
+      ],
+    },
+
+    {
+      title: "HL Provider",
+      metrics: [
+        { label: "TVL", value: this.formatNumber(Number(this.totalValueLocked())) + "$", variation: this.volatHlpProvider() },
+        {
+          label: "Current APR",
+          value: this.formatNumber(Number(this.apr()) * 100) + "%",
+          colorClass: Number(this.apr()) >= 0 ? "text-green-400" : "text-red-400"
+        },
+        { label: "Vol / TVL", value: this.formatNumber(Number(this.ratioProvider())) + "x" }
+      ],
+    },
+
+  ]);
+
+
+
+}
+</file>
+
+</files>
