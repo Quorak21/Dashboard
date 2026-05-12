@@ -1,4 +1,4 @@
-package com.dokkcorp.dashboard.jobs;
+package com.dokkcorp.dashboard.providers.crypto;
 
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;

@@ -1,4 +1,4 @@
-package com.dokkcorp.dashboard.providers.dto;
+package com.dokkcorp.dashboard.providers.dto.crypto;
 
 import java.util.List;
 

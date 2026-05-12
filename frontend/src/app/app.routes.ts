@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { Dashboard } from './features/dashboard/dashboard';
 import { Hype } from './features/crypto/hype/hype';
-
+import { Inveb } from './features/stocks/inveb/inveb';
 
 export const routes: Routes = [
     {
@@ -9,6 +9,9 @@ export const routes: Routes = [
     },
     {
         path: 'hype', component: Hype
+    },
+    {
+        path: 'inveb', component: Inveb
     }
 
 ];

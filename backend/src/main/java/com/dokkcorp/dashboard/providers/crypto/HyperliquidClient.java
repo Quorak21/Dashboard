@@ -1,10 +1,10 @@
-package com.dokkcorp.dashboard.providers;
+package com.dokkcorp.dashboard.providers.crypto;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import tools.jackson.databind.JsonNode;
 
-import com.dokkcorp.dashboard.providers.dto.HyperliquidDto;
+import com.dokkcorp.dashboard.providers.dto.crypto.HyperliquidDto;
 
 @Service
 public class HyperliquidClient {

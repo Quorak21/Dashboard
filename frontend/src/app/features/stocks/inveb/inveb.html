@@ -1,0 +1,13 @@
+<div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col flex-grow gap-8">
+
+    <!-- Carte titre -->
+    <div class="flex flex-wrap gap-8 justify-center">
+        <app-asset-main-card asset="Investor AB" [symbol]="symbol()" [actualPrice]="currentPrice()"
+            [change24h]="priceChangePercentage24h()" [volume24h]="totalVolume()" [marketCap]="marketCap()"
+            [lastRefresh]="lastRefresh()" [currencySymbol]="currencySymbol()">
+        </app-asset-main-card>
+    </div>
+
+    <app-price-chart [prices]="historyPrices()" [labels]="historyDays()"></app-price-chart>
+
+</div>

@@ -1,4 +1,4 @@
-package com.dokkcorp.dashboard.providers;
+package com.dokkcorp.dashboard.providers.crypto;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

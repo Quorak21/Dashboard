@@ -5,9 +5,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import com.dokkcorp.dashboard.features.crypto.hype.HypeService;
 import com.dokkcorp.dashboard.features.crypto.hype.HypeDto;
+import com.dokkcorp.dashboard.features.stocks.investorab.InveBService;
+import com.dokkcorp.dashboard.features.stocks.investorab.InveBDto;
 
 import com.dokkcorp.dashboard.model.entity.AssetDaily;
 import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
+import com.dokkcorp.dashboard.providers.stocks.FMPClient;
 import com.dokkcorp.dashboard.repository.AssetDailyRepository;
 import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
 
@@ -25,14 +28,22 @@ public class AssetSyncJob {
     @Autowired
     private HypeService hypeService;
 
+    @Autowired
+    private InveBService inveBService;
+
+    @Autowired
+    private FMPClient fmpClient;
+
     // toutes les 10 minutes sur des chiffres ronds (00, 10, 20...)
     @Scheduled(cron = "0 0/10 * * * ?")
     public void autoSync() {
         this.hypeService.getData();
+        this.inveBService.getData();
     }
 
     @Scheduled(cron = "0 0 0 * * ?", zone = "UTC")
     public void sendDailySnapshotToDb() {
+        // --- HYPE ---
         AssetDaily ad = this.assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE").get();
         HypeDto data = this.hypeService.getData();
 
@@ -41,17 +52,25 @@ public class AssetSyncJob {
         double hlpProvider = Double.parseDouble(data.totalValueLocked());
         double openInterest = Double.parseDouble(data.openInterest());
 
-        AssetSnapshot s = new AssetSnapshot();
-        s.setSymbol("HYPE");
-        s.setPrice(ad.getCurrentPrice());
-        s.setDay(ad.getLastRefresh());
-        s.setVolume24h(volume24H);
-        s.setFees24h(fees24H);
-        s.setHlpProvider(hlpProvider);
-        s.setOpenInterest(openInterest);
-        s.setBurnedHype(ad.getBurnedHype());
-        s.setCirculatingSupply(ad.getCirculatingSupply());
-        this.assetSnapshotRepository.save(s);
+        AssetSnapshot hypeSnapshot = new AssetSnapshot();
+        hypeSnapshot.setSymbol("HYPE");
+        hypeSnapshot.setPrice(ad.getCurrentPrice());
+        hypeSnapshot.setDay(ad.getLastRefresh());
+        hypeSnapshot.setVolume24h(volume24H);
+        hypeSnapshot.setFees24h(fees24H);
+        hypeSnapshot.setHlpProvider(hlpProvider);
+        hypeSnapshot.setOpenInterest(openInterest);
+        hypeSnapshot.setBurnedHype(ad.getBurnedHype());
+        hypeSnapshot.setCirculatingSupply(ad.getCirculatingSupply());
+        this.assetSnapshotRepository.save(hypeSnapshot);
+
+        // --- INVE-B ---
+        InveBDto inveBData = this.inveBService.getLastInveBData();
+        AssetSnapshot inveBSnapshot = new AssetSnapshot();
+        inveBSnapshot.setSymbol("INVE-B");
+        inveBSnapshot.setPrice(inveBData.currentPrice()); // Prix en USD
+        inveBSnapshot.setDay(System.currentTimeMillis());
+        this.assetSnapshotRepository.save(inveBSnapshot);
     }
 
     @Scheduled(cron = "0 0 0 * * SUN")

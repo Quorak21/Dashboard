@@ -1,4 +1,4 @@
-package com.dokkcorp.dashboard.providers;
+package com.dokkcorp.dashboard.providers.crypto;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -12,8 +12,7 @@ import org.web3j.tx.ReadonlyTransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.contracts.eip20.generated.ERC20;
 
-import com.dokkcorp.dashboard.providers.dto.BlockChainDto;
-import com.dokkcorp.dashboard.jobs.BlockChainRequest;
+import com.dokkcorp.dashboard.providers.dto.crypto.BlockChainDto;
 
 @Configuration
 public class BlockChainClient {

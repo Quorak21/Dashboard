@@ -20,4 +20,11 @@ export class Dashboard {
     ),
     { initialValue: null }
   );
+
+  invebPrice = toSignal(
+    this.http.get<any>(`${environment.apiUrl}/api/dashboard/inveb`).pipe(
+      map(data => data?.currentPrice ?? null)
+    ),
+    { initialValue: null }
+  );
 }

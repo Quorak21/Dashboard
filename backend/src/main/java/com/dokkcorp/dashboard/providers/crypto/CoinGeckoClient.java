@@ -1,11 +1,11 @@
-package com.dokkcorp.dashboard.providers;
+package com.dokkcorp.dashboard.providers.crypto;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import com.dokkcorp.dashboard.providers.dto.CoinGeckoDto;
-import com.dokkcorp.dashboard.providers.dto.CoinGeckoHistoryDto;
+import com.dokkcorp.dashboard.providers.dto.crypto.CoinGeckoDto;
+import com.dokkcorp.dashboard.providers.dto.crypto.CoinGeckoHistoryDto;
 
 @Service
 public class CoinGeckoClient {

@@ -21,5 +21,8 @@ app:
     base-url: "https://api.coingecko.com/api/v3"
   blockchain:
     rpc-url: "${BLOCKCHAIN_RPC_URL:}"
+  fmp:
+    api-key: "${FMP_API_KEY:}"
+    base-url: "https://financialmodelingprep.com/stable"
   cors:
     allowed-origins: "${CORS_ORIGINS:http://localhost:4200,https://dashboard-six-pink-56.vercel.app,https://dashboard.dokkcorp.ch}"

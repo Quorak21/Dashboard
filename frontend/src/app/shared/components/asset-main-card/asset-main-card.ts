@@ -21,4 +21,5 @@ export class AssetMainCard {
   @Input() marketCap: number = 0;
   @Input() actualPrice: number = 0;
   @Input() lastRefresh: number = 0;
+  @Input() currencySymbol: string = "$";
 }

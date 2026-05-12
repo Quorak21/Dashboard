@@ -6,15 +6,15 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dokkcorp.dashboard.providers.CoinGeckoClient;
-import com.dokkcorp.dashboard.providers.dto.CoinGeckoDto;
-import com.dokkcorp.dashboard.providers.dto.CoinGeckoHistoryDto;
+import com.dokkcorp.dashboard.providers.crypto.CoinGeckoClient;
+import com.dokkcorp.dashboard.providers.dto.crypto.CoinGeckoDto;
+import com.dokkcorp.dashboard.providers.dto.crypto.CoinGeckoHistoryDto;
 
-import com.dokkcorp.dashboard.providers.HyperliquidClient;
-import com.dokkcorp.dashboard.providers.dto.HyperliquidDto;
+import com.dokkcorp.dashboard.providers.crypto.HyperliquidClient;
+import com.dokkcorp.dashboard.providers.dto.crypto.HyperliquidDto;
 
-import com.dokkcorp.dashboard.providers.BlockChainClient;
-import com.dokkcorp.dashboard.providers.dto.BlockChainDto;
+import com.dokkcorp.dashboard.providers.crypto.BlockChainClient;
+import com.dokkcorp.dashboard.providers.dto.crypto.BlockChainDto;
 
 import com.dokkcorp.dashboard.model.entity.AssetDaily;
 import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
