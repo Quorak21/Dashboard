@@ -14,8 +14,8 @@
 
     <!-- Input section -->
     <div class="relative z-10 mb-6 flex flex-col gap-4">
-        
-        <div class="grid grid-cols-2 gap-4">
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
             <!-- HYPE Amount -->
             <div class="flex flex-col gap-2">
                 <label for="hypeAmount" class="text-copper-300/60 text-xs font-semibold tracking-wide uppercase">
@@ -26,7 +26,8 @@
                         class="w-full bg-dark-900/50 border border-copper-500/30 rounded-lg px-4 py-3 text-copper-100 font-mono text-lg focus:outline-none focus:border-copper-500 focus:ring-1 focus:ring-copper-500/50 transition-all placeholder-copper-500/30"
                         style="-moz-appearance: textfield; appearance: textfield;" placeholder="0"
                         [formControl]="hypeProjection" autocomplete="off" />
-                    <div class="absolute right-4 top-1/2 -translate-y-1/2 text-copper-400/50 font-bold text-sm">HYPE</div>
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 text-copper-400/50 font-bold text-sm">HYPE
+                    </div>
                 </div>
             </div>
 
@@ -45,10 +46,14 @@
             </div>
         </div>
 
-        <div class="flex justify-between items-center mt-2 px-1 text-[11px] font-medium text-copper-300/50">
-            <span>Current APR: <span class="text-blue-400">{{ stakingAprStr }}%</span></span>
-            <span>Projected value: <span class="text-emerald-400">{{ projectedValueUsd() }} $</span></span>
-            <span>Current price : <span class="text-emerald-400">{{ currentPrice() }} $</span></span>
+        <div
+            class="flex flex-col xl:flex-row justify-between xl:items-center mt-3 xl:mt-2 px-3 xl:px-1 py-3 xl:py-0 gap-2 xl:gap-0 text-[11px] font-medium text-copper-300/50 bg-dark-900/30 xl:bg-transparent rounded-lg border border-copper-500/10 xl:border-transparent">
+            <span class="flex justify-between xl:inline"><span>Current APR:</span> <span class="text-blue-400">{{
+                    stakingAprStr }}%</span></span>
+            <span class="flex justify-between xl:inline"><span>Projected value:</span> <span class="text-emerald-400">{{
+                    projectedValueUsd() }} $</span></span>
+            <span class="flex justify-between xl:inline"><span>Current price:</span> <span class="text-emerald-400">{{
+                    currentPrice() }} $</span></span>
         </div>
     </div>
 

@@ -239,8 +239,8 @@ public class HypeService {
                                 }
 
                                 burned30d = String.valueOf(burnedAvg);
-                                circulating30d = String.valueOf(circAvg);
-                                flux30d = String.valueOf(circAvg - burnedAvg);
+                                circulating30d = String.valueOf(circAvg + burnedAvg);
+                                flux30d = String.valueOf(circAvg);
                         }
                 } catch (Exception e) {
                         e.printStackTrace();
@@ -261,9 +261,10 @@ public class HypeService {
                                         && previous.getCirculatingSupply() != null) {
                                 double burnedDelta = Double.parseDouble(current.getBurnedHype())
                                                 - Double.parseDouble(previous.getBurnedHype());
-                                double issuedDelta = Double.parseDouble(current.getCirculatingSupply())
+                                double circulatingDelta = Double.parseDouble(current.getCirculatingSupply())
                                                 - Double.parseDouble(previous.getCirculatingSupply());
-                                double netFlow = issuedDelta - burnedDelta;
+                                double issuedDelta = circulatingDelta + burnedDelta;
+                                double netFlow = circulatingDelta;
 
                                 fluxBurned.add(burnedDelta);
                                 fluxIssued.add(issuedDelta);
