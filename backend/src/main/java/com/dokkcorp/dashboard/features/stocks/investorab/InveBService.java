@@ -44,7 +44,7 @@ public class InveBService {
         if (response == null || response.length == 0) {
             System.err.println("FMP API returned empty data for Investor AB!");
             return this.cachedData != null ? this.cachedData
-                    : new InveBDto("ERROR", 0, 0, 0, 0, 0, System.currentTimeMillis(), null, null);
+                    : new InveBDto("ERROR", 0, 0, 0, 0, System.currentTimeMillis(), null, null);
         }
 
         FMPDto inveBRaw = response[0];
@@ -54,9 +54,6 @@ public class InveBService {
         double ratioSekUsd = this.forexClient.getSekUsdratio();
         double currentPrice = inveBRaw.currentPrice() * ratioSekUsd;
         double marketCap = inveBRaw.marketCap() * ratioSekUsd;
-        // Conversion SEK → CHF
-        double ratioSekChf = this.forexClient.getSekChfRatio();
-        double currentPriceChf = inveBRaw.currentPrice() * ratioSekChf;
 
         double priceChangePercentage24h = inveBRaw.priceChangePercentage24h();
         double totalVolume = inveBRaw.totalVolume();
@@ -65,7 +62,6 @@ public class InveBService {
         this.cachedData = new InveBDto(
                 symbol,
                 currentPrice,
-                currentPriceChf,
                 marketCap,
                 priceChangePercentage24h,
                 totalVolume,
@@ -77,7 +73,8 @@ public class InveBService {
     }
 
     /**
-     * Recharge l'historique depuis la base de données (max 1 fois par jour en cache mémoire).
+     * Recharge l'historique depuis la base de données (max 1 fois par jour en cache
+     * mémoire).
      * Les snapshots sont enregistrés chaque nuit à minuit UTC via AssetSyncJob.
      */
     private void refreshHistory() {
@@ -85,7 +82,8 @@ public class InveBService {
             return;
         }
 
-        // findTop365BySymbolOrderByDayDesc renvoie du plus récent au plus ancien → on inverse
+        // findTop365BySymbolOrderByDayDesc renvoie du plus récent au plus ancien → on
+        // inverse
         List<AssetSnapshot> snapshots = this.assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("INVE-B");
 
         List<Double> prices = new ArrayList<>();

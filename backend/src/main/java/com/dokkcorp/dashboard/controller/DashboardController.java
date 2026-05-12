@@ -11,6 +11,8 @@ import com.dokkcorp.dashboard.features.crypto.hype.HypeService;
 
 import com.dokkcorp.dashboard.features.stocks.investorab.InveBDto;
 import com.dokkcorp.dashboard.features.stocks.investorab.InveBService;
+import com.dokkcorp.dashboard.features.currency.CurrencyService;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "${app.cors.allowed-origins}")
@@ -23,6 +25,9 @@ public class DashboardController {
     @Autowired
     private InveBService inveBService;
 
+    @Autowired
+    private CurrencyService currencyService;
+
     @GetMapping("/hype")
     public HypeDto getLastHypeData() {
 
@@ -33,6 +38,11 @@ public class DashboardController {
     @GetMapping("/inveb")
     public InveBDto getLastInveBData() {
         return this.inveBService.getLastInveBData();
+    }
+
+    @GetMapping("/rates")
+    public Map<String, Double> getRates() {
+        return this.currencyService.getRates();
     }
 
 }

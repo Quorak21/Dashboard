@@ -7,7 +7,6 @@ public record InveBDto(
         String symbol,
 
         double currentPrice,
-        double currentPriceChf,
 
         double marketCap,
 

@@ -45,4 +45,35 @@ public class ForexClient {
             return 1.0;
         }
     }
+
+    public Double getUsdChfRatio() {
+        try {
+            JsonNode response = this.restClient.get()
+                    .uri("https://api.frankfurter.dev/v1/latest?from=USD&to=CHF")
+                    .header("User-Agent", "Mozilla/5.0")
+                    .retrieve()
+                    .body(JsonNode.class);
+
+            JsonNode responseRatio = response.get("rates").get("CHF");
+            return responseRatio.asDouble();
+
+        } catch (Exception e) {
+            return 1.0;
+        }
+    }
+    public Double getUsdEurRatio() {
+        try {
+            JsonNode response = this.restClient.get()
+                    .uri("https://api.frankfurter.dev/v1/latest?from=USD&to=EUR")
+                    .header("User-Agent", "Mozilla/5.0")
+                    .retrieve()
+                    .body(JsonNode.class);
+
+            JsonNode responseRatio = response.get("rates").get("EUR");
+            return responseRatio.asDouble();
+
+        } catch (Exception e) {
+            return 1.0;
+        }
+    }
 }

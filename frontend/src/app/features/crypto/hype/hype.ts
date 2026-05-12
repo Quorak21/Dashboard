@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, computed } from '@angular/core';
+import { Component, inject, OnDestroy, computed, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { AssetMainCard } from '../../../shared/components/asset-main-card/asset-main-card';
 import { PriceChart } from '../../../shared/components/price-chart/price-chart';
@@ -6,7 +6,7 @@ import { DailyChart } from '../../../shared/components/daily-chart/daily-chart';
 import { HttpClient } from '@angular/common/http';
 import { formatNumber } from '../services/format-number';
 import { formatTime } from '../services/format-dates';
-import { signal } from '@angular/core';
+import { CurrencyService } from '../../../core/services/currency.service';
 import { timer, Subscription } from 'rxjs';
 import type { MetricCard } from './metric-card-model-hype';
 import { HypeMetricCard } from './hype-metric-card/hype-metric-card';
@@ -28,8 +28,24 @@ export class Hype implements OnDestroy {
   public formatTime = formatTime;
 
   private http = inject(HttpClient);
+  public currencyService = inject(CurrencyService);
   private timerSub: Subscription = timer(0, 60000).subscribe(() => this.refresh());
-  currentPrice = signal<number>(0);
+  
+  usdPrice = signal<number>(0);
+  currentPrice = computed(() => {
+    const price = this.usdPrice();
+    const cur = this.currencyService.selectedCurrency();
+    if (cur === 'CHF') return price * this.currencyService.usdChf();
+    if (cur === 'EUR') return price * this.currencyService.usdEur();
+    return price;
+  });
+
+  currencySymbol = computed(() => {
+    const cur = this.currencyService.selectedCurrency();
+    if (cur === 'CHF') return 'CHF';
+    if (cur === 'EUR') return '€';
+    return '$';
+  });
   priceChangePercentage24h = signal<number>(0);
   totalVolume = signal<number>(0);
   marketCap = signal<number>(0);
@@ -88,7 +104,7 @@ export class Hype implements OnDestroy {
 
   refresh() {
     this.http.get<any>(`${environment.apiUrl}/api/dashboard/hype`).subscribe((data: any) => {
-      this.currentPrice.set(data.currentPrice);
+      this.usdPrice.set(data.currentPrice);
       this.priceChangePercentage24h.set(data.priceChangePercentage24h);
       this.totalVolume.set(data.totalVolume);
       this.marketCap.set(data.marketCap);
@@ -183,8 +199,8 @@ export class Hype implements OnDestroy {
       title: "Generated Fees",
       metrics: [
         { label: "24h (Est.)", value: this.formatNumber(Number(this.feesDaily())) },
-        { label: "Annualized", value: this.formatNumber(Number(this.feesAnnual())) },
-        { label: "Price to Fees Ratio", value: this.formatNumber(Number(this.ratioPriceFees())) }
+        { label: "Annualized (Est.)", value: this.formatNumber(Number(this.feesAnnual())) },
+        { label: "Price / Fees Ratio", value: this.formatNumber(Number(this.ratioPriceFees())) }
       ],
     },
 

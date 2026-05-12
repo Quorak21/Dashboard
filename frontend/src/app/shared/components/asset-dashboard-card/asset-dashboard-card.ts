@@ -12,6 +12,8 @@ export class AssetDashboardCard {
 
   asset = input.required<string>();
   price = input<number | null>(null);
+  change = input<number>(0);
+  currencySymbol = input<string>('$');
 
   logo = computed(() => this.asset() === "placeholder" ? "assets/logos/placeholder.png" : "assets/logos/" + this.asset() + ".png");
   name = computed(() => this.asset() === "placeholder" ? "À venir !" : this.asset().toUpperCase());

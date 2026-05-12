@@ -4,7 +4,7 @@
     <div class="flex flex-wrap gap-8 justify-center">
         <app-asset-main-card asset="hype" [symbol]="symbol()" [actualPrice]="currentPrice()"
             [change24h]="priceChangePercentage24h()" [volume24h]="totalVolume()" [marketCap]="marketCap()"
-            [lastRefresh]="lastRefresh()">
+            [lastRefresh]="lastRefresh()" [currencySymbol]="currencySymbol()">
         </app-asset-main-card>
     </div>
 
@@ -35,7 +35,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Burn Card -->
             <app-hype-burn-card [burned24h]="burned24h()" [hypeBurned100]="hypeBurned100()"
-                [currentPrice]="currentPrice()"></app-hype-burn-card>
+                [currentPrice]="usdPrice()"></app-hype-burn-card>
 
             <!-- Flux Chart (Burn vs Issued) -->
             <app-hype-flux-chart class="md:col-span-2" [burned]="fluxBurned()" [issued]="fluxIssued()"
@@ -57,7 +57,7 @@
             <app-hype-supply-distribution [circulatingSupply]="circulatingSupply()" [maxSupply]="maxSupply()"
                 [hypeBurned100]="hypeBurned100()"></app-hype-supply-distribution>
             <!-- Form -->
-            <app-form-hype-projection [currentPrice]="currentPrice()"
+            <app-form-hype-projection [currentPrice]="usdPrice()"
                 [stakingApr]="stakingApr()"></app-form-hype-projection>
 
         </div>

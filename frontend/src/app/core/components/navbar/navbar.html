@@ -11,14 +11,30 @@
                         class="w-5 h-5 group-hover:-translate-y-0.5 group-hover:scale-110 transition-all duration-300"></lucide-icon>
                 </button>
 
-                <!-- CHF Toggle -->
-                <button (click)="currencyService.toggleChf()"
-                    [class.ring-2]="currencyService.wantChf()"
-                    [class.ring-red-500]="currencyService.wantChf()"
-                    class="p-2 rounded-lg text-xl hover:bg-copper-600/20 transition-all duration-300 cursor-pointer focus:outline-none grayscale hover:grayscale-0 transition-all"
-                    [class.grayscale-0]="currencyService.wantChf()">
-                    🇨🇭
-                </button>
+                <!-- Currency Selectors -->
+                <div class="flex gap-1 ml-2 bg-black/20 p-1 rounded-xl border border-white/5">
+                    <button (click)="currencyService.setCurrency('USD')"
+                        class="px-3 py-1 rounded-lg text-sm font-bold transition-all duration-300 cursor-pointer focus:outline-none hover:bg-white/5"
+                        [class.bg-copper-500]="currencyService.selectedCurrency() === 'USD'"
+                        [class.text-white]="currencyService.selectedCurrency() === 'USD'"
+                        [class.text-white/40]="currencyService.selectedCurrency() !== 'USD'">
+                        USD
+                    </button>
+                    <button (click)="currencyService.setCurrency('CHF')"
+                        class="px-3 py-1 rounded-lg text-sm font-bold transition-all duration-300 cursor-pointer focus:outline-none hover:bg-white/5"
+                        [class.bg-copper-500]="currencyService.selectedCurrency() === 'CHF'"
+                        [class.text-white]="currencyService.selectedCurrency() === 'CHF'"
+                        [class.text-white/40]="currencyService.selectedCurrency() !== 'CHF'">
+                        CHF
+                    </button>
+                    <button (click)="currencyService.setCurrency('EUR')"
+                        class="px-3 py-1 rounded-lg text-sm font-bold transition-all duration-300 cursor-pointer focus:outline-none hover:bg-white/5"
+                        [class.bg-copper-500]="currencyService.selectedCurrency() === 'EUR'"
+                        [class.text-white]="currencyService.selectedCurrency() === 'EUR'"
+                        [class.text-white/40]="currencyService.selectedCurrency() !== 'EUR'">
+                        EUR
+                    </button>
+                </div>
 
             </div>
 
