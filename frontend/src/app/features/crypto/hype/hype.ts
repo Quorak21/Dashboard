@@ -4,8 +4,8 @@ import { AssetMainCard } from '../../../shared/components/asset-main-card/asset-
 import { PriceChart } from '../../../shared/components/price-chart/price-chart';
 import { DailyChart } from '../../../shared/components/daily-chart/daily-chart';
 import { HttpClient } from '@angular/common/http';
-import { formatNumber } from '../services/format-number';
-import { formatTime } from '../services/format-dates';
+import { formatNumber } from '../../../core/services/format-number';
+import { formatTime } from '../../../core/services/format-dates';
 import { CurrencyService } from '../../../core/services/currency.service';
 import { timer, Subscription } from 'rxjs';
 import type { MetricCard } from './metric-card-model-hype';
@@ -30,7 +30,7 @@ export class Hype implements OnDestroy {
   private http = inject(HttpClient);
   public currencyService = inject(CurrencyService);
   private timerSub: Subscription = timer(0, 60000).subscribe(() => this.refresh());
-  
+
   usdPrice = signal<number>(0);
   currentPrice = computed(() => {
     const price = this.usdPrice();
@@ -64,8 +64,6 @@ export class Hype implements OnDestroy {
   fluxNetFlow = signal<number[]>([]);
   fluxDays = signal<number[]>([]);
 
-
-
   // Chiffre venant de l'api hyperliquid
   circulatingSupply = signal<string>('');
   totalValueLocked = signal<string>('');
@@ -93,14 +91,11 @@ export class Hype implements OnDestroy {
   flux30d = signal<string>('');
   burned24h = signal<number>(0);
 
-
   // Chiffre blockchain
   bridgedHype = signal<string>('');
   ratioBridged = signal<string>('');
   liquidStaked = signal<string>('');
   stakedEvmCore = signal<string>('');
-
-
 
   refresh() {
     this.http.get<any>(`${environment.apiUrl}/api/dashboard/hype`).subscribe((data: any) => {
@@ -148,8 +143,6 @@ export class Hype implements OnDestroy {
       this.fluxNetFlow.set(data.fluxNetFlow);
       this.fluxDays.set(data.fluxDays);
     });
-
-
 
   }
 
@@ -208,7 +201,7 @@ export class Hype implements OnDestroy {
       title: "Staking",
       metrics: [
         { label: "Total Staked", value: this.formatNumber(Number(this.totalStakedHype())) },
-        { label: "Staked Ratio", value: this.formatNumber(Number(this.ratioStaked())) },
+        { label: "Staked Ratio", value: this.formatNumber(Number(this.ratioStaked())) + "%" },
         { label: "Avg. APR", value: this.formatNumber(Number(this.stakingApr())) + "%" }
       ],
     },

@@ -1,7 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { formatNumber } from '../../services/format-number';
+import { formatNumber } from '../../../../core/services/format-number';
 
 @Component({
   selector: 'app-form-hype-projection',

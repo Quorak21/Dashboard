@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { formatTime } from '../../../features/crypto/services/format-dates';
-import { formatNumber } from '../../../features/crypto/services/format-number';
+import { formatTime } from '../../../core/services/format-dates';
+import { formatNumber } from '../../../core/services/format-number';
 import { DecimalPipe } from '@angular/common';
 
 @Component({

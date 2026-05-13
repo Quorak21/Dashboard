@@ -1,6 +1,6 @@
 import { Component, input, ViewChild, ElementRef, AfterViewInit, effect, HostListener } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
-import { formatNumber } from '../../services/format-number';
+import { formatNumber } from '../../../../core/services/format-number';
 
 Chart.register(...registerables);
 

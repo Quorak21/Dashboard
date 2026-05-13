@@ -30,9 +30,7 @@ public class DashboardController {
 
     @GetMapping("/hype")
     public HypeDto getLastHypeData() {
-
         return this.hypeService.getLastHypeData();
-
     }
 
     @GetMapping("/inveb")

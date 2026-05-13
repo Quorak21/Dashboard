@@ -46,15 +46,13 @@ public class HypeService {
                 if (this.cachedData != null) {
                         return this.cachedData;
                 }
-                this.cachedData = this.assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")
-                                .map(this::mapToDto)
-                                .orElseGet(this::getData);
-                return this.cachedData;
+                return this.getData();
         }
 
         public HypeDto getData() {
 
                 HyperliquidDto hyperliquidData = this.hyperliquidClient.getHlData();
+                BlockChainDto blockchainData = this.blockChainClient.getBlockchainData();
 
                 CoinGeckoDto[] data = this.client.getData();
                 CoinGeckoDto hypeRaw = data[0];
@@ -78,7 +76,7 @@ public class HypeService {
                 }
 
                 AssetDaily savedEntity = this.assetDailyRepository.save(newPoint);
-                this.cachedData = mapToDto(savedEntity);
+                this.cachedData = mapToDto(savedEntity, hyperliquidData, blockchainData);
                 return this.cachedData;
         }
 
@@ -101,7 +99,7 @@ public class HypeService {
 
         }
 
-        private HypeDto mapToDto(AssetDaily entity) {
+        private HypeDto mapToDto(AssetDaily entity, HyperliquidDto hyperliquidData, BlockChainDto blockchainData) {
 
                 List<AssetSnapshot> history = new java.util.ArrayList<>(
                                 this.assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE"));
@@ -114,9 +112,6 @@ public class HypeService {
                 java.util.Collections.reverse(daily);
                 List<Double> livePrice = daily.stream().map(AssetDaily::getCurrentPrice).toList();
                 List<Long> liveDay = daily.stream().map(AssetDaily::getLastRefresh).toList();
-
-                HyperliquidDto hyperliquidData = this.hyperliquidClient.getHlData();
-                BlockChainDto blockchainData = this.blockChainClient.getBlockchainData();
 
                 // Les calculs
                 // Ratio Vol/TVL provider

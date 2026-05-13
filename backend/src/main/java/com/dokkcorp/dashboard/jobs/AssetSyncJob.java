@@ -10,7 +10,7 @@ import com.dokkcorp.dashboard.features.stocks.investorab.InveBDto;
 
 import com.dokkcorp.dashboard.model.entity.AssetDaily;
 import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
-import com.dokkcorp.dashboard.providers.stocks.FMPClient;
+
 import com.dokkcorp.dashboard.repository.AssetDailyRepository;
 import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
 
@@ -30,9 +30,6 @@ public class AssetSyncJob {
 
     @Autowired
     private InveBService inveBService;
-
-    @Autowired
-    private FMPClient fmpClient;
 
     // toutes les 10 minutes sur des chiffres ronds (00, 10, 20...)
     @Scheduled(cron = "0 0/10 * * * ?")

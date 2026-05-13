@@ -32,6 +32,7 @@ public class BlockChainRequest {
         Transaction transaction = Transaction.createEthCallTransaction(null, contractAddress, encodedData);
         String responseRaw = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST).send().getValue();
 
+        @SuppressWarnings("rawtypes")
         List<Type> decodedResponses = FunctionReturnDecoder.decode(responseRaw, function.getOutputParameters());
 
         if (decodedResponses.isEmpty()) {

@@ -17,17 +17,11 @@ import com.dokkcorp.dashboard.providers.dto.crypto.BlockChainDto;
 @Configuration
 public class BlockChainClient {
 
-        private final HyperEvmRpc hyperEvmRpc;
-
         @Autowired
         private Web3j web3j;
 
         @Autowired
         private BlockChainRequest blockChainRequest;
-
-        BlockChainClient(HyperEvmRpc hyperEvmRpc) {
-                this.hyperEvmRpc = hyperEvmRpc;
-        }
 
         public BlockChainDto getBlockchainData() {
 
