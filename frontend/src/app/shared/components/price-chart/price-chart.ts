@@ -13,6 +13,7 @@ export class PriceChart implements AfterViewInit, OnChanges {
   @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
   @Input() prices: number[] = [];
   @Input() labels: number[] = [];
+  @Input() currency: string = '';
 
   private chart: Chart | undefined;
 
@@ -80,7 +81,7 @@ export class PriceChart implements AfterViewInit, OnChanges {
               bodyAlign: 'center',
               displayColors: false,
               callbacks: {
-                label: (ctx) => `${ctx.parsed.y?.toFixed(2)}$`
+                label: (ctx) => `${ctx.parsed.y?.toFixed(2)} ${this.currency}`
               }
             }
           },

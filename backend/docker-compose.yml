@@ -23,6 +23,8 @@ services:
 
   backend:
     image: ${DOCKER_USERNAME}/dashboard-backend:latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     container_name: dashboard-backend
     restart: always
     depends_on:
@@ -38,6 +40,7 @@ services:
       - POSTGRES_PASSWORD=dokksecret
       - COINGECKO_API_KEY=${COINGECKO_API_KEY}
       - BLOCKCHAIN_RPC_URL=${BLOCKCHAIN_RPC_URL}
+      - FMP_API_KEY=${FMP_API_KEY}
       - CORS_ORIGINS=${CORS_ORIGINS}
       - JAVA_OPTS=-Xmx1g -Xms512m # Confortable pour Java sur 4Go
     ports:
@@ -50,12 +53,15 @@ services:
       - dashboard-network
 
   watchtower:
-    image: containrrr/watchtower
+    image: containrrr/watchtower:1.7.1
     container_name: watchtower
     restart: always
+    environment:
+      - DOCKER_API_VERSION=1.41
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --interval 300 --cleanup
+      - /root/.docker/config.json:/config.json
+    command: --interval 3600 --cleanup --label-enable
     deploy:
       resources:
         limits:
@@ -69,4 +75,3 @@ networks:
 
 volumes:
   postgres_data:
-

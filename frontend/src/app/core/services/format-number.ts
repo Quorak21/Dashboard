@@ -3,6 +3,9 @@ export function formatNumber(num: number | undefined | null): string {
 
     const absNum = Math.abs(num);
 
+    if (absNum >= 1.0e+12) {
+        return (num / 1.0e+12).toFixed(2).replace(/\.00$/, '') + 'T';
+    }
     if (absNum >= 1.0e+9) {
         return (num / 1.0e+9).toFixed(2).replace(/\.00$/, '') + 'B';
     }
