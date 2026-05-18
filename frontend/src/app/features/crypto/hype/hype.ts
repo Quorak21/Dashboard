@@ -6,7 +6,6 @@ import { DailyChart } from '../../../shared/components/daily-chart/daily-chart';
 import { HttpClient } from '@angular/common/http';
 import { formatNumber } from '../../../core/services/format-number';
 import { formatTime } from '../../../core/services/format-dates';
-import { CurrencyService } from '../../../core/services/currency.service';
 import { timer, Subscription } from 'rxjs';
 import type { MetricCard } from './metric-card-model-hype';
 import { HypeMetricCard } from './hype-metric-card/hype-metric-card';
@@ -28,24 +27,11 @@ export class Hype implements OnDestroy {
   public formatTime = formatTime;
 
   private http = inject(HttpClient);
-  public currencyService = inject(CurrencyService);
   private timerSub: Subscription = timer(0, 60000).subscribe(() => this.refresh());
 
   usdPrice = signal<number>(0);
-  currentPrice = computed(() => {
-    const price = this.usdPrice();
-    const cur = this.currencyService.selectedCurrency();
-    if (cur === 'CHF') return price * this.currencyService.usdChf();
-    if (cur === 'EUR') return price * this.currencyService.usdEur();
-    return price;
-  });
-
-  currencySymbol = computed(() => {
-    const cur = this.currencyService.selectedCurrency();
-    if (cur === 'CHF') return 'CHF';
-    if (cur === 'EUR') return '€';
-    return '$';
-  });
+  currentPrice = computed(() => this.usdPrice());
+  currencySymbol = computed(() => '$');
   priceChangePercentage24h = signal<number>(0);
   totalVolume = signal<number>(0);
   marketCap = signal<number>(0);

@@ -1,4 +1,4 @@
-package com.dokkcorp.dashboard.providers.dto.crypto;
+package com.dokkcorp.dashboard.providers.hyperliquid;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

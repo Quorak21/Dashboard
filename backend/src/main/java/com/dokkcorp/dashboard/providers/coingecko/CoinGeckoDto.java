@@ -1,4 +1,4 @@
-package com.dokkcorp.dashboard.providers.dto.crypto;
+package com.dokkcorp.dashboard.providers.coingecko;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

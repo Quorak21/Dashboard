@@ -13,8 +13,12 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface AssetDailyRepository extends JpaRepository<AssetDaily, Long> {
 
+    // La table qui contient les data toutes les 10 minutes
+
+    // Récupérer le dernier élément inséré, la dernière mise à jour
     Optional<AssetDaily> findFirstBySymbolOrderByLastRefreshDesc(String symbol);
 
+    // Récupérer les 144 derniers éléments pour le graphique pour la chart daily, les 24 dernière heures
     List<AssetDaily> findTop144BySymbolOrderByLastRefreshDesc(String symbol);
 
     @Transactional

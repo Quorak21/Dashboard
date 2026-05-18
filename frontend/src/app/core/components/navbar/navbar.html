@@ -1,4 +1,4 @@
-<nav class="w-full bg-dark-900 border-b border-copper-500/20 shadow-lg shadow-black/50 sticky top-0 z-50">
+<nav class="w-full bg-dark-900 border-b  border-copper-500/20 shadow-lg shadow-black/50 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div class="flex items-center h-16 w-full justify-between">
 
@@ -11,31 +11,6 @@
                         class="w-5 h-5 group-hover:-translate-y-0.5 group-hover:scale-110 transition-all duration-300"></lucide-icon>
                 </button>
 
-                <!-- Currency Selectors -->
-                <div class="flex gap-1 ml-2 bg-black/20 p-1 rounded-xl border border-white/5">
-                    <button (click)="currencyService.setCurrency('USD')"
-                        class="px-3 py-1 rounded-lg text-sm font-bold transition-all duration-300 cursor-pointer focus:outline-none hover:bg-white/5"
-                        [class.bg-copper-500]="currencyService.selectedCurrency() === 'USD'"
-                        [class.text-white]="currencyService.selectedCurrency() === 'USD'"
-                        [class.text-white/40]="currencyService.selectedCurrency() !== 'USD'">
-                        USD
-                    </button>
-                    <button (click)="currencyService.setCurrency('CHF')"
-                        class="px-3 py-1 rounded-lg text-sm font-bold transition-all duration-300 cursor-pointer focus:outline-none hover:bg-white/5"
-                        [class.bg-copper-500]="currencyService.selectedCurrency() === 'CHF'"
-                        [class.text-white]="currencyService.selectedCurrency() === 'CHF'"
-                        [class.text-white/40]="currencyService.selectedCurrency() !== 'CHF'">
-                        CHF
-                    </button>
-                    <button (click)="currencyService.setCurrency('EUR')"
-                        class="px-3 py-1 rounded-lg text-sm font-bold transition-all duration-300 cursor-pointer focus:outline-none hover:bg-white/5"
-                        [class.bg-copper-500]="currencyService.selectedCurrency() === 'EUR'"
-                        [class.text-white]="currencyService.selectedCurrency() === 'EUR'"
-                        [class.text-white/40]="currencyService.selectedCurrency() !== 'EUR'">
-                        EUR
-                    </button>
-                </div>
-
             </div>
 
             <!-- Titre -->
@@ -47,7 +22,7 @@
             </div>
 
             <!-- Partie droite -->
-            <div class="flex items-center z-10">
+            <div class="flex items-center z-10 relative">
                 <!-- Menu burger -->
                 <button
                     class="p-2 rounded-lg text-copper-400 hover:text-copper-300 hover:bg-copper-600/20 hover:shadow-[0_0_15px_rgba(184,115,51,0.2)] transition-all duration-300 group cursor-pointer focus:outline-none">

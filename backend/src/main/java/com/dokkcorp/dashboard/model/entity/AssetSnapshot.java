@@ -11,6 +11,8 @@ import lombok.Data;
 @Entity
 @Table(name = "asset_snapshot")
 public class AssetSnapshot {
+    // TODO Changer les type de variable, avec du double ou du bigdecimal mais bonne
+    // chance a toi pour la gestion de la DB derrière Dokk du futur
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

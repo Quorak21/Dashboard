@@ -10,11 +10,14 @@ import org.springframework.web.client.RestClient;
 @EnableScheduling
 public class DashboardApplication {
 
-	@Bean //test
+	@Bean
+	// Création du restclient global pour toute l'application
+
 	public static RestClient.Builder restClientBuilder() {
 		return RestClient.builder();
 	}
 
+	// Et on lance le backend !
 	public static void main(String[] args) {
 		SpringApplication.run(DashboardApplication.class, args);
 	}

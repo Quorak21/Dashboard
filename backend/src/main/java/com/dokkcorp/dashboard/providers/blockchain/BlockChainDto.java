@@ -1,4 +1,4 @@
-package com.dokkcorp.dashboard.providers.dto.crypto;
+package com.dokkcorp.dashboard.providers.blockchain;
 
 public record BlockChainDto(
         String bridgedHype,

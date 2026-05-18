@@ -1,4 +1,4 @@
-package com.dokkcorp.dashboard.providers.crypto;
+package com.dokkcorp.dashboard.providers.blockchain.utils;
 
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
@@ -15,11 +15,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-public class BlockChainRequest {
+@Service
+public class ContractReader {
 
+    // Fonction qui permet de lire un contrat pour en ressortir ses datas, va etre utilisé pour des requetes plus poussée qu'une simple balance
     public BigInteger readContract(Web3j web3j, String contractAddress, String functionName) throws Exception {
 
         Function function = new Function(

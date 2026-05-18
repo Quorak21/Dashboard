@@ -3,18 +3,20 @@ package com.dokkcorp.dashboard.features.crypto.hype;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.dokkcorp.dashboard.providers.crypto.CoinGeckoClient;
-import com.dokkcorp.dashboard.providers.dto.crypto.CoinGeckoDto;
-import com.dokkcorp.dashboard.providers.dto.crypto.CoinGeckoHistoryDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.dokkcorp.dashboard.providers.crypto.HyperliquidClient;
-import com.dokkcorp.dashboard.providers.dto.crypto.HyperliquidDto;
+import com.dokkcorp.dashboard.providers.coingecko.CoinGeckoClient;
+import com.dokkcorp.dashboard.providers.coingecko.CoinGeckoDto;
+import com.dokkcorp.dashboard.providers.coingecko.CoinGeckoHistoryDto;
 
-import com.dokkcorp.dashboard.providers.crypto.BlockChainClient;
-import com.dokkcorp.dashboard.providers.dto.crypto.BlockChainDto;
+import com.dokkcorp.dashboard.providers.hyperliquid.HyperliquidClient;
+import com.dokkcorp.dashboard.providers.hyperliquid.HyperliquidDto;
+
+import com.dokkcorp.dashboard.providers.blockchain.BlockChainClient;
+import com.dokkcorp.dashboard.providers.blockchain.BlockChainDto;
 
 import com.dokkcorp.dashboard.model.entity.AssetDaily;
 import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
@@ -25,23 +27,32 @@ import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
 @Service
 public class HypeService {
 
-        @Autowired
-        private CoinGeckoClient client;
+        private final CoinGeckoClient coingeckoclient;
 
-        @Autowired
-        private HyperliquidClient hyperliquidClient;
+        private final HyperliquidClient hyperliquidClient;
 
-        @Autowired
-        private BlockChainClient blockChainClient;
+        private final BlockChainClient blockChainClient;
 
-        @Autowired
-        private AssetDailyRepository assetDailyRepository;
+        private final AssetDailyRepository assetDailyRepository;
 
-        @Autowired
-        private AssetSnapshotRepository assetSnapshotRepository;
+        private final AssetSnapshotRepository assetSnapshotRepository;
+
+        private static final Logger logger = LoggerFactory.getLogger(HypeService.class);
+
+        public HypeService(CoinGeckoClient client, HyperliquidClient hyperliquidClient,
+                        BlockChainClient blockChainClient, AssetDailyRepository assetDailyRepository,
+                        AssetSnapshotRepository assetSnapshotRepository) {
+                this.coingeckoclient = client;
+                this.hyperliquidClient = hyperliquidClient;
+                this.blockChainClient = blockChainClient;
+                this.assetDailyRepository = assetDailyRepository;
+                this.assetSnapshotRepository = assetSnapshotRepository;
+        }
 
         private HypeDto cachedData;
 
+        // On reçoit la requete, on renvoie le cacho pour eviter de nouvelle requete,
+        // s'il est vide, on en créer un
         public HypeDto getLastHypeData() {
                 if (this.cachedData != null) {
                         return this.cachedData;
@@ -50,39 +61,83 @@ public class HypeService {
         }
 
         public HypeDto getData() {
+                HyperliquidDto hyperliquidData = null;
+                BlockChainDto blockchainData = null;
+                CoinGeckoDto hypeRaw = null;
 
-                HyperliquidDto hyperliquidData = this.hyperliquidClient.getHlData();
-                BlockChainDto blockchainData = this.blockChainClient.getBlockchainData();
+                // On check les API 1 par 1 pour cibler en cas d'erreur
+                // Hyperliquid
+                try {
+                        hyperliquidData = this.hyperliquidClient.getHlData();
+                } catch (Exception e) {
+                        logger.warn("Echec API Hyperliquid : {}", e.getMessage());
+                }
+                // Blockchain
+                try {
+                        blockchainData = this.blockChainClient.getBlockchainData();
+                } catch (Exception e) {
+                        logger.warn("Echec API Blockchain : {}", e.getMessage());
+                }
+                // CoinGecko
+                try {
+                        CoinGeckoDto[] data = this.coingeckoclient.getData();
+                        if (data != null && data.length > 0)
+                                hypeRaw = data[0];
+                } catch (Exception e) {
+                        logger.warn("Echec API CoinGecko : {}", e.getMessage());
 
-                CoinGeckoDto[] data = this.client.getData();
-                CoinGeckoDto hypeRaw = data[0];
-
-                AssetDaily newPoint = new AssetDaily();
-                newPoint.setSymbol("HYPE");
-                newPoint.setCurrentPrice(hypeRaw.currentPrice());
-                newPoint.setMarketCap(hypeRaw.marketCap());
-                newPoint.setPriceChangePercentage24h(hypeRaw.priceChangePercentage24h());
-                newPoint.setTotalVolume(hypeRaw.totalVolume());
-                newPoint.setLastRefresh(System.currentTimeMillis());
-                newPoint.setBurnedHype(hyperliquidData.hypeBurned());
-                newPoint.setCirculatingSupply(hyperliquidData.circulatingSupply());
-                newPoint.setFeesDaily(String.valueOf(Double.parseDouble(hyperliquidData.dailyVolume()) * 0.00022));
-                newPoint.setDailyVolume(hyperliquidData.dailyVolume());
-                newPoint.setOpenInterest(hyperliquidData.openInterest());
-                newPoint.setTotalValueLocked(hyperliquidData.totalValueLocked());
-
-                if (this.assetSnapshotRepository.findFirstByOrderByDayDesc().isEmpty()) {
-                        initializeHistory();
                 }
 
-                AssetDaily savedEntity = this.assetDailyRepository.save(newPoint);
-                this.cachedData = mapToDto(savedEntity, hyperliquidData, blockchainData);
-                return this.cachedData;
+                // Si l'un bug, on fait pas le calcul complet
+                // (TODO: faire partiellement pour avoir une partie des chiffre)
+                // (TODO: Time out + retry)
+                if (hyperliquidData == null || blockchainData == null || hypeRaw == null) {
+                        logger.error("Une ou plusieurs API HS");
+                        return (this.cachedData != null) ? this.cachedData : HypeDto.error("HYPE");
+                }
+                // Si tout est OK, on met a jour la DB et on recréer un nouveau cache
+                try {
+
+                        AssetDaily newPoint = new AssetDaily();
+                        newPoint.setSymbol("HYPE");
+                        newPoint.setCurrentPrice(hypeRaw.currentPrice());
+                        newPoint.setMarketCap(hypeRaw.marketCap());
+                        newPoint.setPriceChangePercentage24h(hypeRaw.priceChangePercentage24h());
+                        newPoint.setTotalVolume(hypeRaw.totalVolume());
+                        newPoint.setLastRefresh(System.currentTimeMillis());
+                        newPoint.setBurnedHype(hyperliquidData.hypeBurned());
+                        newPoint.setCirculatingSupply(hyperliquidData.circulatingSupply());
+                        newPoint.setFeesDaily(
+                                        String.valueOf(Double.parseDouble(hyperliquidData.dailyVolume()) * 0.00022));
+                        newPoint.setDailyVolume(hyperliquidData.dailyVolume());
+                        newPoint.setOpenInterest(hyperliquidData.openInterest());
+                        newPoint.setTotalValueLocked(hyperliquidData.totalValueLocked());
+
+                        if (this.assetSnapshotRepository.findFirstByOrderByDayDesc().isEmpty()) {
+                                initializeHistory();
+                        }
+
+                        AssetDaily savedEntity = this.assetDailyRepository.save(newPoint);
+                        // On met à jour le cache avec la nouvelle valeur
+                        this.cachedData = mapToDto(savedEntity, hyperliquidData, blockchainData);
+                        return this.cachedData;
+                        // Si y'a un problème, c'est que c'est dans la mise à jour DB
+                } catch (Exception e) {
+                        logger.error("Erreur non prévue, DB ? : {}", e.getMessage());
+                        // On renvoie le cache
+                        if (this.cachedData != null) {
+                                return this.cachedData;
+                        }
+                        // Sinon en renvoie un objet erreur
+                        return HypeDto.error("HYPE");
+                }
         }
 
+        // Fonction si la DB pour le chart annuel est vide, on la remplit pour avoir une
+        // base
         private void initializeHistory() {
 
-                CoinGeckoHistoryDto history = this.client.getHistory();
+                CoinGeckoHistoryDto history = this.coingeckoclient.getHistory();
 
                 List<AssetSnapshot> snapshots = new ArrayList<>();
                 for (int n = 0; n < history.prices().size(); n++) {
@@ -99,6 +154,7 @@ public class HypeService {
 
         }
 
+        // TODO: Refactorise en différents modules ici
         private HypeDto mapToDto(AssetDaily entity, HyperliquidDto hyperliquidData, BlockChainDto blockchainData) {
 
                 List<AssetSnapshot> history = new java.util.ArrayList<>(
@@ -181,25 +237,25 @@ public class HypeService {
                                 : Double.parseDouble(hyperliquidData.hypeBurned());
                 double burned24h = Double.parseDouble(hyperliquidData.hypeBurned()) - oldBurned;
 
-                // Les volat dernières 24h
+                // Les volat perso dernières 24h
                 double volatVolume = 0;
                 double volatOpenInterest = 0;
                 double volatHlpProvider = 0;
-                if (this.assetSnapshotRepository.findFirstBySymbolOrderByDayDesc("HYPE").isEmpty()
-                                || this.assetSnapshotRepository.findFirstBySymbolOrderByDayDesc("HYPE").get()
-                                                .getVolume24h() == null) {
+                try {
+                        volatVolume = ((volume / Double.parseDouble(h24.getDailyVolume())) - 1) * 100;
+                        volatOpenInterest = ((Double.parseDouble(hyperliquidData.openInterest())
+                                        / Double.parseDouble(h24.getOpenInterest()))
+                                        - 1)
+                                        * 100;
+                        volatHlpProvider = ((tvl / Double.parseDouble(h24.getTotalValueLocked())) - 1) * 100;
+                } catch (ArithmeticException | NumberFormatException e) {
+                        // Si c'est un problème de maths
+                        logger.warn("Calcul volatilité impossible (donnée manquante ou division par zéro) : {}",
+                                        e.getMessage());
+                } catch (Exception e) {
+                        // Si c'est autre chose
+                        logger.error("Erreur inconnue dans le calcul des volatilités", e);
 
-                } else {
-                        try {
-                                volatVolume = ((volume / Double.parseDouble(h24.getDailyVolume())) - 1) * 100;
-                                volatOpenInterest = ((Double.parseDouble(hyperliquidData.openInterest())
-                                                / Double.parseDouble(h24.getOpenInterest()))
-                                                - 1)
-                                                * 100;
-                                volatHlpProvider = ((tvl / Double.parseDouble(h24.getTotalValueLocked())) - 1) * 100;
-                        } catch (Exception e) {
-
-                        }
                 }
 
                 // data 30j
@@ -237,8 +293,12 @@ public class HypeService {
                                 circulating30d = String.valueOf(circAvg + burnedAvg);
                                 flux30d = String.valueOf(circAvg);
                         }
+                } catch (ArithmeticException | NumberFormatException e) {
+                        // Si c'est un problème de maths
+                        logger.warn("Calcul impossible (donnée manquante ou division par zéro) : {}",
+                                        e.getMessage());
                 } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error("Erreur dans le calcul des données 30j ", e);
                 }
 
                 // Données pour la chart des flux
@@ -247,25 +307,33 @@ public class HypeService {
                 List<Double> fluxNetFlow = new ArrayList<>();
                 List<Long> fluxDays = new ArrayList<>();
 
-                for (int i = 1; i < history.size(); i++) {
-                        AssetSnapshot current = history.get(i);
-                        AssetSnapshot previous = history.get(i - 1);
+                try {
+                        for (int i = 1; i < history.size(); i++) {
+                                AssetSnapshot current = history.get(i);
+                                AssetSnapshot previous = history.get(i - 1);
 
-                        if (current.getBurnedHype() != null && previous.getBurnedHype() != null
-                                        && current.getCirculatingSupply() != null
-                                        && previous.getCirculatingSupply() != null) {
-                                double burnedDelta = Double.parseDouble(current.getBurnedHype())
-                                                - Double.parseDouble(previous.getBurnedHype());
-                                double circulatingDelta = Double.parseDouble(current.getCirculatingSupply())
-                                                - Double.parseDouble(previous.getCirculatingSupply());
-                                double issuedDelta = circulatingDelta + burnedDelta;
-                                double netFlow = circulatingDelta;
+                                if (current.getBurnedHype() != null && previous.getBurnedHype() != null
+                                                && current.getCirculatingSupply() != null
+                                                && previous.getCirculatingSupply() != null) {
+                                        double burnedDelta = Double.parseDouble(current.getBurnedHype())
+                                                        - Double.parseDouble(previous.getBurnedHype());
+                                        double circulatingDelta = Double.parseDouble(current.getCirculatingSupply())
+                                                        - Double.parseDouble(previous.getCirculatingSupply());
+                                        double issuedDelta = circulatingDelta + burnedDelta;
+                                        double netFlow = circulatingDelta;
 
-                                fluxBurned.add(burnedDelta);
-                                fluxIssued.add(issuedDelta);
-                                fluxNetFlow.add(netFlow);
-                                fluxDays.add(current.getDay());
+                                        fluxBurned.add(burnedDelta);
+                                        fluxIssued.add(issuedDelta);
+                                        fluxNetFlow.add(netFlow);
+                                        fluxDays.add(current.getDay());
+                                }
                         }
+                } catch (ArithmeticException | NumberFormatException e) {
+                        // Si c'est un problème de maths
+                        logger.warn("Calcul impossible (donnée manquante ou division par zéro) : {}",
+                                        e.getMessage());
+                } catch (Exception e) {
+                        logger.error("Erreur dans le calcul de la chart des flux ", e);
                 }
 
                 return new HypeDto(

@@ -1,4 +1,4 @@
-package com.dokkcorp.dashboard.providers.dto.stocks;
+package com.dokkcorp.dashboard.providers.fmp;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
