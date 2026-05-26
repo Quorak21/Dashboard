@@ -32,9 +32,9 @@ com.dokkcorp.dashboard/
 
 ### Profils & config
 
-- **dev** : `application.yml`, Docker Compose Postgres local possible
-- **prod** : `application-prod.yml`, variables `POSTGRES_*`, `COINGECKO_API_KEY`, `FMP_API_KEY`, `BLOCKCHAIN_RPC_URL`, `CORS_ORIGINS`
-- JVM prod (compose) : `-Xmx1g -Xms512m`
+- **dev** : `application.yml` + `compose.dev.yaml` (démarrage du Postgres local de dev via `docker compose -f compose.dev.yaml up -d`)
+- **prod** : `docker-compose.yml` (production, 3 services), variables `POSTGRES_*`, `COINGECKO_API_KEY`, `FMP_API_KEY`, `BLOCKCHAIN_RPC_URL`, `CORS_ORIGINS`
+- JVM prod (compose) : `-Xmx1g -Xms512m` (JAVA_TOOL_OPTIONS)
 
 ### Symboles métier
 

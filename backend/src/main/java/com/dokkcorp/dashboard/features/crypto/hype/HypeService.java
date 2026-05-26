@@ -1,9 +1,11 @@
 package com.dokkcorp.dashboard.features.crypto.hype;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import java.util.concurrent.atomic.AtomicReference;
+
 
 import org.springframework.stereotype.Service;
 
@@ -164,15 +166,15 @@ public class HypeService {
         // TODO: Refactorise en différents modules ici
         private HypeDto mapToDto(AssetDaily entity, HyperliquidDto hyperliquidData, BlockChainDto blockchainData) {
 
-                List<AssetSnapshot> history = new java.util.ArrayList<>(
+                List<AssetSnapshot> history = new ArrayList<>(
                                 this.assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE"));
-                java.util.Collections.reverse(history);
+                Collections.reverse(history);
                 List<Double> historicalPrice = history.stream().map(AssetSnapshot::getPrice).toList();
                 List<Long> historicalDays = history.stream().map(AssetSnapshot::getDay).toList();
 
-                List<AssetDaily> daily = new java.util.ArrayList<>(
+                List<AssetDaily> daily = new ArrayList<>(
                                 this.assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE"));
-                java.util.Collections.reverse(daily);
+                Collections.reverse(daily);
                 List<Double> livePrice = daily.stream().map(AssetDaily::getCurrentPrice).toList();
                 List<Long> liveDay = daily.stream().map(AssetDaily::getLastRefresh).toList();
 

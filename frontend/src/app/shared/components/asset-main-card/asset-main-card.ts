@@ -2,14 +2,19 @@ import { Component, input } from '@angular/core';
 import { formatTime } from '../../../core/services/format-dates';
 import { formatNumber } from '../../../core/services/format-number';
 import { DecimalPipe } from '@angular/common';
+import { LucideAngularModule, TrendingUp, TrendingDown, Clock } from 'lucide-angular';
 
 @Component({
   selector: 'app-asset-main-card',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, LucideAngularModule],
   templateUrl: './asset-main-card.html',
   styleUrl: './asset-main-card.css',
 })
 export class AssetMainCard {
+  readonly TrendingUp = TrendingUp;
+  readonly TrendingDown = TrendingDown;
+  readonly Clock = Clock;
+
 
   public formatTime = formatTime;
   public formatNumber = formatNumber;

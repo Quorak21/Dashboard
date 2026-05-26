@@ -2,14 +2,20 @@ import { Component, inject, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AssetDashboardCard } from '../../shared/components/asset-dashboard-card/asset-dashboard-card';
 import { DashboardApiService } from '../../core/services/dashboard-api.service';
+import { LucideAngularModule, Zap, TrendingUp, Landmark, Boxes } from 'lucide-angular';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [AssetDashboardCard],
+  imports: [AssetDashboardCard, LucideAngularModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
 export class Dashboard {
+  readonly Zap = Zap;
+  readonly TrendingUp = TrendingUp;
+  readonly Landmark = Landmark;
+  readonly Boxes = Boxes;
+
 
   private api = inject(DashboardApiService);
 

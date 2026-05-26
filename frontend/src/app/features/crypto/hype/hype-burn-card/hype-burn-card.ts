@@ -1,14 +1,17 @@
 import { Component, input, computed } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { formatNumber } from '../../../../core/services/format-number';
+import { LucideAngularModule, Flame } from 'lucide-angular';
 
 @Component({
   selector: 'app-hype-burn-card',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, LucideAngularModule],
   templateUrl: './hype-burn-card.html',
 })
 export class HypeBurnCard {
+  readonly Flame = Flame;
+
   public formatNumber = formatNumber;
 
   burned24h = input.required<number>();
