@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 
 import { AssetDashboardCard } from './asset-dashboard-card';
 
@@ -9,10 +10,12 @@ describe('AssetDashboardCard', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AssetDashboardCard],
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AssetDashboardCard);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('asset', 'hype');
     await fixture.whenStable();
   });
 

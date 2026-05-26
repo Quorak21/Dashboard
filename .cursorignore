@@ -1,0 +1,27 @@
+﻿# Dépendances & builds
+**/node_modules/
+**/.angular/cache/
+**/dist/
+**/out-tsc/
+**/target/
+**/build/
+**/.mvn/wrapper/maven-wrapper.jar
+
+# Artefacts & caches
+**/coverage/
+**/__screenshots__/
+**/*.map
+repomix-output.*
+
+# Locks volumineux (indexation)
+**/package-lock.json
+
+# Secrets (double sécurité indexation)
+**/.env
+**/application-local.yml
+**/application-dev.yml
+
+# IDE / OS
+**/.idea/
+**/.history/
+**/.DS_Store

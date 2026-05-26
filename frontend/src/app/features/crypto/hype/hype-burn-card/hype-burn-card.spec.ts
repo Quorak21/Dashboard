@@ -13,6 +13,7 @@ describe('HypeBurnCard', () => {
 
     fixture = TestBed.createComponent(HypeBurnCard);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('burned24h', 100);
     await fixture.whenStable();
   });
 

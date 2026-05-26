@@ -1,5 +1,9 @@
-export function formatNumber(num: number | undefined | null): string {
-    if (num === null || num === undefined) return '0';
+export function formatNumber(value: number | string | undefined | null): string {
+    if (value === null || value === undefined || value === '') return '0';
+
+    const num = typeof value === 'string' ? Number(value) : value;
+
+    if (Number.isNaN(num)) return '—';
 
     const absNum = Math.abs(num);
 
@@ -15,7 +19,6 @@ export function formatNumber(num: number | undefined | null): string {
     if (absNum >= 1.0e+3) {
         return (num / 1.0e+3).toFixed(2).replace(/\.00$/, '') + 'K';
     }
-
 
     return num.toFixed(2).replace(/\.00$/, '');
 }

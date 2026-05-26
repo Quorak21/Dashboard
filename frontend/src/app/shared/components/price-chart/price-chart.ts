@@ -1,54 +1,63 @@
-import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges, HostListener } from '@angular/core';
+import { Component, ElementRef, viewChild, input, effect, inject, DestroyRef } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-price-chart',
-  standalone: true,
   templateUrl: './price-chart.html',
   styleUrl: './price-chart.css',
 })
-export class PriceChart implements AfterViewInit, OnChanges {
-  @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
-  @Input() prices: number[] = [];
-  @Input() labels: number[] = [];
-  @Input() currency: string = '';
+export class PriceChart {
+  chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
+  prices = input<number[]>([]);
+  labels = input<number[]>([]);
+  currency = input<string>('');
 
   private chart: Chart | undefined;
 
-  @HostListener('window:resize')
-  onResize() {
-    if (this.chart) {
-      this.chart.resize();
-    }
+  private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    // Détruire la chart quand le composant est détruit pour éviter les fuites de mémoire
+    this.destroyRef.onDestroy(() => {
+      this.chart?.destroy();
+    });
+    effect(() => {
+      const canvas = this.chartCanvas();
+      if (canvas && this.labels().length > 0) {
+        if (!this.chart) { // Si la chart n'existe pas, on la crée
+          this.createChart();
+        } else { // Si la chart existe, on la met à jour
+          this.updateChart();
+        }
+      }
+    });
   }
 
-  ngAfterViewInit() {
-    this.createChart();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (this.chart && (changes['prices'] || changes['labels'])) {
-      this.updateChart();
-    }
+  private updateChart() {
+    if (!this.chart) return;
+    this.chart.data.labels = this.labels().map(l => new Date(l).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }));
+    this.chart.data.datasets[0].data = this.prices();
+    this.chart.update('none');
   }
 
   private createChart() {
-    setTimeout(() => {
-      const ctx = this.chartCanvas.nativeElement.getContext('2d');
+      const canvas = this.chartCanvas()?.nativeElement;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      const gradient = ctx.createLinearGradient(0, 0, 0, this.chartCanvas.nativeElement.clientHeight);
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.clientHeight);
       gradient.addColorStop(0, 'rgba(184, 115, 51, 0.3)');
       gradient.addColorStop(1, 'rgba(184, 115, 51, 0)');
 
       this.chart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: this.labels.map(l => new Date(l).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })),
+          labels: this.labels().map(l => new Date(l).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })),
           datasets: [{
-            data: this.prices,
+            data: this.prices(),
             borderColor: '#b87333',
             backgroundColor: gradient,
             fill: true,
@@ -81,7 +90,7 @@ export class PriceChart implements AfterViewInit, OnChanges {
               bodyAlign: 'center',
               displayColors: false,
               callbacks: {
-                label: (ctx) => `${ctx.parsed.y?.toFixed(2)} ${this.currency}`
+                label: (ctx) => `${ctx.parsed.y?.toFixed(2)} ${this.currency()}`
               }
             }
           },
@@ -100,19 +109,11 @@ export class PriceChart implements AfterViewInit, OnChanges {
               ticks: {
                 color: 'rgba(255, 255, 255, 0.4)',
                 font: { size: 10 },
-                callback: (val) => '$' + Number(val)
+                callback: (val) => Number(val)
               }
             }
           }
         }
       });
-    }, 50);
-  }
-
-  private updateChart() {
-    if (!this.chart) return;
-    this.chart.data.labels = this.labels.map(l => new Date(l).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' }));
-    this.chart.data.datasets[0].data = this.prices;
-    this.chart.update();
-  }
+    };
 }

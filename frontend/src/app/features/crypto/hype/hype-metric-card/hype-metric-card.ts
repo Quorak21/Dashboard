@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { MetricCard } from '../metric-card-model-hype';
+import { Component, input} from '@angular/core';
+import { MetricCard } from './metric-card-model-hype';
 import { DecimalPipe } from '@angular/common';
 
 @Component({
@@ -9,5 +9,5 @@ import { DecimalPipe } from '@angular/common';
   styleUrl: './hype-metric-card.css',
 })
 export class HypeMetricCard {
-  @Input({ required: true }) card!: MetricCard;
+  card = input.required<MetricCard>();
 }

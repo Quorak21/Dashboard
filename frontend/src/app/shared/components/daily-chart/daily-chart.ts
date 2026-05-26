@@ -1,54 +1,65 @@
-import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges, HostListener } from '@angular/core';
+import { Component, input, viewChild, ElementRef, inject, DestroyRef, effect } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-daily-chart',
-  standalone: true,
   templateUrl: './daily-chart.html',
   styleUrl: './daily-chart.css',
 })
-export class DailyChart implements AfterViewInit, OnChanges {
-  @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
-  @Input() prices: number[] = [];
-  @Input() labels: number[] = [];
+export class DailyChart {
+
+  private readonly destroyRef = inject(DestroyRef);
+
+  chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
+
+  prices = input<number[]>([]);
+  labels = input<number[]>([]);
 
   private chart: Chart | undefined;
 
-  @HostListener('window:resize')
-  onResize() {
-    if (this.chart) {
-      this.chart.resize();
-    }
+  constructor() {
+    // Détruire la chart quand le composant est détruit pour éviter les fuites de mémoire
+    this.destroyRef.onDestroy(() => {
+      this.chart?.destroy();
+    });
+    effect(() => {
+      const canvas = this.chartCanvas();
+      if (canvas && this.labels().length > 0) {
+        if (!this.chart) { // Si la chart n'existe pas, on la crée
+          this.createChart();
+        } else { // Si la chart existe, on la met à jour
+          this.updateChart();
+        }
+      }
+    });
   }
 
-  ngAfterViewInit() {
-    this.createChart();
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (this.chart && (changes['prices'] || changes['labels'])) {
-      this.updateChart();
-    }
+  private updateChart() {
+    if (!this.chart) return;
+    this.chart.data.labels = this.labels().map(l => new Date(l).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }));
+    this.chart.data.datasets[0].data = this.prices();
+    this.chart.update('none');
   }
 
   private createChart() {
-    setTimeout(() => {
-      const ctx = this.chartCanvas.nativeElement.getContext('2d');
+      const canvas = this.chartCanvas()?.nativeElement;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      const gradient = ctx.createLinearGradient(0, 0, 0, this.chartCanvas.nativeElement.clientHeight);
-      gradient.addColorStop(0, 'rgba(229, 160, 117, 0.2)'); // Light Copper
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.clientHeight);
+      gradient.addColorStop(0, 'rgba(229, 160, 117, 0.2)');
       gradient.addColorStop(1, 'rgba(229, 160, 117, 0)');
 
       this.chart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: this.labels.map(l => new Date(l).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })),
+          labels: this.labels().map(l => new Date(l).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })),
           datasets: [{
-            data: this.prices,
-            borderColor: '#e5a075', // Light Copper
+            data: this.prices(),
+            borderColor: '#e5a075',
             backgroundColor: gradient,
             fill: true,
             tension: 0.3,
@@ -101,19 +112,11 @@ export class DailyChart implements AfterViewInit, OnChanges {
                 font: { size: 12 },
                 stepSize: 0.5,
                 precision: 2,
-                callback: (val) => val + '$'
+                callback: (val) => val + '$'  
               }
             }
           }
         }
       });
-    }, 50);
-  }
-
-  private updateChart() {
-    if (!this.chart) return;
-    this.chart.data.labels = this.labels.map(l => new Date(l).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }));
-    this.chart.data.datasets[0].data = this.prices;
-    this.chart.update('none'); // Update without animation for "live" feel
-  }
+  };
 }

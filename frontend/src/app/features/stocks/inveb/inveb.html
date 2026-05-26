@@ -4,10 +4,11 @@
     <div class="flex flex-wrap gap-8 justify-center">
         <app-asset-main-card asset="Investor AB" [symbol]="symbol()" [actualPrice]="currentPrice()"
             [change24h]="priceChangePercentage24h()" [volume24h]="totalVolume()" [marketCap]="marketCap()"
-            [lastRefresh]="lastRefresh()" [currencySymbol]="currencySymbol()">
+            [lastRefresh]="lastRefresh()" [currencySymbol]="currencySymbol()" tag="stock">
         </app-asset-main-card>
     </div>
 
+    <!-- Annual Chart -->
     <app-price-chart [prices]="historyPrices()" [labels]="historyDays()" currency="SEK"></app-price-chart>
 
 </div>

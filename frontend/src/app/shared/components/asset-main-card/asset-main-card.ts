@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { formatTime } from '../../../core/services/format-dates';
 import { formatNumber } from '../../../core/services/format-number';
 import { DecimalPipe } from '@angular/common';
@@ -14,12 +14,13 @@ export class AssetMainCard {
   public formatTime = formatTime;
   public formatNumber = formatNumber;
 
-  @Input() asset: string = "";
-  @Input() symbol: string = "";
-  @Input() change24h: number = 0;
-  @Input() volume24h: number = 0;
-  @Input() marketCap: number = 0;
-  @Input() actualPrice: number = 0;
-  @Input() lastRefresh: number = 0;
-  @Input() currencySymbol: string = "$";
+  asset = input<string>();
+  symbol = input<string>("");
+  tag = input<string>("");
+  change24h = input<number>(0);
+  volume24h = input<number>(0);
+  marketCap = input<number>(0);
+  actualPrice = input<number>(0);
+  lastRefresh = input<number>(0);
+  currencySymbol = input<string>('$');
 }

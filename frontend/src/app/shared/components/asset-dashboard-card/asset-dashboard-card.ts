@@ -11,12 +11,12 @@ import { DecimalPipe } from '@angular/common';
 export class AssetDashboardCard {
 
   asset = input.required<string>();
+  title = input<string>();
   price = input<number | null>(null);
   change = input<number>(0);
   currencySymbol = input<string>('$');
 
-  logo = computed(() => this.asset() === "placeholder" ? "assets/logos/placeholder.png" : "assets/logos/" + this.asset() + ".png");
-  name = computed(() => this.asset() === "placeholder" ? "À venir !" : this.asset().toUpperCase());
-  link = computed(() => this.asset() === "placeholder" ? "/dashboard" : "/" + this.asset());
+  logo = computed(() => "assets/logos/" + this.asset() + ".png");
+  link = computed(() => "/" + this.asset());
 
 }

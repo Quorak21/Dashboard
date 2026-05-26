@@ -23,9 +23,8 @@
                 </label>
                 <div class="relative">
                     <input id="hypeAmount" type="number"
-                        class="w-full bg-dark-900/50 border border-copper-500/30 rounded-lg px-4 py-3 text-copper-100 font-mono text-lg focus:outline-none focus:border-copper-500 focus:ring-1 focus:ring-copper-500/50 transition-all placeholder-copper-500/30"
-                        style="-moz-appearance: textfield; appearance: textfield;" placeholder="0"
-                        [formControl]="hypeProjection" autocomplete="off" />
+                        class="w-full bg-dark-900/50 border border-copper-500/30 rounded-lg px-4 py-3 text-copper-100 font-mono text-lg focus:outline-none focus:border-copper-500 focus:ring-1 focus:ring-copper-500/50 transition-[border-color,box-shadow] duration-200 placeholder-copper-500/30"
+                        placeholder="0" [(ngModel)]="hypeProjectionAmount" autocomplete="off" />
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 text-copper-400/50 font-bold text-sm">HYPE
                     </div>
                 </div>
@@ -38,27 +37,27 @@
                 </label>
                 <div class="relative">
                     <input id="projectedPrice" type="number" step="0.01"
-                        class="w-full bg-dark-900/50 border border-copper-500/30 rounded-lg px-4 py-3 text-copper-100 font-mono text-lg focus:outline-none focus:border-copper-500 focus:ring-1 focus:ring-copper-500/50 transition-all placeholder-copper-500/30"
-                        style="-moz-appearance: textfield; appearance: textfield;" [placeholder]="currentPrice()"
-                        [formControl]="priceProjection" autocomplete="off" />
+                        class="w-full bg-dark-900/50 border border-copper-500/30 rounded-lg px-4 py-3 text-copper-100 font-mono text-lg focus:outline-none focus:border-copper-500 focus:ring-1 focus:ring-copper-500/50 transition-[border-color,box-shadow] duration-200 placeholder-copper-500/30"
+                        [placeholder]="currentPrice()" [(ngModel)]="projectedPriceValue" autocomplete="off" />
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 text-copper-400/50 font-bold text-sm">$</div>
                 </div>
             </div>
         </div>
 
         <div
-            class="flex flex-col xl:flex-row justify-between xl:items-center mt-3 xl:mt-2 px-3 xl:px-1 py-3 xl:py-0 gap-2 xl:gap-0 text-[11px] font-medium text-copper-300/50 bg-dark-900/30 xl:bg-transparent rounded-lg border border-copper-500/10 xl:border-transparent">
-            <span class="flex justify-between xl:inline"><span>Current APR:</span> <span class="text-blue-400">{{
-                    stakingAprStr }}%</span></span>
-            <span class="flex justify-between xl:inline"><span>Projected value:</span> <span class="text-emerald-400">{{
+            class="flex flex-col xl:flex-row justify-between xl:items-center px-3 xl:px-1 py-2 xl:py-0 gap-2 xl:gap-0 text-[12px] font-medium text-copper-300/50 bg-dark-900/30 xl:bg-transparent rounded-lg border border-copper-500/10 xl:border-transparent">
+            <span class="flex justify-between xl:inline"><span>Current APR: </span> <span class="text-blue-400">{{
+                    stakingApr() | number:'1.0-2' }}%</span></span>
+            <span class="flex justify-between xl:inline"><span>Projected value: </span> <span
+                    class="text-emerald-400">{{
                     projectedValueUsd() }} $</span></span>
-            <span class="flex justify-between xl:inline"><span>Current price:</span> <span class="text-emerald-400">{{
+            <span class="flex justify-between xl:inline"><span>Current price: </span> <span class="text-emerald-400">{{
                     currentPrice() }} $</span></span>
         </div>
     </div>
 
     <!-- Results section -->
-    <div class="relative z-10 flex flex-col gap-2 mt-auto">
+    <div class="relative z-10 flex flex-col gap-2">
 
         <!-- Yearly -->
         <div

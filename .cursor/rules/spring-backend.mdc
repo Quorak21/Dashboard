@@ -1,0 +1,51 @@
+---
+description: Règles Spring Boot 4 / Java 21 pour le backend Dashboard
+globs: backend/**/*
+alwaysApply: false
+---
+
+# Backend Spring Boot 4 / Java 21
+
+**Interaction** : voir `monorepo.mdc` — pistes et explications par défaut ; code seulement sur demande explicite.
+
+Lire et maintenir [`backend/AGENTS.md`](backend/AGENTS.md) : le consulter en début de session feature back ; mettre à jour le journal après chaque tâche significative.
+
+## Stack
+
+- Spring Boot 4.x, Java 21 (records, pattern matching, switch expressions)
+- HTTP sortant : `RestClient` via `RestClient.Builder` injecté — **pas** de `RestTemplate`.
+- Virtual threads : activer explicitement dans la config pour la parallélisation I/O.
+- JPA : `ddl-auto: update` ; optimiser la configuration JVM en Docker (`-XX:MaxRAMPercentage` / `-Xmx`).
+
+## Architecture des packages
+
+| Package | Rôle |
+|---------|------|
+| `controller/` | Controllers REST exposant les endpoints de l'API. |
+| `features/<domain>/` | Package par domaine fonctionnel contenant les `*Service` et les DTOs (`record`). |
+| `providers/<vendor>/` | Clients tiers (HTTP, Blockchain) encapsulant les appels externes et gérant les exceptions localement (retourner `null` ou un DTO d'erreur). |
+| `jobs/` | Tâches planifiées (`@Scheduled`) appelant les services métiers sans dupliquer de logique. |
+| `model/entity/` | Entités de persistance JPA. |
+| `repository/` | Interfaces de persistance `JpaRepository`. |
+
+## Bonnes pratiques
+
+- **DTOs** : Privilégier les Java `record` immutables pour les échanges API.
+- **Clients API (Providers)** : Injecter le `RestClient.Builder` et configurer les URLs et clés d'API via les propriétés Spring Boot (pas de valeurs codées en dur). Ne jamais propager d'exception brute vers la couche service.
+- **Thread-Safety** : Les services étant des singletons Spring, toute variable d'état ou de cache local doit être gérée de manière thread-safe (ex. `volatile`, `AtomicReference`, collections thread-safe).
+- **Gestion des pannes** : Prévoir une dégradation gracieuse en cas de panne d'un client tiers (renvoi de données en cache ou d'un objet d'erreur standardisé).
+- **Secrets** : Toujours utiliser des placeholders du type `${SECRET_NAME:valeurParDefaut}` résolus via les variables d'environnement dans `application.yml`.
+- **Mémoire VPS** : Limiter la taille des caches en mémoire pour respecter les contraintes de RAM du VPS.
+
+## Tests
+
+```bash
+cd backend && mvn test
+```
+
+- Valider le comportement via des tests unitaires ou d'intégration ciblés.
+- Mocker les clients de messagerie/réseau externes pour les tests de services et de controllers.
+
+## Journal
+
+Après tâche significative : entrée datée en tête de `## Journal` dans `backend/AGENTS.md` (voir politique dans `monorepo.mdc`).

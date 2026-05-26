@@ -36,3 +36,8 @@ build/
 .env
 /backend/src/main/resources/application-local.yml
 /backend/src/main/resources/application-dev.yml
+code_review.md
+
+# Repomix outputs
+repomix-output.xml
+repomix-output.*

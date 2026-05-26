@@ -1,3 +1,4 @@
+// Affichage des data avec label
 export interface MetricRow {
     label: string;
     value: string;
@@ -6,6 +7,7 @@ export interface MetricRow {
     ratio?: string;
 }
 
+// Titre + data
 export interface MetricCard {
     title: string;
     metrics: MetricRow[];

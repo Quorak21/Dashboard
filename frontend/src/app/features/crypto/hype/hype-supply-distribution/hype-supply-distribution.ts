@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, viewChild, input, effect, inject, DestroyRef, computed } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { formatNumber } from '../../../../core/services/format-number';
 
@@ -10,49 +10,57 @@ Chart.register(...registerables);
   templateUrl: './hype-supply-distribution.html',
   styleUrl: './hype-supply-distribution.css',
 })
-export class HypeSupplyDistribution implements AfterViewInit, OnChanges {
+export class HypeSupplyDistribution {
 
-  @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
-  @Input() circulatingSupply: string = '';
-  @Input() maxSupply: string = '';
-  @Input() hypeBurned100: string = '';
+  chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
+  circulatingSupply = input<string>('');
+  maxSupply = input<string>('');
 
   private chart: Chart | undefined;
 
-  ngAfterViewInit() {
-    this.createChart();
+   // Création de destroyer 
+   private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    // On dit à Angular de détruire le graphique Chart.js (qui n'est pas uniquement lié au composant) à la fermeture du composant
+    this.destroyRef.onDestroy(() => {
+      this.chart?.destroy();
+    });
+    effect(() => {
+      const canvas = this.chartCanvas();
+      const data = this.supplyData();
+
+      if (!canvas || data[0] === 0) return;
+
+      if (!this.chart) {
+        this.createChart(canvas.nativeElement, data);
+      } else {
+        this.updateChart(this.chart, data);
+      }
+    });
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (this.chart) {
-      this.updateChart();
-    }
-  }
-
-  private updateChart() {
-    if (!this.chart) return;
-
+  // Calcul des données
+  supplyData = computed<number[]>(() => {
     const ORIGINAL_TOTAL_SUPPLY = 1000000000;
-    const currentMaxSupply = parseFloat(this.maxSupply) || ORIGINAL_TOTAL_SUPPLY;
-    const circulating = parseFloat(this.circulatingSupply) || 0;
-
+    const currentMaxSupply = parseFloat(this.maxSupply()) || ORIGINAL_TOTAL_SUPPLY;
+    const circulating = parseFloat(this.circulatingSupply()) || 0;
     const burned = Math.max(0, ORIGINAL_TOTAL_SUPPLY - currentMaxSupply);
     const unissued = Math.max(0, currentMaxSupply - circulating);
+    return [circulating, burned, unissued];
+  });
 
-    this.chart.data.datasets[0].data = [circulating, burned, unissued];
-    this.chart.update();
+  private updateChart(chart: Chart, data: number[]) {
+    // Envoi des données à la chart
+    chart.data.datasets[0].data = data;
+    // Mise à jour de la chart
+    chart.update();
   }
 
-  private createChart() {
-    const ctx = this.chartCanvas.nativeElement.getContext('2d');
+  private createChart(canvas: HTMLCanvasElement, data: number[]) {
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const ORIGINAL_TOTAL_SUPPLY = 1000000000;
-    const currentMaxSupply = parseFloat(this.maxSupply) || ORIGINAL_TOTAL_SUPPLY;
-    const circulating = parseFloat(this.circulatingSupply) || 0;
-
-    const burned = Math.max(0, ORIGINAL_TOTAL_SUPPLY - currentMaxSupply);
-    const unissued = Math.max(0, currentMaxSupply - circulating);
 
     this.chart = new Chart(ctx, {
       type: 'doughnut',
@@ -63,7 +71,7 @@ export class HypeSupplyDistribution implements AfterViewInit, OnChanges {
           'Unissued'
         ],
         datasets: [{
-          data: [circulating, burned, unissued],
+          data: data,
           backgroundColor: [
             'rgba(217, 119, 54, 0.85)', // Vibrant Copper
             'rgba(122, 46, 13, 0.85)',  // Dark Burnt Copper

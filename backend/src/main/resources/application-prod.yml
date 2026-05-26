@@ -10,3 +10,18 @@ spring:
 
   jpa:
     show-sql: false
+    hibernate:
+      ddl-auto: validate
+
+
+  web:
+    error:
+      include-message: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+

@@ -1,12 +1,11 @@
-import { Component, inject, computed, OnDestroy } from '@angular/core';
+import { Component, inject, computed, DestroyRef } from '@angular/core';
 import { signal } from '@angular/core';
-import { Subscription, timer } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { DashboardApiService } from '../../../core/services/dashboard-api.service';
 import { formatNumber } from '../../../core/services/format-number';
 import { formatTime } from '../../../core/services/format-dates';
-import { environment } from '../../../../environments/environment';
 import { AssetMainCard } from '../../../shared/components/asset-main-card/asset-main-card';
 import { PriceChart } from '../../../shared/components/price-chart/price-chart';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-inveb',
@@ -14,40 +13,36 @@ import { PriceChart } from '../../../shared/components/price-chart/price-chart';
   templateUrl: './inveb.html',
   styleUrl: './inveb.css',
 })
-export class Inveb implements OnDestroy {
+export class Inveb {
+
+  // TODO: Toujours ce problème de any
+  data = signal<any>(null);
 
   public formatNumber = formatNumber;
   public formatTime = formatTime;
+  private api = inject(DashboardApiService);
+  private destroyRef = inject(DestroyRef);
 
-  private http = inject(HttpClient);
-
-  private timerSub: Subscription = timer(0, 60000).subscribe(() => this.refresh());
-
-  currentPrice = signal<number>(0);
+  // On récupère les data dont on a besoin de data, mis à jour au refresh tous les 3minutes 
+  currentPrice = computed(() => this.data()?.currentPrice ?? 0);
   currencySymbol = computed(() => 'SEK');
+  priceChangePercentage24h = computed(() => this.data()?.priceChangePercentage24h ?? 0);
+  totalVolume = computed(() => this.data()?.totalVolume ?? 0);
+  marketCap = computed(() => this.data()?.marketCap ?? 0);
+  symbol = computed(() => this.data()?.symbol ?? 'INVE-B');
+  lastRefresh = computed(() => this.data()?.lastRefresh ?? 0);
+  historyPrices = computed(() => this.data()?.historyPrices ?? []);
+  historyDays = computed(() => this.data()?.historyDays ?? []);
 
-  priceChangePercentage24h = signal<number>(0);
-  totalVolume = signal<number>(0);
-  marketCap = signal<number>(0);
-  symbol = signal<string>('INVE-B');
-  lastRefresh = signal<number>(0);
-  historyPrices = signal<number[]>([]);
-  historyDays = signal<number[]>([]);
-
-  refresh() {
-    this.http.get<any>(`${environment.apiUrl}/api/dashboard/inveb`).subscribe((data: any) => {
-      this.currentPrice.set(data.currentPrice);
-      this.priceChangePercentage24h.set(data.priceChangePercentage24h);
-      this.totalVolume.set(data.totalVolume);
-      this.marketCap.set(data.marketCap);
-      this.symbol.set(data.symbol);
-      this.lastRefresh.set(data.lastRefresh);
-      this.historyPrices.set(data.historyPrices);
-      this.historyDays.set(data.historyDays);
-    });
+  // Constructeur — initialisation du refresh et du timer
+  constructor() {
+    this.refresh();
+    const intervalID = setInterval(() => this.refresh(), 180000);
+    this.destroyRef.onDestroy(() => clearInterval(intervalID));
   }
 
-  ngOnDestroy() {
-    this.timerSub.unsubscribe();
+  // TODO: Message d'erreur si on reçoit plus rien, la dernière donnée valide reste mais plus de mise à jour. Appartition tag rouge "erreur donnée plus a jour"
+  refresh() {
+    this.api.getData('inveb').pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => this.data.set(data));
   }
 }

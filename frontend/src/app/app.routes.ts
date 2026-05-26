@@ -1,17 +1,16 @@
 import { Routes } from '@angular/router';
-import { Dashboard } from './features/dashboard/dashboard';
-import { Hype } from './features/crypto/hype/hype';
-import { Inveb } from './features/stocks/inveb/inveb';
 
 export const routes: Routes = [
     {
-        path: '', component: Dashboard
+        path: '',
+        loadComponent: () => import('./features/dashboard/dashboard').then(m => m.Dashboard)
     },
     {
-        path: 'hype', component: Hype
+        path: 'hype',
+        loadComponent: () => import('./features/crypto/hype/hype').then(m => m.Hype)
     },
     {
-        path: 'inveb', component: Inveb
+        path: 'inveb',
+        loadComponent: () => import('./features/stocks/inveb/inveb').then(m => m.Inveb)
     }
-
 ];

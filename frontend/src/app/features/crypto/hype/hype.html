@@ -4,15 +4,11 @@
     <div class="flex flex-wrap gap-8 justify-center">
         <app-asset-main-card asset="hype" [symbol]="symbol()" [actualPrice]="currentPrice()"
             [change24h]="priceChangePercentage24h()" [volume24h]="totalVolume()" [marketCap]="marketCap()"
-            [lastRefresh]="lastRefresh()" [currencySymbol]="currencySymbol()">
+            [lastRefresh]="lastRefresh()" tag="crypto">
         </app-asset-main-card>
     </div>
 
-    <!-- Charts Section -->
-    <div class="flex flex-col gap-8 w-full mt-4">
-
-
-        <!-- Les deux chart -->
+        <!-- Section 1 -->
         <div class="flex flex-col md:flex-row gap-4 w-full">
             <!-- Chart annuelle-->
             <div class="flex flex-col w-full md:w-3/5">
@@ -22,7 +18,7 @@
                 </h3>
                 <app-price-chart [prices]="historyPrices()" [labels]="historyDays()" currency="$"></app-price-chart>
             </div>
-            <!-- Live 24h Chart -->
+            <!-- 24h Chart -->
             <div class="flex flex-col w-full md:w-2/5">
                 <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
@@ -32,35 +28,34 @@
             </div>
         </div>
 
+        <!-- Section 2 -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <!-- Burn Card -->
             <app-hype-burn-card [burned24h]="burned24h()" [hypeBurned100]="hypeBurned100()"
-                [currentPrice]="usdPrice()"></app-hype-burn-card>
+                [currentPrice]="currentPrice()"></app-hype-burn-card>
 
-            <!-- Flux Chart (Burn vs Issued) -->
+            <!-- Flow Chart  -->
             <app-hype-flux-chart class="md:col-span-2" [burned]="fluxBurned()" [issued]="fluxIssued()"
                 [netFlow]="fluxNetFlow()" [labels]="fluxDays()"
                 [historyPrices]="historyPrices().slice(-fluxBurned().length)">
             </app-hype-flux-chart>
         </div>
 
-        <!-- Metrics cards -->
+        <!-- Section 3, metric cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             @for (card of cards(); track card.title) {
             <app-hype-metric-card [card]="card"></app-hype-metric-card>
             }
         </div>
 
-        <!-- Supply distribution -->
+        <!-- Section 4 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Donut -->
-            <app-hype-supply-distribution [circulatingSupply]="circulatingSupply()" [maxSupply]="maxSupply()"
-                [hypeBurned100]="hypeBurned100()"></app-hype-supply-distribution>
+            <app-hype-supply-distribution [circulatingSupply]="circulatingSupply()" [maxSupply]="maxSupply()"></app-hype-supply-distribution>
             <!-- Form -->
-            <app-form-hype-projection [currentPrice]="usdPrice()"
+            <app-form-hype-projection [currentPrice]="currentPrice()"
                 [stakingApr]="stakingApr()"></app-form-hype-projection>
 
         </div>
-    </div>
 
 </div>

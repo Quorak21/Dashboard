@@ -1,4 +1,4 @@
-import { Component, input, ViewChild, ElementRef, AfterViewInit, effect, HostListener } from '@angular/core';
+import { Component, input, viewChild, ElementRef, effect, inject, DestroyRef } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { formatNumber } from '../../../../core/services/format-number';
 
@@ -10,9 +10,13 @@ Chart.register(...registerables);
   templateUrl: './hype-flux-chart.html',
   styleUrl: './hype-flux-chart.css',
 })
-export class HypeFluxChart implements AfterViewInit {
-  @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
+export class HypeFluxChart {
 
+  chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
+  // Création de destroyer 
+  private readonly destroyRef = inject(DestroyRef);
+
+  // Création des signals avec les données envoyées par le parent
   burned = input<number[]>([]);
   issued = input<number[]>([]);
   netFlow = input<number[]>([]);
@@ -20,12 +24,15 @@ export class HypeFluxChart implements AfterViewInit {
   historyPrices = input<number[]>([]);
 
   private chart: Chart | undefined;
-  private viewInitialized = false;
 
   constructor() {
+    // On dit à Angular de détruire le graphique Chart.js (qui n'est pas uniquement lié au composant) à la fermeture du composant
+    this.destroyRef.onDestroy(() => {
+      this.chart?.destroy();
+    });
     effect(() => {
-      const labels = this.labels();
-      if (this.viewInitialized && labels.length > 0) {
+      const canvas = this.chartCanvas();
+      if (canvas && this.labels().length > 0) {
         if (!this.chart) {
           this.createChart();
         } else {
@@ -35,23 +42,13 @@ export class HypeFluxChart implements AfterViewInit {
     });
   }
 
-  @HostListener('window:resize')
-  onResize() {
-    if (this.chart) {
-      this.chart.resize();
-    }
-  }
-
-  ngAfterViewInit() {
-    this.viewInitialized = true;
-  }
-
+  // Calcul pour avoir des bornes symétrique et donc avoir le 0 sur l'axe Y au centre
   private getSymmetricBounds() {
     const values = this.netFlow();
     const max = values.length > 0 ? Math.max(...values.map(Math.abs)) : 100000;
-    return Math.max(max * 1.10, 1000);
+    return Math.max(max * 1.05, 1000);
   }
-
+  // L'update de la chart, on renvoie les nouvelles data + nouvel axe Y
   private updateChart() {
     if (!this.chart) return;
     const finalYMax = this.getSymmetricBounds();
@@ -59,22 +56,20 @@ export class HypeFluxChart implements AfterViewInit {
       this.chart.options.scales['y'].suggestedMax = finalYMax;
       this.chart.options.scales['y'].suggestedMin = -finalYMax;
     }
+
+    // On enleve un jour pour afficher le bon jour
     this.chart.data.labels = this.labels().map(l => new Date(l - 86400000).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }));
     if (this.chart.data.datasets[0]) {
       this.chart.data.datasets[0].data = this.netFlow();
     }
     this.chart.update('none');
   }
-
+  // TODO : Régler ce problème de pic de donnée lors des unlock, mais a voir quand on aura dépasser les 30j de moyenne
   private createChart() {
-    const canvas = this.chartCanvas?.nativeElement;
+    const canvas = this.chartCanvas()?.nativeElement;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    if (this.chart) {
-      this.chart.destroy();
-    }
 
     const finalYMax = this.getSymmetricBounds();
 
@@ -120,7 +115,7 @@ export class HypeFluxChart implements AfterViewInit {
                 const date = new Date(this.labels()[items[0].dataIndex] - 86400000);
                 return `📅 ${date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`;
               },
-              label: (ctx) => {
+              label: (ctx) => { // Les données de l'info-bulle selon le curseur (ctx du jour)
                 const i = ctx.dataIndex;
                 const b = Math.abs(this.burned()[i]);
                 const e = this.issued()[i];
@@ -149,7 +144,7 @@ export class HypeFluxChart implements AfterViewInit {
             grid: {
               drawOnChartArea: true,
               color: (context) => context.tick.value === 0 ? 'rgba(75, 37, 2, 0.88)' : 'transparent',
-              lineWidth: (context) => context.tick.value === 0 ? 3 : 0
+              lineWidth: (context) => context.tick.value === 0 ? 4 : 0
             },
             ticks: {
               color: 'rgba(59, 130, 246, 0.6)',

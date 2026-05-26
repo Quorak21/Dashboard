@@ -10,26 +10,24 @@ import { formatNumber } from '../../../../core/services/format-number';
 })
 export class HypeBurnCard {
   public formatNumber = formatNumber;
+
   burned24h = input.required<number>();
   hypeBurned100 = input<string>('0');
   currentPrice = input<number>(0);
 
   // Valeur en USD calculée
-  burnedValueUsd = computed(() => {
-    return formatNumber(this.burned24h() * this.currentPrice());
-  });
+  burnedValueUsd = computed(() => formatNumber(this.burned24h() * this.currentPrice()));
 
   // Longueur de l'arc de l'ellipse M 10 50 A 35 50 0 0 1 100 50
   totalLength = 174;
 
   dashArrayStyle = computed(() => {
+    // On recup le string pour le changer en nombre
     const burnedStr = this.hypeBurned100() || '0';
     const percent = parseFloat(burnedStr);
     const validPercent = isNaN(percent) ? 0 : percent;
-    // ratio is out of 100
-    let ratio = validPercent / 100;
-    if (ratio > 1) ratio = 1;
-    if (ratio < 0) ratio = 0;
+    // On check que le ratio est entre 0 et 1
+    const ratio = Math.max(0, Math.min(1, validPercent / 100));
 
     // Le premier chiffre est la partie visible (remplie), le deuxième est le vide (la partie restante)
     const filledLength = this.totalLength * ratio;

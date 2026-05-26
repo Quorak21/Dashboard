@@ -9,8 +9,10 @@ import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
+
 import org.slf4j.LoggerFactory;
 
 @Service
@@ -27,16 +29,18 @@ public class InveBService {
         this.assetSnapshotRepository = assetSnapshotRepository;
     }
 
-    private InveBDto cachedData;
-    private List<Double> historyPrices = new ArrayList<>();
-    private List<Long> historyDays = new ArrayList<>();
-    private long lastHistoryRefresh = 0;
+    // volatile pour les listes pour aller uniquement dans la RAM chercher les données fraîches
+    private final AtomicReference<InveBDto> cachedData = new AtomicReference<>();
+    private volatile List<Double> historyPrices = new ArrayList<>();
+    private volatile List<Long> historyDays = new ArrayList<>();
+    private volatile long lastHistoryRefresh = 0;
 
     // Quand le front demande, on renvoie ce qu'il y a en cache. S'il est vide, on
     // va la remplir
     public InveBDto getLastInveBData() {
-        if (this.cachedData != null) {
-            return this.cachedData;
+        InveBDto data = this.cachedData.get();
+        if (data != null) {
+            return data;
         }
         return this.getData();
     }
@@ -62,7 +66,7 @@ public class InveBService {
             double totalVolume = inveBRaw.totalVolume();
             double lastRefresh = System.currentTimeMillis();
 
-            this.cachedData = new InveBDto(
+            InveBDto newDto = new InveBDto(
                     symbol,
                     currentPrice,
                     marketCap,
@@ -72,17 +76,20 @@ public class InveBService {
                     this.historyPrices,
                     this.historyDays);
 
-            return this.cachedData;
+            this.cachedData.set(newDto);
+            return newDto;
         } catch (ArithmeticException | NumberFormatException e) {
             logger.warn("Erreur de calcul");
-            if (this.cachedData != null) {
-                return this.cachedData;
+            InveBDto data = this.cachedData.get();
+            if (data != null) {
+                return data;
             }
             return InveBDto.error("ERROR");
         } catch (Exception e) {
             logger.error("API FMP HS", e);
-            if (this.cachedData != null) {
-                return this.cachedData;
+            InveBDto data = this.cachedData.get();
+            if (data != null) {
+                return data;
             }
             return InveBDto.error("ERROR");
         }

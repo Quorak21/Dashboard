@@ -1,18 +1,17 @@
-import { Component, inject, OnDestroy, computed, signal } from '@angular/core';
-import { environment } from '../../../../environments/environment';
+import { Component, inject, computed, signal, DestroyRef } from '@angular/core';
 import { AssetMainCard } from '../../../shared/components/asset-main-card/asset-main-card';
 import { PriceChart } from '../../../shared/components/price-chart/price-chart';
 import { DailyChart } from '../../../shared/components/daily-chart/daily-chart';
-import { HttpClient } from '@angular/common/http';
+import { DashboardApiService } from '../../../core/services/dashboard-api.service';
 import { formatNumber } from '../../../core/services/format-number';
 import { formatTime } from '../../../core/services/format-dates';
-import { timer, Subscription } from 'rxjs';
-import type { MetricCard } from './metric-card-model-hype';
+import type { MetricCard } from './hype-metric-card/metric-card-model-hype';
 import { HypeMetricCard } from './hype-metric-card/hype-metric-card';
 import { HypeBurnCard } from './hype-burn-card/hype-burn-card';
 import { HypeFluxChart } from './hype-flux-chart/hype-flux-chart';
 import { HypeSupplyDistribution } from './hype-supply-distribution/hype-supply-distribution';
 import { FormHypeProjection } from './form-hype-projection/form-hype-projection';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-hype',
@@ -21,201 +20,161 @@ import { FormHypeProjection } from './form-hype-projection/form-hype-projection'
   templateUrl: './hype.html',
   styleUrl: './hype.css',
 })
-export class Hype implements OnDestroy {
+export class Hype {
 
   public formatNumber = formatNumber;
   public formatTime = formatTime;
+  private destroyRef = inject(DestroyRef);
+  
+  private api = inject(DashboardApiService);
 
-  private http = inject(HttpClient);
-  private timerSub: Subscription = timer(0, 60000).subscribe(() => this.refresh());
+  // TODO: Changer le any pour eviter les fausses données
+  data = signal<any>(null);
 
-  usdPrice = signal<number>(0);
-  currentPrice = computed(() => this.usdPrice());
-  currencySymbol = computed(() => '$');
-  priceChangePercentage24h = signal<number>(0);
-  totalVolume = signal<number>(0);
-  marketCap = signal<number>(0);
-  symbol = signal<string>('HYPE');
-  lastRefresh = signal<number>(0);
+  // Computed — Market data
+  currentPrice = computed(() => this.data()?.currentPrice ?? 0);
+  priceChangePercentage24h = computed(() => this.data()?.priceChangePercentage24h ?? 0);
+  totalVolume = computed(() => this.data()?.totalVolume ?? 0);
+  marketCap = computed(() => this.data()?.marketCap ?? 0);
+  symbol = computed(() => this.data()?.symbol ?? 'HYPE');
+  lastRefresh = computed(() => this.data()?.lastRefresh ?? 0);
 
-  // Chart annuel et daily
-  historyPrices = signal<number[]>([]);
-  historyDays = signal<number[]>([]);
-  livePrices = signal<number[]>([]);
-  liveDays = signal<number[]>([]);
+  // Computed — Charts annuel et daily
+  historyPrices = computed(() => this.data()?.historyPrices ?? []);
+  historyDays = computed(() => this.data()?.historyDays ?? []);
+  livePrices = computed(() => this.data()?.livePrices ?? []);
+  liveDays = computed(() => this.data()?.liveDays ?? []);
 
-  // Chart flux
-  fluxBurned = signal<number[]>([]);
-  fluxIssued = signal<number[]>([]);
-  fluxNetFlow = signal<number[]>([]);
-  fluxDays = signal<number[]>([]);
+  // Computed — Chart flux
+  fluxBurned = computed(() => this.data()?.fluxBurned ?? []);
+  fluxIssued = computed(() => this.data()?.fluxIssued ?? []);
+  fluxNetFlow = computed(() => this.data()?.fluxNetFlow ?? []);
+  fluxDays = computed(() => this.data()?.fluxDays ?? []);
 
-  // Chiffre venant de l'api hyperliquid
-  circulatingSupply = signal<string>('');
-  totalValueLocked = signal<string>('');
-  apr = signal<string>('');
-  dailyVolume = signal<string>('');
-  ratioProvider = signal<string>('');
-  openInterest = signal<string>('');
-  feesDaily = signal<string>('');
-  feesAnnual = signal<string>('');
-  volatVolume = signal<number>(0);
-  volatOpenInterest = signal<number>(0);
-  volatHlpProvider = signal<number>(0);
-  stakingApr = signal<string>('');
-  maxSupply = signal<string>('');
-  circulation100 = signal<string>('');
-  fdv = signal<string>('');
-  ratioMcapFdv = signal<string>('');
-  hypeBurned100 = signal<string>('');
-  ratioPriceFees = signal<string>('');
-  ratioOImcap = signal<string>('');
-  totalStakedHype = signal<string>('');
-  ratioStaked = signal<string>('');
-  burned30d = signal<string>('');
-  circulating30d = signal<string>('');
-  flux30d = signal<string>('');
-  burned24h = signal<number>(0);
+  // Computed — API Hyperliquid
+  circulatingSupply = computed(() => this.data()?.circulatingSupply ?? '');
+  totalValueLocked = computed(() => this.data()?.totalValueLocked ?? '');
+  apr = computed(() => this.data()?.apr ?? '');
+  dailyVolume = computed(() => this.data()?.dailyVolume ?? '');
+  ratioProvider = computed(() => this.data()?.ratioProvider ?? '');
+  openInterest = computed(() => this.data()?.openInterest ?? '');
+  feesDaily = computed(() => this.data()?.feesDaily ?? '');
+  feesAnnual = computed(() => this.data()?.feesAnnual ?? '');
+  volatVolume = computed(() => this.data()?.volatVolume ?? 0);
+  volatOpenInterest = computed(() => this.data()?.volatOpenInterest ?? 0);
+  volatHlpProvider = computed(() => this.data()?.volatHlpProvider ?? 0);
+  stakingApr = computed(() => this.data()?.stakingApr ?? '');
+  maxSupply = computed(() => this.data()?.maxSupply ?? '');
+  circulation100 = computed(() => this.data()?.circulation100 ?? '');
+  fdv = computed(() => this.data()?.fdv ?? '');
+  ratioMcapFdv = computed(() => this.data()?.ratioMcapFdv ?? '');
+  hypeBurned100 = computed(() => this.data()?.hypeBurned100 ?? '');
+  ratioPriceFees = computed(() => this.data()?.ratioPriceFees ?? '');
+  ratioOImcap = computed(() => this.data()?.ratioOImcap ?? '');
+  totalStakedHype = computed(() => this.data()?.totalStakedHype ?? '');
+  ratioStaked = computed(() => this.data()?.ratioStaked ?? '');
+  burned30d = computed(() => this.data()?.burned30d ?? '');
+  circulating30d = computed(() => this.data()?.circulating30d ?? '');
+  flux30d = computed(() => this.data()?.flux30d ?? '');
+  burned24h = computed(() => this.data()?.burned24h ?? 0);
 
-  // Chiffre blockchain
-  bridgedHype = signal<string>('');
-  ratioBridged = signal<string>('');
-  liquidStaked = signal<string>('');
-  stakedEvmCore = signal<string>('');
+  // Computed — Blockchain
+  bridgedHype = computed(() => this.data()?.bridgedHype ?? '');
+  ratioBridged = computed(() => this.data()?.ratioBridged ?? '');
+  liquidStaked = computed(() => this.data()?.liquidStaked ?? '');
+  stakedEvmCore = computed(() => this.data()?.stakedEvmCore ?? '');
 
-  refresh() {
-    this.http.get<any>(`${environment.apiUrl}/api/dashboard/hype`).subscribe((data: any) => {
-      this.usdPrice.set(data.currentPrice);
-      this.priceChangePercentage24h.set(data.priceChangePercentage24h);
-      this.totalVolume.set(data.totalVolume);
-      this.marketCap.set(data.marketCap);
-      this.symbol.set(data.symbol);
-      this.lastRefresh.set(data.lastRefresh);
-      this.historyPrices.set(data.historyPrices);
-      this.historyDays.set(data.historyDays);
-      this.livePrices.set(data.livePrices);
-      this.liveDays.set(data.liveDays);
-      this.circulatingSupply.set(data.circulatingSupply);
-      this.totalValueLocked.set(data.totalValueLocked);
-      this.apr.set(data.apr);
-      this.dailyVolume.set(data.dailyVolume);
-      this.ratioProvider.set(data.ratioProvider);
-      this.openInterest.set(data.openInterest);
-      this.feesDaily.set(data.feesDaily);
-      this.feesAnnual.set(data.feesAnnual);
-      this.volatVolume.set(data.volatVolume);
-      this.volatOpenInterest.set(data.volatOpenInterest);
-      this.volatHlpProvider.set(data.volatHlpProvider);
-      this.stakingApr.set(data.stakingApr);
-      this.maxSupply.set(data.maxSupply);
-      this.circulation100.set(data.circulation100);
-      this.fdv.set(data.fdv);
-      this.ratioMcapFdv.set(data.ratioMcapFdv);
-      this.hypeBurned100.set(data.hypeBurned100);
-      this.ratioPriceFees.set(data.ratioPriceFees);
-      this.ratioOImcap.set(data.ratioOImcap);
-      this.totalStakedHype.set(data.totalStakedHype);
-      this.ratioStaked.set(data.ratioStaked);
-      this.bridgedHype.set(data.bridgedHype);
-      this.ratioBridged.set(data.ratioBridged);
-      this.liquidStaked.set(data.liquidStaked);
-      this.stakedEvmCore.set(data.stakedEvmCore);
-      this.burned30d.set(data.burned30d);
-      this.circulating30d.set(data.circulating30d);
-      this.flux30d.set(data.flux30d);
-      this.burned24h.set(data.burned24h);
-      this.fluxBurned.set(data.fluxBurned);
-      this.fluxIssued.set(data.fluxIssued);
-      this.fluxNetFlow.set(data.fluxNetFlow);
-      this.fluxDays.set(data.fluxDays);
-    });
-
-  }
-
-  ngOnDestroy() {
-    this.timerSub.unsubscribe();
-  }
-
+  // Metric cards
   cards = computed<MetricCard[]>(() => [
 
     {
       title: "Supply",
       metrics: [
-        { label: "Circulating", value: this.formatNumber(Number(this.circulatingSupply())), },
-        { label: "Maximum", value: this.formatNumber(Number(this.maxSupply())) },
-        { label: "Burned", value: this.formatNumber(Number(this.hypeBurned100())) + "%" }
+        { label: "Circulating", value: this.formatNumber(this.circulatingSupply()) },
+        { label: "Maximum", value: this.formatNumber(this.maxSupply()) },
+        { label: "Burned", value: this.formatNumber(this.hypeBurned100()) + "%" }
       ],
     },
 
     {
       title: "Valuation",
       metrics: [
-        { label: "Market Cap", value: this.formatNumber(Number(this.marketCap())) + "$" },
-        { label: "FDV", value: this.formatNumber(Number(this.fdv())) + "$" },
-        { label: "MCap / FDV", value: this.formatNumber(Number(this.ratioMcapFdv())) + "x" }
+        { label: "Market Cap", value: this.formatNumber(this.marketCap()) + "$" },
+        { label: "FDV", value: this.formatNumber(this.fdv()) + "$" },
+        { label: "MCap / FDV", value: this.formatNumber(this.ratioMcapFdv()) + "x" }
       ],
     },
 
     {
       title: "Issuance (Daily Avg)",
       metrics: [
-        { label: "Burn (30D avg)", value: this.formatNumber(Number(this.burned30d())) },
-        { label: "Issued (30D avg)", value: this.formatNumber(Number(this.circulating30d())) },
-        { label: "Net (30D avg)", value: this.formatNumber(Number(this.flux30d())) }
+        { label: "Burn (30D avg)", value: this.formatNumber(this.burned30d()) },
+        { label: "Issued (30D avg)", value: this.formatNumber(this.circulating30d()) },
+        { label: "Net (30D avg)", value: this.formatNumber(this.flux30d()) }
       ],
     },
 
     {
       title: "EVM Network",
       metrics: [
-        { label: "Bridged", value: this.formatNumber(Number(this.bridgedHype())) },
-        { label: "Supply Share", value: this.formatNumber(Number(this.ratioBridged())) },
-        { label: "Liquid Staked", value: this.formatNumber(Number(this.liquidStaked())), ratio: this.formatNumber(Number(this.stakedEvmCore())) + "%" }
+        { label: "Bridged", value: this.formatNumber(this.bridgedHype()) },
+        { label: "Supply Share", value: this.formatNumber(this.ratioBridged()) },
+        { label: "Liquid Staked", value: this.formatNumber(this.liquidStaked()), ratio: this.formatNumber(this.stakedEvmCore()) + "%" }
       ],
     },
 
     {
       title: "Generated Fees",
       metrics: [
-        { label: "24h (Est.)", value: this.formatNumber(Number(this.feesDaily())) },
-        { label: "Annualized (Est.)", value: this.formatNumber(Number(this.feesAnnual())) },
-        { label: "Price / Fees Ratio", value: this.formatNumber(Number(this.ratioPriceFees())) }
+        { label: "24h (Est.)", value: this.formatNumber(this.feesDaily()) },
+        { label: "Annualized (Est.)", value: this.formatNumber(this.feesAnnual()) },
+        { label: "Price / Fees Ratio", value: this.formatNumber(this.ratioPriceFees()) }
       ],
     },
 
     {
       title: "Staking",
       metrics: [
-        { label: "Total Staked", value: this.formatNumber(Number(this.totalStakedHype())) },
-        { label: "Staked Ratio", value: this.formatNumber(Number(this.ratioStaked())) + "%" },
-        { label: "Avg. APR", value: this.formatNumber(Number(this.stakingApr())) + "%" }
+        { label: "Total Staked", value: this.formatNumber(this.totalStakedHype()) },
+        { label: "Staked Ratio", value: this.formatNumber(this.ratioStaked()) + "%" },
+        { label: "Avg. APR", value: this.formatNumber(this.stakingApr()) + "%" }
       ],
     },
 
     {
       title: "Activity",
       metrics: [
-        { label: "24h Volume", value: this.formatNumber(Number(this.dailyVolume())) + "$", variation: this.volatVolume() },
-        { label: "Open Interest", value: this.formatNumber(Number(this.openInterest())) + "$", variation: this.volatOpenInterest() },
-        { label: "OI / MCap", value: this.formatNumber(Number(this.ratioOImcap())) + "x" }
+        { label: "24h Volume", value: this.formatNumber(this.dailyVolume()) + "$", variation: this.volatVolume() },
+        { label: "Open Interest", value: this.formatNumber(this.openInterest()) + "$", variation: this.volatOpenInterest() },
+        { label: "OI / MCap", value: this.formatNumber(this.ratioOImcap()) + "x" }
       ],
     },
 
     {
       title: "HL Provider",
       metrics: [
-        { label: "TVL", value: this.formatNumber(Number(this.totalValueLocked())) + "$", variation: this.volatHlpProvider() },
+        { label: "TVL", value: this.formatNumber(this.totalValueLocked()) + "$", variation: this.volatHlpProvider() },
         {
           label: "Current APR",
           value: this.formatNumber(Number(this.apr()) * 100) + "%",
           colorClass: Number(this.apr()) >= 0 ? "text-green-400" : "text-red-400"
         },
-        { label: "Vol / TVL", value: this.formatNumber(Number(this.ratioProvider())) + "x" }
+        { label: "Vol / TVL", value: this.formatNumber(this.ratioProvider()) + "x" }
       ],
     },
 
   ]);
 
+  // Constructeur — initialisation du refresh et du timer
+  constructor() {
+    this.refresh();
+    const intervalID = setInterval(() => this.refresh(), 180000);
+    this.destroyRef.onDestroy(() => clearInterval(intervalID));
+  }
 
+  // TODO: Message d'erreur si on reçoit plus rien, la dernière donnée valide reste mais plus de mise à jour. Appartition tag rouge "erreur donnée plus a jour"
+  refresh() {
+    this.api.getData('hype').pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => this.data.set(data));
+  }
 
 }

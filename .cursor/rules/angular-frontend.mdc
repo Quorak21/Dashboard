@@ -1,0 +1,49 @@
+---
+description: Règles Angular 21 pour le frontend Dashboard
+globs: frontend/**/*
+alwaysApply: false
+---
+
+# Frontend Angular 21
+
+**Interaction** : voir `monorepo.mdc` — pistes et explications par défaut ; code seulement sur demande explicite.
+
+Lire et maintenir [`frontend/AGENTS.md`](frontend/AGENTS.md) : le consulter en début de session feature front ; mettre à jour le journal après chaque tâche significative.
+
+## Stack
+
+- Angular 21, standalone (pas de `NgModule`)
+- Signals : `signal`, `computed`, `effect`, `input`, `output`, `model`
+- Control flow : `@if`, `@for` (avec `track`), `@switch`
+- `@defer` uniquement si gain mesurable (non utilisé par défaut)
+- Tests : **Vitest** via `ng test` (pas Karma/Jasmine)
+
+## Architecture des dossiers
+
+| Dossier | Rôle |
+|---------|------|
+| `core/` | Shell (navbar, footer), services transverses (`format-number`, `format-dates`) |
+| `features/<domain>/<asset>/` | Pages routées et UI métier (ex. `crypto/hype/`, `stocks/inveb/`) |
+| `shared/components/` | Cartes, charts, background réutilisables |
+
+## Bonnes pratiques
+
+- **Modern Angular** : Utiliser les fonctionnalités modernes d'Angular 21 (Standalone components, control flow `@if` / `@for` avec `track`, signals pour la gestion d'état).
+- **Gestion des états & Flux** : Préférer les Signals (`signal`, `computed`) pour l'état local. Pour l'asynchrone, privilégier `toSignal` et limiter les `subscribe` manuels.
+- **Architecture de données** : Typer explicitement toutes les réponses API (DTO) et éviter le type `any`. Isoler les appels HTTP dans des services dédiés.
+- **Props & Composants** : Utiliser l'API `input()` / `input.required()` pour les nouveaux composants.
+- **Nettoyage des ressources** : Toujours nettoyer les abonnements, timers (`DestroyRef.onDestroy` ou `OnDestroy`) et détruire proprement les instances de librairies externes (comme Chart.js).
+- **Style (UI)** : Respecter la palette de couleurs Tailwind configurée dans le projet (`dark` et `copper`) sans introduire de couleurs génériques.
+
+## Tests
+
+```bash
+cd frontend && ng test
+```
+
+- Rédiger des tests unitaires simples avec Vitest.
+- Utiliser `provideHttpClient()` et `provideHttpClientTesting()` pour mocker les appels réseau.
+
+## Journal
+
+Après tâche significative : entrée datée en tête de `## Journal` dans `frontend/AGENTS.md` (voir politique dans `monorepo.mdc`).

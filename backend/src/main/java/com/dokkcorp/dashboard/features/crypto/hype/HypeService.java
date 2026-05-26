@@ -3,7 +3,10 @@ package com.dokkcorp.dashboard.features.crypto.hype;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.springframework.stereotype.Service;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,13 +52,14 @@ public class HypeService {
                 this.assetSnapshotRepository = assetSnapshotRepository;
         }
 
-        private HypeDto cachedData;
+        private final AtomicReference<HypeDto> cachedData = new AtomicReference<>();
 
         // On reçoit la requete, on renvoie le cacho pour eviter de nouvelle requete,
         // s'il est vide, on en créer un
         public HypeDto getLastHypeData() {
-                if (this.cachedData != null) {
-                        return this.cachedData;
+                HypeDto data = this.cachedData.get();
+                if (data != null) {
+                        return data;
                 }
                 return this.getData();
         }
@@ -93,7 +97,8 @@ public class HypeService {
                 // (TODO: Time out + retry)
                 if (hyperliquidData == null || blockchainData == null || hypeRaw == null) {
                         logger.error("Une ou plusieurs API HS");
-                        return (this.cachedData != null) ? this.cachedData : HypeDto.error("HYPE");
+                        HypeDto data = this.cachedData.get();
+                        return (data != null) ? data : HypeDto.error("HYPE");
                 }
                 // Si tout est OK, on met a jour la DB et on recréer un nouveau cache
                 try {
@@ -119,22 +124,24 @@ public class HypeService {
 
                         AssetDaily savedEntity = this.assetDailyRepository.save(newPoint);
                         // On met à jour le cache avec la nouvelle valeur
-                        this.cachedData = mapToDto(savedEntity, hyperliquidData, blockchainData);
-                        return this.cachedData;
+                        HypeDto newDto = mapToDto(savedEntity, hyperliquidData, blockchainData);
+                        this.cachedData.set(newDto);
+                        return newDto;
                         // Si y'a un problème, c'est que c'est dans la mise à jour DB
                 } catch (Exception e) {
                         logger.error("Erreur non prévue, DB ? : {}", e.getMessage());
                         // On renvoie le cache
-                        if (this.cachedData != null) {
-                                return this.cachedData;
+                        HypeDto data = this.cachedData.get();
+                        if (data != null) {
+                                return data;
                         }
                         // Sinon en renvoie un objet erreur
                         return HypeDto.error("HYPE");
                 }
         }
 
-        // Fonction si la DB pour le chart annuel est vide, on la remplit pour avoir une
-        // base
+
+        // Fonction si la DB pour le chart annuel est vide, on la remplit pour avoir une base
         private void initializeHistory() {
 
                 CoinGeckoHistoryDto history = this.coingeckoclient.getHistory();

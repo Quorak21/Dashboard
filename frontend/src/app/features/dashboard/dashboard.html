@@ -19,13 +19,13 @@
                             d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-bold text-white tracking-widest uppercase">
+                <h2 class="text-xl font-bold text-amber-100 tracking-widest uppercase">
                     Cryptocurrencies
                 </h2>
                 <div class="h-[1px] flex-grow bg-gradient-to-r from-copper-500/30 to-transparent"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <app-asset-dashboard-card asset="hype" [price]="hypePrice()" [change]="hypeChange()"
+                <app-asset-dashboard-card asset="hype" title="Hype" [price]="hypePrice()" [change]="hypeChange()"
                     currencySymbol="$"></app-asset-dashboard-card>
             </div>
         </section>
@@ -40,13 +40,13 @@
                             d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                 </div>
-                <h2 class="text-xl font-bold text-white tracking-widest uppercase">
+                <h2 class="text-xl font-bold text-amber-100 tracking-widest uppercase">
                     Stocks
                 </h2>
                 <div class="h-[1px] flex-grow bg-gradient-to-r from-copper-500/30 to-transparent"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                <app-asset-dashboard-card asset="inveb" [price]="invebPrice()" [change]="invebChange()"
+                <app-asset-dashboard-card asset="inveb" title="Investor AB" [price]="invebPrice()" [change]="invebChange()"
                     currencySymbol="SEK"></app-asset-dashboard-card>
             </div>
         </section>

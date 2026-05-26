@@ -13,6 +13,12 @@ describe('HypeMetricCard', () => {
 
     fixture = TestBed.createComponent(HypeMetricCard);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('card', {
+      title: 'Circulating Supply',
+      metrics: [
+        { label: 'Circulating', value: '123,456' }
+      ]
+    });
     await fixture.whenStable();
   });
 
