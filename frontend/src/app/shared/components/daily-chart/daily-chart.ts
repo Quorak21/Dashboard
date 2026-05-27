@@ -16,6 +16,7 @@ export class DailyChart {
 
   prices = input<number[]>([]);
   labels = input<number[]>([]);
+  currency = input<string>('');
 
   private chart: Chart | undefined;
 
@@ -91,7 +92,7 @@ export class DailyChart {
               bodyAlign: 'center',
               displayColors: false,
               callbacks: {
-                label: (ctx) => `${ctx.parsed.y?.toFixed(2)}$`
+                label: (ctx) => `${ctx.parsed.y?.toFixed(2)} ${this.currency()}`
               }
             }
           },
@@ -112,7 +113,7 @@ export class DailyChart {
                 font: { size: 12 },
                 stepSize: 0.5,
                 precision: 2,
-                callback: (val) => val + '$'  
+                callback: (val) => val + this.currency()  
               }
             }
           }

@@ -5,7 +5,6 @@ import { LucideAngularModule, Flame } from 'lucide-angular';
 
 @Component({
   selector: 'app-hype-burn-card',
-  standalone: true,
   imports: [DecimalPipe, LucideAngularModule],
   templateUrl: './hype-burn-card.html',
 })

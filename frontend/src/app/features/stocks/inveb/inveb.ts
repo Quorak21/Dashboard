@@ -24,11 +24,11 @@ export class Inveb {
   private destroyRef = inject(DestroyRef);
 
   // On récupère les data dont on a besoin de data, mis à jour au refresh tous les 3minutes 
-  currentPrice = computed(() => this.data()?.currentPrice ?? 0);
+  currentPrice = computed(() => this.data()?.currentPrice ?? null);
   currencySymbol = computed(() => 'SEK');
-  priceChangePercentage24h = computed(() => this.data()?.priceChangePercentage24h ?? 0);
-  totalVolume = computed(() => this.data()?.totalVolume ?? 0);
-  marketCap = computed(() => this.data()?.marketCap ?? 0);
+  priceChangePercentage24h = computed(() => this.data()?.priceChangePercentage24h ?? null);
+  totalVolume = computed(() => this.data()?.totalVolume ?? null);
+  marketCap = computed(() => this.data()?.marketCap ?? null);
   symbol = computed(() => this.data()?.symbol ?? 'INVE-B');
   lastRefresh = computed(() => this.data()?.lastRefresh ?? 0);
   historyPrices = computed(() => this.data()?.historyPrices ?? []);

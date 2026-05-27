@@ -6,7 +6,6 @@ Chart.register(...registerables);
 
 @Component({
   selector: 'app-hype-flux-chart',
-  standalone: true,
   templateUrl: './hype-flux-chart.html',
   styleUrl: './hype-flux-chart.css',
 })

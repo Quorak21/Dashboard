@@ -8,7 +8,7 @@ alwaysApply: false
 
 **Interaction** : voir `monorepo.mdc` — pistes et explications par défaut ; code seulement sur demande explicite.
 
-Lire et maintenir [`frontend/AGENTS.md`](frontend/AGENTS.md) : le consulter en début de session feature front ; mettre à jour le journal après chaque tâche significative.
+Consulter [`frontend/AGENTS.md`](frontend/AGENTS.md) pour la carte du projet front (routes, API, conventions).
 
 ## Stack
 
@@ -44,6 +44,6 @@ cd frontend && ng test
 - Rédiger des tests unitaires simples avec Vitest.
 - Utiliser `provideHttpClient()` et `provideHttpClientTesting()` pour mocker les appels réseau.
 
-## Journal
+## Suivi dette technique
 
-Après tâche significative : entrée datée en tête de `## Journal` dans `frontend/AGENTS.md` (voir politique dans `monorepo.mdc`).
+Voir politique dans `monorepo.mdc` — workflow `code_review.md` + `journal.md`.

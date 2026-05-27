@@ -8,7 +8,7 @@ alwaysApply: false
 
 **Interaction** : voir `monorepo.mdc` — pistes et explications par défaut ; code seulement sur demande explicite.
 
-Lire et maintenir [`backend/AGENTS.md`](backend/AGENTS.md) : le consulter en début de session feature back ; mettre à jour le journal après chaque tâche significative.
+Consulter [`backend/AGENTS.md`](backend/AGENTS.md) pour la carte du projet back (endpoints, jobs, config).
 
 ## Stack
 
@@ -46,6 +46,6 @@ cd backend && mvn test
 - Valider le comportement via des tests unitaires ou d'intégration ciblés.
 - Mocker les clients de messagerie/réseau externes pour les tests de services et de controllers.
 
-## Journal
+## Suivi dette technique
 
-Après tâche significative : entrée datée en tête de `## Journal` dans `backend/AGENTS.md` (voir politique dans `monorepo.mdc`).
+Voir politique dans `monorepo.mdc` — workflow `code_review.md` + `journal.md`.

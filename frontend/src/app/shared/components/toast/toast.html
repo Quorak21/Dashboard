@@ -1,0 +1,12 @@
+@if (toast() !== null) {
+<div class="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+    <div
+      class="pointer-events-auto w-max max-w-lg backdrop-blur-xl bg-dark-900 rounded-2xl px-8 py-5 shadow-2xl shadow-black/60 border border-white/30 flex items-center gap-4 animate-toast-in">
+
+      <div class="w-1 h-8 rounded-full bg-red-500 shrink-0"></div>
+
+      <p class="text-base font-medium tracking-wide text-white">{{ toast() }}</p>
+
+    </div>
+</div>
+}

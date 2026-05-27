@@ -32,6 +32,8 @@ import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
 @Service
 public class HypeService {
 
+
+
         private final CoinGeckoClient coingeckoclient;
 
         private final HyperliquidClient hyperliquidClient;
@@ -115,7 +117,7 @@ public class HypeService {
                         newPoint.setBurnedHype(hyperliquidData.hypeBurned());
                         newPoint.setCirculatingSupply(hyperliquidData.circulatingSupply());
                         newPoint.setFeesDaily(
-                                        String.valueOf(Double.parseDouble(hyperliquidData.dailyVolume()) * 0.00022));
+                                        String.valueOf(Double.parseDouble(hyperliquidData.dailyVolume()) * HypeConstants.FEE_RATE));
                         newPoint.setDailyVolume(hyperliquidData.dailyVolume());
                         newPoint.setOpenInterest(hyperliquidData.openInterest());
                         newPoint.setTotalValueLocked(hyperliquidData.totalValueLocked());
@@ -202,11 +204,11 @@ public class HypeService {
                 String ratioMcapFdv = String.valueOf(ratioMcapFdvtemp);
 
                 // Hype brulé % pourcentage
-                double hypeBurnedtemp = (Double.parseDouble(hyperliquidData.hypeBurned()) / 1000000000) * 100;
+                double hypeBurnedtemp = (Double.parseDouble(hyperliquidData.hypeBurned()) / HypeConstants.MAX_SUPPLY) * 100;
                 String hypeBurned100 = String.valueOf(hypeBurnedtemp);
 
                 // Estimation fees
-                double feesDaily = volume * 0.00022;
+                double feesDaily = volume * HypeConstants.FEE_RATE;
                 double averageDailyFees = history.stream()
                                 .filter(snapshot -> snapshot.getFees24h() != null)
                                 .mapToDouble(AssetSnapshot::getFees24h)

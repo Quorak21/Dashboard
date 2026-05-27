@@ -13,6 +13,7 @@ import org.web3j.utils.Convert;
 import org.springframework.stereotype.Service;
 
 import com.dokkcorp.dashboard.providers.blockchain.utils.ContractReader;
+import com.dokkcorp.dashboard.features.crypto.hype.HypeConstants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,6 @@ public class BlockChainClient {
         private static final String KHYPE_CONTRACT_ADDRESS = "0x393d0b87ed38fc779fd9611144ae649ba6082109";
         private static final String MKHYPE_CONTRACT_ADDRESS = "0x5901e744759561C63309865Ef8822aBb041655E2";
 
-        private static final BigDecimal TOTAL_SUPPLY_HYPE = new BigDecimal("1000000000");
 
         public BlockChainClient(Web3j web3j, ContractReader contractReader) {
                 this.web3j = web3j;
@@ -63,7 +63,7 @@ public class BlockChainClient {
                                                         DefaultBlockParameterName.LATEST)
                                         .send().getBalance();
 
-                        BigDecimal bridgedHypeTemp = TOTAL_SUPPLY_HYPE
+                        BigDecimal bridgedHypeTemp = HypeConstants.MAX_SUPPLY_BD
                                         .subtract(Convert.fromWei(hypeWei.toString(), Convert.Unit.ETHER));
                         bridgedHype = bridgedHypeTemp.toPlainString();
 

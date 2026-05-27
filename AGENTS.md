@@ -41,16 +41,8 @@ cd backend && mvn test
 - [ ] `mvn test` + `ng test` passent
 - [ ] Image Docker back testée localement si changement infra
 
-## Journal (cross-stack)
+## Suivi dette technique
 
-Entrées pour décisions ou changements touchant **front et back** (contrat API, déploiement, nommage partagé).
+Backlog actif : [`code_review.md`](code_review.md) · Historique résolu : [`journal.md`](journal.md)
 
----
-
-### 2026-05-21 — Mise en place contexte Cursor
-
-- **Contexte** : Optimisation Cursor avant passage Pro (règles `.mdc`, journaux, `.cursorignore`).
-- **Décisions** : Règles scindées monorepo / angular / spring ; `AGENTS.md` versionnés par périmètre.
-- **Fichiers clés** : `.cursor/rules/*.mdc`, `AGENTS.md`, `.cursorignore`.
-- **Dette / TODO** : Phase 2 — MCP Angular (`ng mcp`), règle explicite pour lancer les tests.
-- **Pièges** : Ne pas dupliquer le journal détaillé ici — utiliser `frontend/` ou `backend/AGENTS.md`.
+Voir politique complète dans `.cursor/rules/monorepo.mdc`.

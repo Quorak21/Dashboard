@@ -22,10 +22,10 @@ export class AssetMainCard {
   asset = input<string>();
   symbol = input<string>("");
   tag = input<string>("");
-  change24h = input<number>(0);
-  volume24h = input<number>(0);
-  marketCap = input<number>(0);
-  actualPrice = input<number>(0);
+  change24h = input<number | null>(null);
+  volume24h = input<number | null>(null);
+  marketCap = input<number | null>(null);
+  actualPrice = input<number | null>(null);
   lastRefresh = input<number>(0);
   currencySymbol = input<string>('$');
 }

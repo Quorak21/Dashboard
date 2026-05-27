@@ -1,6 +1,6 @@
 # Backend Spring — AGENTS
 
-Journal et carte du projet back. Règles détaillées : [`.cursor/rules/spring-backend.mdc`](../.cursor/rules/spring-backend.mdc).
+Carte du projet back. Règles détaillées : [`.cursor/rules/spring-backend.mdc`](../.cursor/rules/spring-backend.mdc).
 
 ## Carte du projet
 
@@ -41,16 +41,6 @@ com.dokkcorp.dashboard/
 - `"HYPE"` — crypto
 - `"INVE-B"` — actions (FMP : `INVE-B.ST`)
 
-## Journal
+## Suivi dette technique
 
-Nouvelles entrées **en tête** (plus récent en premier). Format : Contexte | Décisions | Fichiers clés | Dette/TODO | Pièges.
-
----
-
-### 2026-05-21 — Initialisation AGENTS.md (exemple)
-
-- **Contexte** : Création du journal back dans le cadre de l’optimisation Cursor.
-- **Décisions** : Un seul controller REST ; providers retournent `null` en erreur ; services dégradent vers cache ou `*.error()`.
-- **Fichiers clés** : `DashboardController.java`, `HypeService.java`, `InveBService.java`, `AssetSyncJob.java`.
-- **Dette / TODO** : Virtual threads non configurés ; tests au-delà de `contextLoads` ; `BigDecimal` mentionné en TODO sur entités.
-- **Pièges** : Dupliquer la logique de fetch dans les jobs au lieu d’appeler `*Service.getData()` ; hardcoder des clés API.
+Voir [`code_review.md`](../code_review.md) et [`journal.md`](../journal.md) à la racine.

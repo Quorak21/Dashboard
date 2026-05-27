@@ -7,8 +7,11 @@ import tools.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.dokkcorp.dashboard.features.crypto.hype.HypeConstants;
+
 @Service
 public class HyperliquidClient {
+
 
         private static final Logger logger = LoggerFactory.getLogger(HyperliquidClient.class);
 
@@ -178,7 +181,7 @@ public class HyperliquidClient {
                         for (int n = 0; n < node.size(); n++) {
 
                                 if (node.get(n).get("isJailed").asBoolean() == false) {
-                                        stakedHype += (node.get(n).get("stake").asDouble() / 100000000);
+                                        stakedHype += (node.get(n).get("stake").asDouble() / HypeConstants.MAX_SUPPLY);
                                 }
                         }
 
@@ -213,7 +216,7 @@ public class HyperliquidClient {
                                 if (nodeBalance.get(n).get("coin").asString().equals("HYPE")) {
                                         burnedHype = nodeBalance.get(n).get("total").asDouble();
                                         hypeBurned = String.valueOf(burnedHype);
-                                        maxSupply = String.valueOf(1000000000 - burnedHype);
+                                        maxSupply = String.valueOf(HypeConstants.MAX_SUPPLY - burnedHype);
                                 }
                         }
 

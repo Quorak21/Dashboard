@@ -15,7 +15,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-hype',
-  standalone: true,
   imports: [AssetMainCard, PriceChart, DailyChart, HypeMetricCard, HypeBurnCard, HypeFluxChart, HypeSupplyDistribution, FormHypeProjection],
   templateUrl: './hype.html',
   styleUrl: './hype.css',
@@ -32,10 +31,10 @@ export class Hype {
   data = signal<any>(null);
 
   // Computed — Market data
-  currentPrice = computed(() => this.data()?.currentPrice ?? 0);
-  priceChangePercentage24h = computed(() => this.data()?.priceChangePercentage24h ?? 0);
-  totalVolume = computed(() => this.data()?.totalVolume ?? 0);
-  marketCap = computed(() => this.data()?.marketCap ?? 0);
+  currentPrice = computed(() => this.data()?.currentPrice ?? null);
+  priceChangePercentage24h = computed(() => this.data()?.priceChangePercentage24h ?? null);
+  totalVolume = computed(() => this.data()?.totalVolume ?? null);
+  marketCap = computed(() => this.data()?.marketCap ?? null);
   symbol = computed(() => this.data()?.symbol ?? 'HYPE');
   lastRefresh = computed(() => this.data()?.lastRefresh ?? 0);
 

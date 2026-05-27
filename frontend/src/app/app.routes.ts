@@ -12,5 +12,10 @@ export const routes: Routes = [
     {
         path: 'inveb',
         loadComponent: () => import('./features/stocks/inveb/inveb').then(m => m.Inveb)
+    },
+    // La route pour la 404, retour au dashboard
+    {
+        path: '**',
+        redirectTo: '/'
     }
 ];

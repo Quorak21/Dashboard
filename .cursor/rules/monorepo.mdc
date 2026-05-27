@@ -65,13 +65,30 @@ Si la demande est ambiguë entre « explique-moi » et « code-moi », **demande
 - Pour le front : suivre `angular-frontend.mdc`
 - Pour le back : suivre `spring-backend.mdc`
 
-## Journal (AGENTS.md)
+## Règles MCP (optimisation coût/perf)
 
-Après toute tâche **non triviale** (feature, refacto, fix architecture, décision API) :
+- **Principe** : ne jamais appeler un MCP "au cas où". Utiliser uniquement le serveur MCP pertinent pour la tâche en cours.
+- **Frontend (`frontend/**`)** : autoriser `angular-cli` ; éviter les MCP backend/Spring.
+- **Backend (`backend/**`)** : éviter `angular-cli` ; privilégier un MCP Spring uniquement si la tâche demande explicitement génération/validation Spring.
+- **Monorepo / infra / docs** : par défaut, ne pas utiliser de MCP ; n'en utiliser qu'en cas de vrai besoin.
+- **Budget tokens** : minimiser les appels MCP et éviter les appels redondants ; réutiliser le contexte déjà collecté avant de relancer un MCP.
 
-1. Lire le `AGENTS.md` du périmètre (`frontend/` ou `backend/`) + `AGENTS.md` racine si impact cross-stack
-2. Ajouter une entrée datée (`YYYY-MM-DD`) **en tête** de la section `## Journal`
-3. Format : **Contexte** | **Décisions** | **Fichiers clés** | **Dette/TODO** | **Pièges à éviter**
-4. Entrées très courtes (5–10 lignes max). Pas de blabla inutile ni de dump de diff.
-5. Garder le fichier concis : si un `AGENTS.md` dépasse 150 lignes, résumer ou purger les plus vieilles entrées historiques pour éviter d'encombrer le contexte de l'agent.
-6. Ne pas journaliser typos, CSS mineurs ou renommages cosmétiques.
+## Suivi de dette technique (`code_review.md` + `journal.md`)
+
+Deux fichiers à la racine du monorepo gèrent la dette technique :
+
+- **`code_review.md`** — Backlog actif (tâches à faire, classées par sévérité). Chaque item a un ID unique (ex: `BACK-03`, `FRONT-01`).
+- **`journal.md`** — Historique des tâches résolues (archive datée).
+
+### Workflow obligatoire
+
+1. **Avant de travailler** : lire `code_review.md` pour vérifier si la tâche demandée correspond à un item existant (noter son ID).
+2. **Après résolution d'un item** :
+   - **Supprimer** l'item de `code_review.md`
+   - **Décrémenter** le compteur dans `📊 Résumé` et dans `Tâches actives` en haut
+   - **Append** dans `journal.md` (ne pas le lire, juste ajouter à la fin), format : `- **ID** — Titre` + `  - *Description* : ce qui a été fait (1-2 lignes)` + mettre a jour tâches realisée en haut.
+3. **Ajout de tâche** (sur demande utilisateur ou suggestion agent) :
+   - Ajouter l'item dans `code_review.md` dans la bonne section de sévérité, avec un nouvel ID unique (préfixe existant + prochain numéro libre)
+   - **Incrémenter** les compteurs (résumé + total en haut)
+   - L'agent peut **proposer** d'ajouter une tâche s'il repère une dette importante durant le travail — toujours demander confirmation avant d'ajouter
+4. **Sécurité** : ne jamais écrire de secrets en clair dans ces fichiers.

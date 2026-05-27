@@ -11,9 +11,15 @@ spring:
   application:
     name: dokkcorp-dashboard
 
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dokkcorp_db
+    username: dokkadmin
+    password: dokksecret
+
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
 
 app:
   coingecko:
