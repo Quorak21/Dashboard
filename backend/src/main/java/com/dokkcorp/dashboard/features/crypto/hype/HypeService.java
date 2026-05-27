@@ -58,9 +58,9 @@ public class HypeService {
 
         private final AtomicReference<HypeDto> cachedData = new AtomicReference<>();
 
-        // On reçoit la requete, on renvoie le cacho pour eviter de nouvelle requete,
-        // s'il est vide, on en créer un
+        // On reçoit la requete, on renvoie le cacho pour eviter de nouvelle requete, s'il est vide, on en créer un
         public HypeDto getLastHypeData() {
+
                 HypeDto data = this.cachedData.get();
                 if (data != null) {
                         return data;
@@ -73,8 +73,7 @@ public class HypeService {
                 BlockChainDto blockchainData = null;
                 CoinGeckoDto hypeRaw = null;
 
-                // On check les API 1 par 1 pour cibler en cas d'erreur
-                // Hyperliquid
+                // On check les API 1 par 1 pour cibler en cas d'erreur Hyperliquid
                 try {
                         hyperliquidData = this.hyperliquidClient.getHlData();
                 } catch (Exception e) {

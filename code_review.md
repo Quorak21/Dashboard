@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-05-26 · **Tâches actives** : 36
+> **Mise à jour** : 2026-05-27 · **Tâches actives** : 35
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -18,10 +18,6 @@
 ## 🟠 ÉLEVÉ
 
 ### Backend — Architecture
-
-- [ ] **BACK-02** — Pas de `@ControllerAdvice` / gestion d'erreur globale
-  - Aucun handler global. Les erreurs remontent comme HTTP 500 avec stack trace.
-  - → Créer un `GlobalExceptionHandler` avec `@ControllerAdvice`
 
 - [ ] **BACK-03** — `HypeService.mapToDto()` = 225 lignes
   - 📁 `HypeService.java` L157-382
@@ -227,6 +223,6 @@
 | Sévérité | Restant |
 |----------|---------|
 | 🔴 Critique | 1 |
-| 🟠 Élevé | 10 |
+| 🟠 Élevé | 9 |
 | 🟡 Moyen | 16 |
 | 🔵 Info | 9 |

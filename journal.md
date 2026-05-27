@@ -2,7 +2,7 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 21**
+- **Tâches réalisée depuis l'implémentation du workflow : 22**
 
 ---
 
@@ -68,3 +68,6 @@ Historique des tâches et de la dette technique résolues sur le monorepo (Sprin
 
 - **INFRA-01** — `JAVA_OPTS` ignoré dans le Dockerfile
   - *Description* : Ajout de `JAVA_TOOL_OPTIONS` avec `-XX:MaxRAMPercentage=75.0` dans le Dockerfile (la JVM lit cette variable nativement). Suppression de la ligne `JAVA_OPTS` inutile dans `docker-compose.yml`. Le heap s'adapte désormais automatiquement à la limite mémoire du conteneur.
+
+- **BACK-02** — Pas de `@ControllerAdvice` / gestion d'erreur globale
+  - *Description* : Package `exception/` avec `ApiErrorResponse` (message seul) et `GlobalExceptionHandler` (`@RestControllerAdvice`) : log complet côté serveur, réponse HTTP 500 avec message générique sans stack trace au client.
