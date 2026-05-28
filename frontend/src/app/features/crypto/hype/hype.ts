@@ -30,58 +30,62 @@ export class Hype {
   // TODO: Changer le any pour eviter les fausses données
   data = signal<any>(null);
 
-  // Computed — Market data
-  currentPrice = computed(() => this.data()?.currentPrice ?? null);
-  priceChangePercentage24h = computed(() => this.data()?.priceChangePercentage24h ?? null);
-  totalVolume = computed(() => this.data()?.totalVolume ?? null);
-  marketCap = computed(() => this.data()?.marketCap ?? null);
-  symbol = computed(() => this.data()?.symbol ?? 'HYPE');
-  lastRefresh = computed(() => this.data()?.lastRefresh ?? 0);
+  // Summary
+  currentPrice = computed(() => this.data()?.summary.currentPrice ?? null);
+  priceChangePercentage24h = computed(() => this.data()?.summary.priceChangePercentage24h ?? null);
+  totalVolume = computed(() => this.data()?.summary.totalVolume ?? null);
+  marketCap = computed(() => this.data()?.summary.marketCap ?? null);
+  symbol = computed(() => this.data()?.summary.symbol ?? 'HYPE');
+  lastRefresh = computed(() => this.data()?.summary.lastRefresh ?? 0);
 
-  // Computed — Charts annuel et daily
-  historyPrices = computed(() => this.data()?.historyPrices ?? []);
-  historyDays = computed(() => this.data()?.historyDays ?? []);
-  livePrices = computed(() => this.data()?.livePrices ?? []);
-  liveDays = computed(() => this.data()?.liveDays ?? []);
+  // Charts
+  historyPrices = computed(() => this.data()?.charts.historyPrices ?? []);
+  historyDays = computed(() => this.data()?.charts.historyDays ?? []);
+  livePrices = computed(() => this.data()?.charts.livePrices ?? []);
+  liveDays = computed(() => this.data()?.charts.liveDays ?? []);
 
-  // Computed — Chart flux
-  fluxBurned = computed(() => this.data()?.fluxBurned ?? []);
-  fluxIssued = computed(() => this.data()?.fluxIssued ?? []);
-  fluxNetFlow = computed(() => this.data()?.fluxNetFlow ?? []);
-  fluxDays = computed(() => this.data()?.fluxDays ?? []);
+  // Timed Data
+  burned24h = computed(() => this.data()?.timedData.burned24h ?? 0);
+  volatVolume = computed(() => this.data()?.timedData.volatVolume ?? 0);
+  volatOpenInterest = computed(() => this.data()?.timedData.volatOpenInterest ?? 0);
+  volatHlpProvider = computed(() => this.data()?.timedData.volatHlpProvider ?? 0);  
+  fluxBurned = computed(() => this.data()?.timedData.fluxBurned ?? []);
+  fluxIssued = computed(() => this.data()?.timedData.fluxIssued ?? []);
+  fluxNetFlow = computed(() => this.data()?.timedData.fluxNetFlow ?? []);
+  fluxDays = computed(() => this.data()?.timedData.fluxDays ?? []);
+  burned30d = computed(() => this.data()?.timedData.burned30d ?? '');
+  circulating30d = computed(() => this.data()?.timedData.circulating30d ?? '');
+  flux30d = computed(() => this.data()?.timedData.flux30d ?? '');
 
-  // Computed — API Hyperliquid
-  circulatingSupply = computed(() => this.data()?.circulatingSupply ?? '');
-  totalValueLocked = computed(() => this.data()?.totalValueLocked ?? '');
-  apr = computed(() => this.data()?.apr ?? '');
-  dailyVolume = computed(() => this.data()?.dailyVolume ?? '');
-  ratioProvider = computed(() => this.data()?.ratioProvider ?? '');
-  openInterest = computed(() => this.data()?.openInterest ?? '');
-  feesDaily = computed(() => this.data()?.feesDaily ?? '');
-  feesAnnual = computed(() => this.data()?.feesAnnual ?? '');
-  volatVolume = computed(() => this.data()?.volatVolume ?? 0);
-  volatOpenInterest = computed(() => this.data()?.volatOpenInterest ?? 0);
-  volatHlpProvider = computed(() => this.data()?.volatHlpProvider ?? 0);
-  stakingApr = computed(() => this.data()?.stakingApr ?? '');
-  maxSupply = computed(() => this.data()?.maxSupply ?? '');
-  circulation100 = computed(() => this.data()?.circulation100 ?? '');
-  fdv = computed(() => this.data()?.fdv ?? '');
-  ratioMcapFdv = computed(() => this.data()?.ratioMcapFdv ?? '');
-  hypeBurned100 = computed(() => this.data()?.hypeBurned100 ?? '');
-  ratioPriceFees = computed(() => this.data()?.ratioPriceFees ?? '');
-  ratioOImcap = computed(() => this.data()?.ratioOImcap ?? '');
-  totalStakedHype = computed(() => this.data()?.totalStakedHype ?? '');
-  ratioStaked = computed(() => this.data()?.ratioStaked ?? '');
-  burned30d = computed(() => this.data()?.burned30d ?? '');
-  circulating30d = computed(() => this.data()?.circulating30d ?? '');
-  flux30d = computed(() => this.data()?.flux30d ?? '');
-  burned24h = computed(() => this.data()?.burned24h ?? 0);
+  // Supply
+  circulatingSupply = computed(() => this.data()?.supply.circulatingSupply ?? '');
+  maxSupply = computed(() => this.data()?.supply.maxSupply ?? '');
+  hypeBurned100 = computed(() => this.data()?.supply.hypeBurned100 ?? '');
+  circulating100 = computed(() => this.data()?.supply.circulating100 ?? '');
 
-  // Computed — Blockchain
-  bridgedHype = computed(() => this.data()?.bridgedHype ?? '');
-  ratioBridged = computed(() => this.data()?.ratioBridged ?? '');
-  liquidStaked = computed(() => this.data()?.liquidStaked ?? '');
-  stakedEvmCore = computed(() => this.data()?.stakedEvmCore ?? '');
+  // Blockchain
+  bridgedHype = computed(() => this.data()?.blockchain.bridgedHype ?? '');
+  ratioBridged = computed(() => this.data()?.blockchain.ratioBridged ?? '');
+  liquidStaked = computed(() => this.data()?.blockchain.liquidStaked ?? '');
+  stakedEvmCore = computed(() => this.data()?.blockchain.stakedEvmCore ?? '');
+
+  // HLP
+  providerTvl = computed(() => this.data()?.hlp.providerTvl ?? '');
+  providerApr = computed(() => this.data()?.hlp.providerApr ?? '');
+  ratioProvider = computed(() => this.data()?.hlp.ratioProvider ?? '');
+
+  // Valuation
+  totalStakedHype = computed(() => this.data()?.valuation.totalStakedHype ?? '');
+  ratioStaked = computed(() => this.data()?.valuation.ratioStaked ?? '');
+  stakingApr = computed(() => this.data()?.valuation.stakingApr ?? '');
+  fdv = computed(() => this.data()?.valuation.fdv ?? '');
+  ratioMcapFdv = computed(() => this.data()?.valuation.ratioMcapFdv ?? '');
+  dailyVolume = computed(() => this.data()?.valuation.dailyVolume ?? '');
+  openInterest = computed(() => this.data()?.valuation.openInterest ?? '');
+  feesDaily = computed(() => this.data()?.valuation.feesDaily ?? '');
+  feesAnnual = computed(() => this.data()?.valuation.feesAnnual ?? '');
+  ratioPriceFees = computed(() => this.data()?.valuation.ratioPriceFees ?? '');
+  ratioOImcap = computed(() => this.data()?.valuation.ratioOImcap ?? '');
 
   // Metric cards
   cards = computed<MetricCard[]>(() => [
@@ -152,11 +156,11 @@ export class Hype {
     {
       title: "HL Provider",
       metrics: [
-        { label: "TVL", value: this.formatNumber(this.totalValueLocked()) + "$", variation: this.volatHlpProvider() },
+        { label: "TVL", value: this.formatNumber(this.providerTvl()) + "$", variation: this.volatHlpProvider() },
         {
           label: "Current APR",
-          value: this.formatNumber(Number(this.apr()) * 100) + "%",
-          colorClass: Number(this.apr()) >= 0 ? "text-green-400" : "text-red-400"
+          value: this.formatNumber(Number(this.providerApr()) * 100) + "%",
+          colorClass: Number(this.providerApr()) >= 0 ? "text-green-400" : "text-red-400"
         },
         { label: "Vol / TVL", value: this.formatNumber(this.ratioProvider()) + "x" }
       ],

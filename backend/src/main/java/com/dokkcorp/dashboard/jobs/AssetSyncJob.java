@@ -53,15 +53,14 @@ public class AssetSyncJob {
         // HYPE
         try {
             // Récup la derniere MAJ
-            // TODO: Prend celle de 23:50 forcement, petit decalage de 10min, a voir
             AssetDaily ad = this.assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")
                     .orElseThrow(() -> new IllegalStateException("Pas d'entrée hype dans la table Daily, WTF ?"));
             HypeDto data = this.hypeService.getData();
 
-            double volume24H = Double.parseDouble(data.dailyVolume());
-            double fees24H = Double.parseDouble(data.feesDaily());
-            double hlpProvider = Double.parseDouble(data.totalValueLocked());
-            double openInterest = Double.parseDouble(data.openInterest());
+            double volume24H = data.valuation().dailyVolume();
+            double fees24H = data.valuation().feesDaily();
+            double hlpProvider = data.hlp().providerTvl();
+            double openInterest = data.valuation().openInterest();
             // Création de l'objet a mettre en DB
             AssetSnapshot hypeSnapshot = new AssetSnapshot();
             hypeSnapshot.setSymbol("HYPE");

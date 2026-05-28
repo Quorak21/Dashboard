@@ -86,7 +86,7 @@ Deux fichiers à la racine du monorepo gèrent la dette technique :
 2. **Après résolution d'un item** :
    - **Supprimer** l'item de `code_review.md`
    - **Décrémenter** le compteur dans `📊 Résumé` et dans `Tâches actives` en haut
-   - **Append** dans `journal.md` (ne pas le lire, juste ajouter à la fin), format : `- **ID** — Titre` + `  - *Description* : ce qui a été fait (1-2 lignes)` + mettre a jour tâches realisée en haut.
+   - **Préfixer** dans `journal.md` (ajouter en haut pour voir le plus récent d'abord), format : `- **ID** — Titre` + `  - *Description* : ce qui a été fait (1-2 lignes)` + mettre a jour tâches realisée en haut.
 3. **Ajout de tâche** (sur demande utilisateur ou suggestion agent) :
    - Ajouter l'item dans `code_review.md` dans la bonne section de sévérité, avec un nouvel ID unique (préfixe existant + prochain numéro libre)
    - **Incrémenter** les compteurs (résumé + total en haut)

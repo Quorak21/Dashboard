@@ -12,8 +12,8 @@ import org.web3j.utils.Convert;
 
 import org.springframework.stereotype.Service;
 
+import com.dokkcorp.dashboard.features.crypto.hype.maths.HypeConstants;
 import com.dokkcorp.dashboard.providers.blockchain.utils.ContractReader;
-import com.dokkcorp.dashboard.features.crypto.hype.HypeConstants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +63,7 @@ public class BlockChainClient {
                                                         DefaultBlockParameterName.LATEST)
                                         .send().getBalance();
 
-                        BigDecimal bridgedHypeTemp = HypeConstants.MAX_SUPPLY_BD
+                        BigDecimal bridgedHypeTemp = HypeConstants.TOTAL_SUPPLY_BD
                                         .subtract(Convert.fromWei(hypeWei.toString(), Convert.Unit.ETHER));
                         bridgedHype = bridgedHypeTemp.toPlainString();
 

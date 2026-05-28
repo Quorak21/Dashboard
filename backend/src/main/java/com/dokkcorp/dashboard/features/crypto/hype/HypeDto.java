@@ -1,104 +1,43 @@
 package com.dokkcorp.dashboard.features.crypto.hype;
 
-import java.util.List;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeBlockchainDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeChartsDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeHlpDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeSummaryDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeSupplyDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeTimedDataDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeValuationDto;
 
 // TODO: Refactorisé en mini-DTO pour allégé et separer les données
 public record HypeDto(
 
-        String symbol,
+        HypeSummaryDto summary,
 
-        double currentPrice,
+        HypeChartsDto charts,
 
-        double marketCap,
+        HypeTimedDataDto timedData,
 
-        double priceChangePercentage24h,
+        HypeSupplyDto supply,
 
-        double totalVolume,
+        HypeBlockchainDto blockchain,
 
-        double lastRefresh,
+        HypeHlpDto hlp,
 
-        List<Double> historyPrices,
+        HypeValuationDto valuation
 
-        List<Long> historyDays,
-
-        List<Double> livePrices,
-
-        List<Long> liveDays,
-
-        String circulatingSupply,
-
-        String totalValueLocked,
-
-        String apr,
-
-        String dailyVolume,
-
-        String ratioProvider,
-
-        String openInterest,
-
-        String feesDaily,
-
-        String feesAnnual,
-
-        double volatVolume,
-
-        double volatOpenInterest,
-
-        double volatHlpProvider,
-
-        String stakingApr,
-
-        String maxSupply,
-
-        String circulation100,
-
-        String fdv,
-
-        String ratioMcapFdv,
-
-        String hypeBurned100,
-
-        String ratioPriceFees,
-
-        String ratioOImcap,
-
-        String totalStakedHype,
-
-        String ratioStaked,
-
-        String bridgedHype,
-
-        String ratioBridged,
-
-        String liquidStaked,
-
-        String stakedEvmCore,
-
-        String burned30d,
-
-        String circulating30d,
-
-        String flux30d,
-
-        double burned24h,
-
-        List<Double> fluxBurned,
-
-        List<Double> fluxIssued,
-
-        List<Double> fluxNetFlow,
-
-        List<Long> fluxDays) {
+) {
 
     // Pour gérer les futures erreur et éviter de tout se retaper a la main
     public static HypeDto error(String symbol) {
         return new HypeDto(
-                "ERROR", 0.0, 0.0, 0.0, 0.0, (double) System.currentTimeMillis(),
-                java.util.List.of(), java.util.List.of(), java.util.List.of(), java.util.List.of(),
-                "0", "0", "0", "0", "0", "0", "0", "0",
-                0.0, 0.0, 0.0,
-                "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0",
-                0.0, java.util.List.of(), java.util.List.of(), java.util.List.of(), java.util.List.of());
+
+                HypeSummaryDto.error(symbol),
+                HypeChartsDto.error(symbol),
+                HypeTimedDataDto.error(symbol),
+                HypeSupplyDto.error(symbol),
+                HypeBlockchainDto.error(symbol),
+                HypeHlpDto.error(symbol),
+                HypeValuationDto.error(symbol)
+            );
     }
 }

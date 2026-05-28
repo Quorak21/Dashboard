@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-05-27 · **Tâches actives** : 35
+> **Mise à jour** : 2026-05-28 · **Tâches actives** : 38
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -19,10 +19,15 @@
 
 ### Backend — Architecture
 
-- [ ] **BACK-03** — `HypeService.mapToDto()` = 225 lignes
-  - 📁 `HypeService.java` L157-382
-  - Calculs financiers + requêtes DB + mapping DTO dans une seule méthode. Impossible à tester unitairement.
-  - → Extraire en classes : `HypeCalculator`, `HypeMapper`, `FluxCalculator`
+- [ ] **BACK-20** — Extraire le mapping final vers un `HypeMapper` dédié
+  - 📁 `HypeService.java`
+  - `mapToDto` porte encore la préparation de données (`history`/`daily`) + assemblage DTO.
+  - → Créer un `HypeMapper` (ou équivalent) pour isoler le mapping et réduire la responsabilité du service.
+
+- [ ] **BACK-21** — Découper le cache/récupération HYPE par thème pour isoler les pannes partielles
+  - 📁 `HypeService.java`
+  - Cache et récupération actuels sont globaux : si une source échoue, le fallback peut dégrader tout l'agrégat.
+  - → Séparer par thèmes (`summary`, `timedData`, `supply`, `blockchain`, `hlp`, `valuation`) avec cache/fallback dédiés pour ne dégrader que le secteur en erreur.
 
 - [ ] **BACK-04** — `HypeService.getData()` trop long (~70 lignes)
   - 📁 `HypeService.java` L63-134
@@ -79,6 +84,11 @@
   - 50+ `computed()` en cascade sans aucune sécurité de type.
   - → Typer avec l'interface DTO correspondante.
 
+- [ ] **FRONT-12** — HYPE : résumé d’erreur = champs `null` (pas de zéros factices)
+  - Convention : en cas d’échec API / état dégradé, `HypeSummaryDto` expose des **`null`** pour marquer « pas de donnée », à distinguer d’une vraie valeur `0`.
+  - 📁 Back : `HypeDto.java`, `HypeSummaryDto.java`, factory `error()` — garder cette convention alignée sur l’agrégat.
+  - → Front (quand refactor HYPE branché) : lire `summaryDto` / `summary`, UI « indisponible » si `null`, optional chaining ; ne pas traiter `0` comme erreur pour le bloc summary.
+
 ---
 
 ## 🟡 MOYEN
@@ -119,6 +129,11 @@
   - 📁 `AssetDailyRepository.java` L24, `AssetSyncJob.java` L95
   - Double `@Transactional` repository + appelant. Fonctionnel mais confus.
   - → Garder uniquement au niveau du job.
+
+- [ ] **BACK-22** — Corriger la propagation du symbole dans `InveBDto.error()`
+  - 📁 `InveBService.java` L87
+  - `InveBService` propage `"ERROR"` comme symbole lors d'une exception dans `InveBDto.error()`.
+  - → Utiliser le bon symbole `"INVE-B"` lors de l'appel.
 
 ### Frontend
 
@@ -223,6 +238,6 @@
 | Sévérité | Restant |
 |----------|---------|
 | 🔴 Critique | 1 |
-| 🟠 Élevé | 9 |
-| 🟡 Moyen | 16 |
+| 🟠 Élevé | 11 |
+| 🟡 Moyen | 17 |
 | 🔵 Info | 9 |

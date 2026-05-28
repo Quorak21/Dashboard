@@ -2,16 +2,16 @@ package com.dokkcorp.dashboard.providers.hyperliquid;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+
+import com.dokkcorp.dashboard.features.crypto.hype.maths.HypeConstants;
+
 import tools.jackson.databind.JsonNode;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dokkcorp.dashboard.features.crypto.hype.HypeConstants;
-
 @Service
 public class HyperliquidClient {
-
 
         private static final Logger logger = LoggerFactory.getLogger(HyperliquidClient.class);
 
@@ -37,8 +37,8 @@ public class HyperliquidClient {
 
                 return new HyperliquidDto(
                                 supply != null ? supply.circulatingSupply() : "0",
-                                hlp != null ? hlp.totalValueLocked() : "0",
-                                hlp != null ? hlp.apr() : "0",
+                                hlp != null ? hlp.providerTvl() : "0",
+                                hlp != null ? hlp.providerApr() : "0",
                                 volume24H != null ? volume24H.dailyVolume() : "0",
                                 openInterest != null ? openInterest.openInterest() : "0",
                                 staking != null ? staking.stakingApr() : "0",
@@ -69,8 +69,8 @@ public class HyperliquidClient {
         // La TVL du vault principal + l'APR
         private ProviderHlp fetchProviderData() {
 
-                String apr = "0";
-                String totalValueLocked = "0";
+                String providerApr = "0";
+                String providerTvl = "0";
 
                 try {
                         JsonNode node = this.restClient
@@ -84,14 +84,14 @@ public class HyperliquidClient {
                         if (node != null) {
                                 // Récupération de l'APR
                                 if (node.has("apr")) {
-                                        apr = node.get("apr").asString();
+                                        providerApr = node.get("apr").asString();
                                 }
 
                                 // Récupération de la TVL
                                 JsonNode historyArray = node.get("portfolio").get(0).get(1).get("accountValueHistory");
                                 if (historyArray != null && historyArray.isArray()) {
                                         int lastIndex = historyArray.size() - 1;
-                                        totalValueLocked = historyArray.get(lastIndex).get(1).asString();
+                                        providerTvl = historyArray.get(lastIndex).get(1).asString();
                                 }
                         }
                 } catch (Exception e) {
@@ -99,7 +99,7 @@ public class HyperliquidClient {
                                         e.getMessage());
                 }
 
-                return new ProviderHlp(totalValueLocked, apr);
+                return new ProviderHlp(providerTvl, providerApr);
         }
 
         private Volume24H fetchVolume24H() {
@@ -177,15 +177,16 @@ public class HyperliquidClient {
                                 }
                         }
 
-                        //Total staked HYPE
+                        // Total staked HYPE (normalized from raw 8-decimal units)
                         for (int n = 0; n < node.size(); n++) {
 
                                 if (node.get(n).get("isJailed").asBoolean() == false) {
-                                        stakedHype += (node.get(n).get("stake").asDouble() / HypeConstants.MAX_SUPPLY);
+                                        double stakeRaw = node.get(n).get("stake").asDouble();
+                                        stakedHype += stakeRaw / HypeConstants.STAKE_SCALE_FACTOR;
                                 }
                         }
 
-                        totalStakedHype = Double.toString(stakedHype);
+                        totalStakedHype = String.valueOf(stakedHype);
 
                         return new Staking(stakingApr, totalStakedHype);
                 } catch (Exception e) {
@@ -216,7 +217,7 @@ public class HyperliquidClient {
                                 if (nodeBalance.get(n).get("coin").asString().equals("HYPE")) {
                                         burnedHype = nodeBalance.get(n).get("total").asDouble();
                                         hypeBurned = String.valueOf(burnedHype);
-                                        maxSupply = String.valueOf(HypeConstants.MAX_SUPPLY - burnedHype);
+                                        maxSupply = String.valueOf(HypeConstants.TOTAL_SUPPLY - burnedHype);
                                 }
                         }
 

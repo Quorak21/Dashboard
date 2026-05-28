@@ -7,9 +7,9 @@ public record HyperliquidDto(
 
                 String circulatingSupply,
 
-                String totalValueLocked,
+                String providerTvl,
 
-                String apr,
+                String providerApr,
 
                 String dailyVolume,
 

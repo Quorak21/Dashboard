@@ -45,7 +45,7 @@ export class HypeFluxChart {
   private getSymmetricBounds() {
     const values = this.netFlow();
     const max = values.length > 0 ? Math.max(...values.map(Math.abs)) : 100000;
-    return Math.max(max * 1.05, 1000);
+    return Math.max(max * 1.025, 1000);
   }
   // L'update de la chart, on renvoie les nouvelles data + nouvel axe Y
   private updateChart() {

@@ -2,9 +2,12 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 22**
+- **Tâches réalisée depuis l'implémentation du workflow : 23**
 
 ---
+
+- **BACK-03** — Extraire les calculs de `HypeService.mapToDto()` vers `HypeCalculator`
+  - *Description* : migration des calculs principaux (`timedData`, `supply`, `blockchain`, `hlp`, `valuation`) dans `HypeCalculator`, avec `HypeService` recentré sur l'orchestration et délégation des calculs.
 
 - **SEC-01** — Clés API en clair
   - *Description* : Fichier `application-dev.yml` sécurisé et bien protégé dans le `.gitignore` racine. Aucun risque d'exposition des clés CoinGecko, Alchemy et FMP.

@@ -6,9 +6,7 @@ import java.util.List;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-
 import org.springframework.stereotype.Service;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,13 +14,21 @@ import org.slf4j.LoggerFactory;
 import com.dokkcorp.dashboard.providers.coingecko.CoinGeckoClient;
 import com.dokkcorp.dashboard.providers.coingecko.CoinGeckoDto;
 import com.dokkcorp.dashboard.providers.coingecko.CoinGeckoHistoryDto;
+import com.dokkcorp.dashboard.features.crypto.hype.maths.HypeCalculator;
 
 import com.dokkcorp.dashboard.providers.hyperliquid.HyperliquidClient;
 import com.dokkcorp.dashboard.providers.hyperliquid.HyperliquidDto;
 
 import com.dokkcorp.dashboard.providers.blockchain.BlockChainClient;
 import com.dokkcorp.dashboard.providers.blockchain.BlockChainDto;
-
+import com.dokkcorp.dashboard.features.crypto.hype.maths.HypeConstants;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeBlockchainDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeChartsDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeHlpDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeSummaryDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeSupplyDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeTimedDataDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeValuationDto;
 import com.dokkcorp.dashboard.model.entity.AssetDaily;
 import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
 
@@ -32,33 +38,30 @@ import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
 @Service
 public class HypeService {
 
-
-
         private final CoinGeckoClient coingeckoclient;
-
         private final HyperliquidClient hyperliquidClient;
-
         private final BlockChainClient blockChainClient;
-
         private final AssetDailyRepository assetDailyRepository;
-
         private final AssetSnapshotRepository assetSnapshotRepository;
+        private final HypeCalculator hypeCalculator;
 
         private static final Logger logger = LoggerFactory.getLogger(HypeService.class);
 
+        private final AtomicReference<HypeDto> cachedData = new AtomicReference<>();
+
         public HypeService(CoinGeckoClient client, HyperliquidClient hyperliquidClient,
                         BlockChainClient blockChainClient, AssetDailyRepository assetDailyRepository,
-                        AssetSnapshotRepository assetSnapshotRepository) {
+                        AssetSnapshotRepository assetSnapshotRepository, HypeCalculator hypeCalculator) {
                 this.coingeckoclient = client;
                 this.hyperliquidClient = hyperliquidClient;
                 this.blockChainClient = blockChainClient;
                 this.assetDailyRepository = assetDailyRepository;
                 this.assetSnapshotRepository = assetSnapshotRepository;
+                this.hypeCalculator = hypeCalculator;
         }
 
-        private final AtomicReference<HypeDto> cachedData = new AtomicReference<>();
-
-        // On reçoit la requete, on renvoie le cacho pour eviter de nouvelle requete, s'il est vide, on en créer un
+        // On reçoit la requete, on renvoie le cacho pour eviter de nouvelle requete,
+        // s'il est vide, on en créer un
         public HypeDto getLastHypeData() {
 
                 HypeDto data = this.cachedData.get();
@@ -109,17 +112,20 @@ public class HypeService {
                         AssetDaily newPoint = new AssetDaily();
                         newPoint.setSymbol("HYPE");
                         newPoint.setCurrentPrice(hypeRaw.currentPrice());
-                        newPoint.setMarketCap(hypeRaw.marketCap());
+                        double circulatingSupply = safeParseDouble(hyperliquidData.circulatingSupply(),
+                                        "hyperliquid.circulatingSupply");
+                        newPoint.setMarketCap(hypeRaw.currentPrice() * circulatingSupply);
                         newPoint.setPriceChangePercentage24h(hypeRaw.priceChangePercentage24h());
                         newPoint.setTotalVolume(hypeRaw.totalVolume());
                         newPoint.setLastRefresh(System.currentTimeMillis());
                         newPoint.setBurnedHype(hyperliquidData.hypeBurned());
                         newPoint.setCirculatingSupply(hyperliquidData.circulatingSupply());
                         newPoint.setFeesDaily(
-                                        String.valueOf(Double.parseDouble(hyperliquidData.dailyVolume()) * HypeConstants.FEE_RATE));
+                                        String.valueOf(Double.parseDouble(hyperliquidData.dailyVolume())
+                                                        * HypeConstants.FEE_RATE));
                         newPoint.setDailyVolume(hyperliquidData.dailyVolume());
                         newPoint.setOpenInterest(hyperliquidData.openInterest());
-                        newPoint.setTotalValueLocked(hyperliquidData.totalValueLocked());
+                        newPoint.setProviderTvl(hyperliquidData.providerTvl());
 
                         if (this.assetSnapshotRepository.findFirstByOrderByDayDesc().isEmpty()) {
                                 initializeHistory();
@@ -143,8 +149,8 @@ public class HypeService {
                 }
         }
 
-
-        // Fonction si la DB pour le chart annuel est vide, on la remplit pour avoir une base
+        // Fonction si la DB pour le chart annuel est vide, on la remplit pour avoir une
+        // base
         private void initializeHistory() {
 
                 CoinGeckoHistoryDto history = this.coingeckoclient.getHistory();
@@ -164,231 +170,95 @@ public class HypeService {
 
         }
 
-        // TODO: Refactorise en différents modules ici
+        // Conversio des mini DTO en DTO final, temporaire pour la migration
         private HypeDto mapToDto(AssetDaily entity, HyperliquidDto hyperliquidData, BlockChainDto blockchainData) {
 
+                // Récupération des données historiques et quotidiennes et mise à l'envers pour
+                // avoir les données les plus récentes en premier
                 List<AssetSnapshot> history = new ArrayList<>(
                                 this.assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE"));
                 Collections.reverse(history);
-                List<Double> historicalPrice = history.stream().map(AssetSnapshot::getPrice).toList();
-                List<Long> historicalDays = history.stream().map(AssetSnapshot::getDay).toList();
-
                 List<AssetDaily> daily = new ArrayList<>(
                                 this.assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE"));
                 Collections.reverse(daily);
+
+                HypeSummaryDto summaryDto = getSummaryData(entity);
+                HypeChartsDto chartsDto = getChartsData(history, daily);
+                HypeTimedDataDto timedDataDto = getTimedData(hyperliquidData, daily, history);
+                HypeSupplyDto supplyDto = getSupplyData(hyperliquidData);
+                HypeBlockchainDto blockchainDto = getBlockchainData(hyperliquidData, blockchainData);
+                HypeHlpDto hlpDto = getHlpData(hyperliquidData);
+                HypeValuationDto valuationDto = getValuationData(hyperliquidData, entity, history);
+
+                return new HypeDto(
+                                summaryDto,
+                                chartsDto,
+                                timedDataDto,
+                                supplyDto,
+                                blockchainDto,
+                                hlpDto,
+                                valuationDto);
+        }
+
+        private HypeSummaryDto getSummaryData(AssetDaily entity) {
+                return new HypeSummaryDto(
+                                entity.getSymbol(),
+                                entity.getCurrentPrice(),
+                                entity.getMarketCap(),
+                                entity.getPriceChangePercentage24h(),
+                                entity.getTotalVolume(),
+                                entity.getLastRefresh());
+        }
+
+        private HypeChartsDto getChartsData(List<AssetSnapshot> history, List<AssetDaily> daily) {
+
+                List<Double> historicalPrice = history.stream().map(AssetSnapshot::getPrice).toList();
+                List<Long> historicalDays = history.stream().map(AssetSnapshot::getDay).toList();
+
                 List<Double> livePrice = daily.stream().map(AssetDaily::getCurrentPrice).toList();
                 List<Long> liveDay = daily.stream().map(AssetDaily::getLastRefresh).toList();
 
-                // Les calculs
-                // Ratio Vol/TVL provider
-                double volume = Double.parseDouble(hyperliquidData.dailyVolume());
-                double tvl = Double.parseDouble(hyperliquidData.totalValueLocked());
-                double ratioVolTvl = volume / tvl;
-                String ratioProvider = Double.toString(ratioVolTvl);
-
-                // % en circulation
-                double circulation100temp = Double.parseDouble(hyperliquidData.circulatingSupply())
-                                / Double.parseDouble(hyperliquidData.maxSupply()) * 100;
-                String circulation100 = String.valueOf(circulation100temp);
-
-                // Marketcap
-                double marketCap = Double.parseDouble(hyperliquidData.circulatingSupply()) * entity.getCurrentPrice();
-
-                // FDV
-                double fdvtemp = Double.parseDouble(hyperliquidData.maxSupply()) * entity.getCurrentPrice();
-                String fdv = String.valueOf(fdvtemp);
-
-                // Ratio Mcap/FDV
-                double ratioMcapFdvtemp = marketCap / fdvtemp;
-                String ratioMcapFdv = String.valueOf(ratioMcapFdvtemp);
-
-                // Hype brulé % pourcentage
-                double hypeBurnedtemp = (Double.parseDouble(hyperliquidData.hypeBurned()) / HypeConstants.MAX_SUPPLY) * 100;
-                String hypeBurned100 = String.valueOf(hypeBurnedtemp);
-
-                // Estimation fees
-                double feesDaily = volume * HypeConstants.FEE_RATE;
-                double averageDailyFees = history.stream()
-                                .filter(snapshot -> snapshot.getFees24h() != null)
-                                .mapToDouble(AssetSnapshot::getFees24h)
-                                .average()
-                                .orElse(feesDaily);
-                double feesAnnual = averageDailyFees * 365;
-
-                // Ratio Price to Fees
-                double ratioPriceFeesTemp = marketCap / feesAnnual;
-                String ratioPriceFees = String.valueOf(ratioPriceFeesTemp);
-
-                // Ratio OI/Mcap
-                double ratioOImcapTemp = Double.parseDouble(hyperliquidData.openInterest()) / marketCap;
-                String ratioOImcap = String.valueOf(ratioOImcapTemp);
-
-                // Ratio % staké
-                double ratioStakedTemp = Double.parseDouble(hyperliquidData.totalStakedHype())
-                                / Double.parseDouble(hyperliquidData.maxSupply()) * 100;
-                String ratioStaked = String.valueOf(ratioStakedTemp);
-
-                // % bridged hype sur EVM
-                double ratioBridgedTemp = Double.parseDouble(blockchainData.bridgedHype())
-                                / Double.parseDouble(hyperliquidData.circulatingSupply()) * 100;
-                String ratioBridged = String.valueOf(ratioBridgedTemp);
-
-                // % staké evm vs core
-                double stakedEvmCoreTemp = (Double.parseDouble(blockchainData.liquidStaked())
-                                / Double.parseDouble(hyperliquidData.circulatingSupply())) * 100;
-                String stakedEvmCore = String.valueOf(stakedEvmCoreTemp);
-
-                // Récup les données h24 (le premier élément après reverse est celui d'il y a
-                // 24h)
-                AssetDaily h24 = !daily.isEmpty() ? daily.get(0) : entity;
-                // burn 24h
-                double oldBurned = h24.getBurnedHype() != null
-                                ? Double.parseDouble(h24.getBurnedHype())
-                                : Double.parseDouble(hyperliquidData.hypeBurned());
-                double burned24h = Double.parseDouble(hyperliquidData.hypeBurned()) - oldBurned;
-
-                // Les volat perso dernières 24h
-                double volatVolume = 0;
-                double volatOpenInterest = 0;
-                double volatHlpProvider = 0;
-                try {
-                        volatVolume = ((volume / Double.parseDouble(h24.getDailyVolume())) - 1) * 100;
-                        volatOpenInterest = ((Double.parseDouble(hyperliquidData.openInterest())
-                                        / Double.parseDouble(h24.getOpenInterest()))
-                                        - 1)
-                                        * 100;
-                        volatHlpProvider = ((tvl / Double.parseDouble(h24.getTotalValueLocked())) - 1) * 100;
-                } catch (ArithmeticException | NumberFormatException e) {
-                        // Si c'est un problème de maths
-                        logger.warn("Calcul volatilité impossible (donnée manquante ou division par zéro) : {}",
-                                        e.getMessage());
-                } catch (Exception e) {
-                        // Si c'est autre chose
-                        logger.error("Erreur inconnue dans le calcul des volatilités", e);
-
-                }
-
-                // data 30j
-                String burned30d = "0";
-                String circulating30d = "0";
-                String flux30d = "0";
-                try {
-                        List<AssetSnapshot> historyWithData = history.stream()
-                                        .filter(s -> s.getBurnedHype() != null && s.getCirculatingSupply() != null)
-                                        .toList();
-
-                        if (!historyWithData.isEmpty()) {
-                                int size = historyWithData.size();
-                                int period = Math.min(size, 31);
-
-                                AssetSnapshot reference = historyWithData.get(size - period);
-                                AssetSnapshot latest = historyWithData.get(size - 1);
-
-                                double latestBurned = Double.parseDouble(latest.getBurnedHype());
-                                double refBurned = Double.parseDouble(reference.getBurnedHype());
-                                double latestCirc = Double.parseDouble(latest.getCirculatingSupply());
-                                double refCirc = Double.parseDouble(reference.getCirculatingSupply());
-
-                                double burnedAvg, circAvg;
-
-                                if (period > 1) {
-                                        burnedAvg = (latestBurned - refBurned) / (period - 1);
-                                        circAvg = (latestCirc - refCirc) / (period - 1);
-                                } else {
-                                        burnedAvg = Double.parseDouble(hyperliquidData.hypeBurned()) - latestBurned;
-                                        circAvg = Double.parseDouble(hyperliquidData.circulatingSupply()) - latestCirc;
-                                }
-
-                                burned30d = String.valueOf(burnedAvg);
-                                circulating30d = String.valueOf(circAvg + burnedAvg);
-                                flux30d = String.valueOf(circAvg);
-                        }
-                } catch (ArithmeticException | NumberFormatException e) {
-                        // Si c'est un problème de maths
-                        logger.warn("Calcul impossible (donnée manquante ou division par zéro) : {}",
-                                        e.getMessage());
-                } catch (Exception e) {
-                        logger.error("Erreur dans le calcul des données 30j ", e);
-                }
-
-                // Données pour la chart des flux
-                List<Double> fluxBurned = new ArrayList<>();
-                List<Double> fluxIssued = new ArrayList<>();
-                List<Double> fluxNetFlow = new ArrayList<>();
-                List<Long> fluxDays = new ArrayList<>();
-
-                try {
-                        for (int i = 1; i < history.size(); i++) {
-                                AssetSnapshot current = history.get(i);
-                                AssetSnapshot previous = history.get(i - 1);
-
-                                if (current.getBurnedHype() != null && previous.getBurnedHype() != null
-                                                && current.getCirculatingSupply() != null
-                                                && previous.getCirculatingSupply() != null) {
-                                        double burnedDelta = Double.parseDouble(current.getBurnedHype())
-                                                        - Double.parseDouble(previous.getBurnedHype());
-                                        double circulatingDelta = Double.parseDouble(current.getCirculatingSupply())
-                                                        - Double.parseDouble(previous.getCirculatingSupply());
-                                        double issuedDelta = circulatingDelta + burnedDelta;
-                                        double netFlow = circulatingDelta;
-
-                                        fluxBurned.add(burnedDelta);
-                                        fluxIssued.add(issuedDelta);
-                                        fluxNetFlow.add(netFlow);
-                                        fluxDays.add(current.getDay());
-                                }
-                        }
-                } catch (ArithmeticException | NumberFormatException e) {
-                        // Si c'est un problème de maths
-                        logger.warn("Calcul impossible (donnée manquante ou division par zéro) : {}",
-                                        e.getMessage());
-                } catch (Exception e) {
-                        logger.error("Erreur dans le calcul de la chart des flux ", e);
-                }
-
-                return new HypeDto(
-                                entity.getSymbol(),
-                                entity.getCurrentPrice(),
-                                marketCap,
-                                entity.getPriceChangePercentage24h(),
-                                entity.getTotalVolume(),
-                                entity.getLastRefresh(),
+                return new HypeChartsDto(
                                 historicalPrice,
                                 historicalDays,
                                 livePrice,
-                                liveDay,
-                                hyperliquidData.circulatingSupply(),
-                                hyperliquidData.totalValueLocked(),
-                                hyperliquidData.apr(),
-                                hyperliquidData.dailyVolume(),
-                                ratioProvider,
-                                hyperliquidData.openInterest(),
-                                Double.toString(feesDaily),
-                                Double.toString(feesAnnual),
-                                volatVolume,
-                                volatOpenInterest,
-                                volatHlpProvider,
-                                hyperliquidData.stakingApr(),
-                                hyperliquidData.maxSupply(),
-                                circulation100,
-                                fdv,
-                                ratioMcapFdv,
-                                hypeBurned100,
-                                ratioPriceFees,
-                                ratioOImcap,
-                                hyperliquidData.totalStakedHype(),
-                                ratioStaked,
-                                blockchainData.bridgedHype(),
-                                ratioBridged,
-                                blockchainData.liquidStaked(),
-                                stakedEvmCore,
-                                burned30d,
-                                circulating30d,
-                                flux30d,
-                                burned24h,
-                                fluxBurned,
-                                fluxIssued,
-                                fluxNetFlow,
-                                fluxDays);
+                                liveDay);
         }
+
+        private HypeTimedDataDto getTimedData(HyperliquidDto hyperliquidData, List<AssetDaily> daily,
+                        List<AssetSnapshot> history) {
+                AssetDaily h24 = !daily.isEmpty() ? daily.get(0) : null;
+                return this.hypeCalculator.computeTimedData(hyperliquidData, h24, history);
+        }
+
+        private HypeSupplyDto getSupplyData(HyperliquidDto hyperliquidData) {
+                return this.hypeCalculator.computeSupplyData(hyperliquidData);
+        }
+
+        private HypeBlockchainDto getBlockchainData(HyperliquidDto hyperliquidData, BlockChainDto blockchainData) {
+                return this.hypeCalculator.computeBlockchainData(blockchainData, hyperliquidData);
+        }
+
+        private HypeHlpDto getHlpData(HyperliquidDto hyperliquidData) {
+                return this.hypeCalculator.computeHlpData(hyperliquidData);
+        }
+
+        private HypeValuationDto getValuationData(HyperliquidDto hyperliquidData, AssetDaily entity,
+                        List<AssetSnapshot> history) {
+                return this.hypeCalculator.computeValuationData(hyperliquidData, entity, history);
+        }
+
+        private double safeParseDouble(String value, String fieldName) {
+                if (value == null || value.isBlank()) {
+                        logger.warn("Valeur manquante pour {}", fieldName);
+                        return 0d;
+                }
+                try {
+                        return Double.parseDouble(value);
+                } catch (NumberFormatException e) {
+                        logger.warn("Valeur invalide pour {} : {}", fieldName, value);
+                        return 0d;
+                }
+        }
+
 }
