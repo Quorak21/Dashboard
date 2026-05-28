@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-05-28 · **Tâches actives** : 38
+> **Mise à jour** : 2026-05-28 · **Tâches actives** : 28
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -125,11 +125,6 @@
   - Spring Boot auto-configure déjà un `RestClient.Builder`. Ce bean est redondant.
   - → Supprimer, ou le garder mais configurer timeouts dedans.
 
-- [ ] **BACK-19** — `@Transactional` en double sur les deletes
-  - 📁 `AssetDailyRepository.java` L24, `AssetSyncJob.java` L95
-  - Double `@Transactional` repository + appelant. Fonctionnel mais confus.
-  - → Garder uniquement au niveau du job.
-
 - [ ] **BACK-22** — Corriger la propagation du symbole dans `InveBDto.error()`
   - 📁 `InveBService.java` L87
   - `InveBService` propage `"ERROR"` comme symbole lors d'une exception dans `InveBDto.error()`.
@@ -142,16 +137,6 @@
   - ~80% de code identique (constructor/effect/createChart/updateChart, config tooltip/scales). CSS aussi quasi identique.
   - → Créer un `BaseChart` abstrait ou un composant configurable unique.
 
-- [ ] **FRONT-06** — `formatNumber`/`formatTime` en propriétés au lieu de Pipes
-  - 📁 `hype.ts` L25-26, `inveb.ts` L20-21, `asset-main-card.ts` L14-15
-  - Dupliqué 3 fois. Devrait être des Pipes Angular réutilisables.
-  - → Créer `FormatNumberPipe` et `FormatTimePipe` dans `shared/pipes/`
-
-- [ ] **FRONT-09** — `window.devicePixelRatio` accès direct au DOM
-  - 📁 `daily-chart.ts` L77, `price-chart.ts` L76
-  - Pas bloquant pour une SPA, mais problème SSR/tests.
-  - → Injecter via un service ou `isPlatformBrowser()`
-
 - [ ] **FRONT-10** — Magic numbers dans les composants
   - 📁 `hype.ts` L171 (`180000`), `inveb.ts` L39 (`180000`), `hype-flux-chart.ts` L61 (`86400000`), `hype-supply-distribution.ts` L45 (`1000000000`)
   - → Extraire en constantes nommées.
@@ -162,11 +147,6 @@
   - Nécessite côté backend : persister les données volume/OI en base quotidiennement via le job de sync.
   - Côté frontend : créer le composant chart (30j) une fois les données disponibles.
   - → Commencer par le modèle DB + collecte, puis le chart.
-
-- [ ] **FEAT-02** — Chart daily pour Investor AB
-  - 📁 `frontend/src/app/features/crypto/inveb/`
-  - Ajouter un graphique d'évolution journalière (même logique que le daily chart de HYPE).
-  - → Réutiliser/adapter le composant `daily-chart` existant.
 
 - [ ] **FEAT-03** — Metrics cards pour Investor AB
   - 📁 `frontend/src/app/features/crypto/inveb/`
@@ -191,46 +171,6 @@
   - `price-chart` et `hype.ts` n'ont pas de fichier spec.
   - → Tester les `computed()` dans `hype.ts` et `inveb.ts`.
 
-- [ ] **QUAL-04** — `<button routerLink>` au lieu de `<a>`
-  - 📁 `navbar.html` L8, `asset-dashboard-card.html` L2
-  - → Utiliser `<a routerLink="...">` pour les liens de navigation.
-
-- [ ] **QUAL-05** — `lang="en"` sur une app avec contenu mixte FR/EN
-  - 📁 `index.html` L2
-  - → Mettre `lang="fr"`
-
-- [ ] **A11Y-01** — Boutons/SVG sans attributs ARIA
-  - Boutons navbar sans `aria-label`, SVGs décoratifs sans `aria-hidden="true"`, canvas chart sans fallback.
-  - → `aria-label` sur les boutons, `aria-hidden="true"` sur les SVG décoratifs.
-
-- [ ] **INFRA-06** — Dépendance `security-test` sans `security`
-  - 📁 `pom.xml` L72-84
-  - `spring-boot-starter-security-test` inclus mais `security` est commenté.
-  - → Retirer `security-test` tant que Security n'est pas activé.
-
-- [ ] **INFRA-08** — Dockerfile sans user non-root
-  - 📁 `Dockerfile`
-  - → Ajouter `addgroup/adduser` + `USER app`
-
-- [ ] **INFRA-09** — Pas de cache des dépendances Maven dans le Dockerfile
-  - 📁 `Dockerfile` L4-6
-  - Chaque changement de code redownload toutes les dépendances.
-  - → `COPY pom.xml` → `mvn dependency:go-offline` → `COPY src`
-
-- [ ] **INFRA-10** — Dossier `target/` résiduel à la racine
-  - Build lancé au mauvais endroit. Gitignored mais du bruit.
-  - → Supprimer manuellement.
-
-- [ ] **INFRA-11** — `application-prod.yml` non gitignored
-  - 📁 `.gitignore` L35-38
-  - Pas de secrets dedans actuellement, mais risque si quelqu'un en ajoute.
-  - → Gitignorer ou ajouter un commentaire d'avertissement.
-
-- [ ] **INFRA-12** — Burger menu non fonctionnel
-  - 📁 `navbar.html` L27-31
-  - Bouton menu présent sans click handler ni dropdown.
-  - → Implémenter ou retirer.
-
 ---
 
 ## 📊 Résumé
@@ -239,5 +179,5 @@
 |----------|---------|
 | 🔴 Critique | 1 |
 | 🟠 Élevé | 11 |
-| 🟡 Moyen | 17 |
-| 🔵 Info | 9 |
+| 🟡 Moyen | 14 |
+| 🔵 Info | 2 |

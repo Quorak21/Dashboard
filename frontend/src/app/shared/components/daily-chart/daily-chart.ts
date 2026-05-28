@@ -75,7 +75,6 @@ export class DailyChart {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          devicePixelRatio: window.devicePixelRatio,
           layout: { padding: { right: 5 } },
           interaction: { intersect: false, mode: 'index' },
           plugins: {
@@ -111,9 +110,12 @@ export class DailyChart {
               ticks: {
                 color: 'rgba(255, 255, 255, 0.4)',
                 font: { size: 12 },
-                stepSize: 0.5,
-                precision: 2,
-                callback: (val) => val + this.currency()  
+                maxTicksLimit: 6,
+                callback: (val) => {
+                  const num = Number(val);
+                  const formatted = num < 10 ? num.toFixed(2) : num.toFixed(0);
+                  return formatted + ' ' + this.currency();
+                }
               }
             }
           }

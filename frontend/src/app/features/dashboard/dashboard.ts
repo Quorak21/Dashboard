@@ -24,10 +24,10 @@ export class Dashboard {
 
   private rawInveb = toSignal( this.api.getData('inveb'), { initialValue: null });
 
-  hypePrice = computed(() => this.rawHype()?.currentPrice ?? null);
+  hypePrice = computed(() => this.rawHype()?.summary?.currentPrice ?? null);
   invebPrice = computed(() => this.rawInveb()?.currentPrice ?? null);
 
-  hypeChange = computed(() => this.rawHype()?.priceChangePercentage24h ?? null);
+  hypeChange = computed(() => this.rawHype()?.summary?.priceChangePercentage24h ?? null);
   invebChange = computed(() => this.rawInveb()?.priceChangePercentage24h ?? null);
 
 }

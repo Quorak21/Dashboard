@@ -15,6 +15,7 @@
         <h3 class="text-orange-400 text-xl font-black uppercase tracking-[0.2em] drop-shadow-md flex items-center">
             <!-- Flame Icon -->
             <lucide-icon [img]="Flame"
+                aria-hidden="true"
                 class="h-8 w-8 mr-2 text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,1)] animate-pulse"></lucide-icon>
             Last 24h
         </h3>
@@ -24,7 +25,7 @@
     <div class="relative z-10 flex-grow flex items-center justify-center mt-6">
         <div class="relative w-full max-w-[350px] aspect-[4/3]">
             <!-- Semi-Circle SVG -->
-            <svg viewBox="0 0 110 40" class="w-full h-full drop-shadow-2xl overflow-visible">
+            <svg viewBox="0 0 110 40" aria-hidden="true" class="w-full h-full drop-shadow-2xl overflow-visible">
                 <!-- Background Track -->
                 <path d="M 10 50 A 35 50 0 0 1 100 50" fill="none" stroke="currentColor" stroke-width="12"
                     stroke-linecap="round" class="text-orange-950/60" />
@@ -49,7 +50,7 @@
             <div class="absolute inset-0 flex flex-col items-center justify-end pb-0">
                 <span
                     class="text-4xl font-mono font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 drop-shadow-[0_0_20px_rgba(249,115,22,0.5)]">
-                    {{ formatNumber(burned24h()) }}
+                    {{ burned24h() | formatNumber }}
                 </span>
                 <!-- Valeur USD secondaire -->
                 <span class="text-orange-200/50 text-sm font-medium mt-[-4px] mb-1">

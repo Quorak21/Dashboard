@@ -5,11 +5,13 @@
             <!-- Partie gauche -->
             <div class="flex gap-2 items-center relative z-10">
                 <!-- Home -->
-                <button routerLink=""
+                <a routerLink=""
+                    aria-label="Go to homepage"
                     class="p-2 rounded-lg text-copper-400 hover:text-copper-300 hover:bg-copper-600/20 hover:shadow-[0_0_15px_rgba(184,115,51,0.2)] transition-all duration-300 group cursor-pointer focus:outline-none">
                     <lucide-icon [img]="Home"
+                        aria-hidden="true"
                         class="w-5 h-5 group-hover:-translate-y-0.5 group-hover:scale-110 transition-all duration-300"></lucide-icon>
-                </button>
+                </a>
 
             </div>
 
@@ -21,15 +23,8 @@
                 </span>
             </div>
 
-            <!-- Partie droite -->
-            <div class="flex items-center z-10 relative">
-                <!-- Menu burger -->
-                <button
-                    class="p-2 rounded-lg text-copper-400 hover:text-copper-300 hover:bg-copper-600/20 hover:shadow-[0_0_15px_rgba(184,115,51,0.2)] transition-all duration-300 group cursor-pointer focus:outline-none">
-                    <lucide-icon [img]="Menu"
-                        class="w-5 h-5 group-hover:-translate-y-0.5 group-hover:scale-110 transition-all duration-300"></lucide-icon>
-                </button>
-            </div>
+            <!-- Partie droite (placeholder pour centrage du titre) -->
+            <div class="w-9 h-9"></div>
 
         </div>
     </div>

@@ -8,8 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import com.dokkcorp.dashboard.model.entity.AssetDaily;
 
-import jakarta.transaction.Transactional;
-
 @Repository
 public interface AssetDailyRepository extends JpaRepository<AssetDaily, Long> {
 
@@ -21,6 +19,5 @@ public interface AssetDailyRepository extends JpaRepository<AssetDaily, Long> {
     // Récupérer les 144 derniers éléments pour le graphique pour la chart daily, les 24 dernière heures
     List<AssetDaily> findTop144BySymbolOrderByLastRefreshDesc(String symbol);
 
-    @Transactional
     void deleteByLastRefreshBefore(Long timestamp);
 }

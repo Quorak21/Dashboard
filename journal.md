@@ -2,9 +2,45 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 23**
+- **Tâches réalisée depuis l'implémentation du workflow : 35**
 
 ---
+
+- **INFRA-12** — Burger menu non fonctionnel
+  - *Description* : Retrait du bouton de menu burger inactif dans la barre de navigation (`navbar.html`) et nettoyage du composant Angular associé (`navbar.ts`). Un placeholder invisible maintient le centrage parfait du titre "Dashboard".
+
+- **FEAT-02** — Chart daily pour Investor AB
+  - *Description* : Intégration du composant de graphique journalier `DailyChart` (`<app-daily-chart>`) sur l'interface d'Investor AB (`inveb.html` / `inveb.ts`). Réutilise parfaitement le composant partagé existant et affiche les variations du prix "Live" sur 24 heures en couronnes suédoises (SEK).
+
+- **BACK-19** — `@Transactional` en double sur les deletes
+  - *Description* : Suppression de l'annotation `@Transactional` redondante sur `deleteByLastRefreshBefore` dans `AssetDailyRepository`. La gestion de la transaction est déléguée uniquement au niveau de l'appelant dans le job planifié `AssetSyncJob.cleanDB()`.
+
+- **FRONT-06** — `formatNumber`/`formatTime` en propriétés au lieu de Pipes
+  - *Description* : Création de deux Pipes Angular standalone (`FormatNumberPipe` et `FormatTimePipe`) et nettoyage complet des fichiers `.ts` de composants. Élimine la duplication de code et améliore drastiquement la performance de rendu grâce au cache natif des Pure Pipes Angular.
+
+- **FRONT-09** — `window.devicePixelRatio` accès direct au DOM
+  - *Description* : Suppression de la configuration manuelle `devicePixelRatio: window.devicePixelRatio` dans les graphiques `PriceChart` et `DailyChart`. Chart.js gérant nativement ce ratio sur le navigateur, sa suppression élimine le risque d'exception sur les tests unitaires et lors d'un futur rendu côté serveur (SSR).
+
+- **INFRA-08** — Dockerfile sans user non-root
+  - *Description* : Sécurisation du conteneur de production en créant un utilisateur système non-privilégié `app` (UID/GID 1001), en lui affectant la propriété du fichier `app.jar` exécutable, et en forçant Docker à démarrer le processus Java sous cette identité (`USER app`).
+
+- **A11Y-01** — Boutons/SVG sans attributs ARIA
+  - *Description* : Ajout d'attributs `aria-label` descriptifs sur les boutons textless de la navbar (Home, Menu), configuration de `aria-hidden="true"` sur toutes les icônes de décoration `<lucide-icon>` et les SVGs purement esthétiques pour éviter la pollution sonore des lecteurs d'écran, et intégration de descriptions de repli `<p class="sr-only">` à l'intérieur de toutes les balises `<canvas>` des graphiques (Flux, Prix Annuel, Live 24h).
+
+- **QUAL-04** — `<button routerLink>` au lieu de `<a>`
+  - *Description* : Remplacement des boutons de navigation (`<button routerLink>`) par des balises d'ancre standards (`<a routerLink>`) dans la barre de navigation et sur les cartes du tableau de bord afin d'améliorer la sémantique HTML et l'accessibilité.
+
+- **QUAL-05** — Harmonisation à 100% en anglais (anciennement `lang="en"` sur contenu mixte)
+  - *Description* : Correction et traduction en anglais des derniers résidus français présents dans l'interface de HYPE (h3 "Annual Performance" / "24h Live" et formatage de date `en-US` dans le graphique des flux). L'attribut `lang="en"` d'`index.html` est désormais parfaitement exact.
+
+- **INFRA-06** — Dépendance `security-test` sans `security`
+  - *Description* : Mise en commentaire de la dépendance de test `spring-boot-starter-security-test` dans le `pom.xml` car le module de sécurité principal est également désactivé. Évite de charger des outils inutilisés.
+
+- **INFRA-09** — Pas de cache des dépendances Maven dans le Dockerfile
+  - *Description* : Optimisation de la mise en cache Docker en séparant la récupération des dépendances (`mvn dependency:go-offline`) du code source (`src/`). Le temps de build passe de quelques minutes à quelques secondes lors de modifs de code.
+
+- **INFRA-10** — Dossier `target/` résiduel à la racine
+  - *Description* : Suppression du dossier `target/` résiduel qui traînait à la racine du monorepo suite à un build lancé par erreur en dehors du sous-dossier `backend/`.
 
 - **BACK-03** — Extraire les calculs de `HypeService.mapToDto()` vers `HypeCalculator`
   - *Description* : migration des calculs principaux (`timedData`, `supply`, `blockchain`, `hlp`, `valuation`) dans `HypeCalculator`, avec `HypeService` recentré sur l'orchestration et délégation des calculs.

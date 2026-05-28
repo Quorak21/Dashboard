@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { LucideAngularModule, Home, Menu } from 'lucide-angular';
+import { LucideAngularModule, Home } from 'lucide-angular';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -11,6 +11,5 @@ import { RouterLink } from '@angular/router';
 export class Navbar {
 
   readonly Home = Home;
-  readonly Menu = Menu;
 
 }

@@ -73,7 +73,6 @@ export class PriceChart {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          devicePixelRatio: window.devicePixelRatio,
           layout: { padding: { right: 10 } },
           interaction: { intersect: false, mode: 'index' },
           plugins: {

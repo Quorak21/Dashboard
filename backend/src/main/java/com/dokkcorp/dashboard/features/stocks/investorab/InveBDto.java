@@ -19,11 +19,16 @@ public record InveBDto(
 
                 List<Double> historyPrices,
 
-                List<Long> historyDays) {
+                List<Long> historyDays,
+
+                List<Double> livePrices,
+
+                List<Long> liveDays) {
 
         public static InveBDto error(String symbol) {
                 return new InveBDto(
                                 "ERROR", 0.0, 0.0, 0.0, 0.0, (double) System.currentTimeMillis(),
+                                java.util.List.of(), java.util.List.of(),
                                 java.util.List.of(), java.util.List.of());
         }
 

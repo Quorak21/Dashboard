@@ -1,12 +1,12 @@
 import { Component, input } from '@angular/core';
-import { formatTime } from '../../../core/services/format-dates';
-import { formatNumber } from '../../../core/services/format-number';
 import { DecimalPipe } from '@angular/common';
 import { LucideAngularModule, TrendingUp, TrendingDown, Clock } from 'lucide-angular';
+import { FormatNumberPipe } from '../../pipes/format-number.pipe';
+import { FormatTimePipe } from '../../pipes/format-time.pipe';
 
 @Component({
   selector: 'app-asset-main-card',
-  imports: [DecimalPipe, LucideAngularModule],
+  imports: [DecimalPipe, LucideAngularModule, FormatNumberPipe, FormatTimePipe],
   templateUrl: './asset-main-card.html',
   styleUrl: './asset-main-card.css',
 })
@@ -14,10 +14,6 @@ export class AssetMainCard {
   readonly TrendingUp = TrendingUp;
   readonly TrendingDown = TrendingDown;
   readonly Clock = Clock;
-
-
-  public formatTime = formatTime;
-  public formatNumber = formatNumber;
 
   asset = input<string>();
   symbol = input<string>("");
@@ -28,4 +24,5 @@ export class AssetMainCard {
   actualPrice = input<number | null>(null);
   lastRefresh = input<number>(0);
   currencySymbol = input<string>('$');
+  marketClosed = input<boolean>(false);
 }

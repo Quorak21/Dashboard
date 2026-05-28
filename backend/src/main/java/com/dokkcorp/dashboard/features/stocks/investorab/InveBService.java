@@ -7,7 +7,17 @@ import com.dokkcorp.dashboard.providers.fmp.FMPClient;
 import com.dokkcorp.dashboard.providers.fmp.FMPDto;
 import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
 
+import com.dokkcorp.dashboard.model.entity.AssetDaily;
+import com.dokkcorp.dashboard.repository.AssetDailyRepository;
+
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -22,11 +32,14 @@ public class InveBService {
 
     private final AssetSnapshotRepository assetSnapshotRepository;
 
+    private final AssetDailyRepository assetDailyRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(InveBService.class);
 
-    public InveBService(FMPClient fmpClient, AssetSnapshotRepository assetSnapshotRepository) {
+    public InveBService(FMPClient fmpClient, AssetSnapshotRepository assetSnapshotRepository, AssetDailyRepository assetDailyRepository) {
         this.fmpClient = fmpClient;
         this.assetSnapshotRepository = assetSnapshotRepository;
+        this.assetDailyRepository = assetDailyRepository;
     }
 
     // volatile pour les listes pour aller uniquement dans la RAM chercher les données fraîches
@@ -64,7 +77,53 @@ public class InveBService {
 
             double priceChangePercentage24h = inveBRaw.priceChangePercentage24h();
             double totalVolume = inveBRaw.totalVolume();
-            double lastRefresh = System.currentTimeMillis();
+            long lastRefresh = System.currentTimeMillis();
+
+            // We check Stockholm Stock Exchange market hours
+            ZoneId stockholmZone = ZoneId.of("Europe/Stockholm");
+            ZonedDateTime nowStockholm = ZonedDateTime.now(stockholmZone);
+            DayOfWeek day = nowStockholm.getDayOfWeek();
+            LocalTime time = nowStockholm.toLocalTime();
+
+            boolean isMarketHours = (day != DayOfWeek.SATURDAY && day != DayOfWeek.SUNDAY)
+                    && !time.isBefore(LocalTime.of(9, 0))
+                    && !time.isAfter(LocalTime.of(17, 35));
+
+            if (isMarketHours) {
+                AssetDaily newPoint = new AssetDaily();
+                newPoint.setSymbol("INVE-B");
+                newPoint.setCurrentPrice(currentPrice);
+                newPoint.setMarketCap(marketCap);
+                newPoint.setPriceChangePercentage24h(priceChangePercentage24h);
+                newPoint.setTotalVolume(totalVolume);
+                newPoint.setLastRefresh(lastRefresh);
+                this.assetDailyRepository.save(newPoint);
+            }
+
+            // Get historical daily data and extract the latest session
+            List<AssetDaily> dailyPoints = this.assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B");
+            List<AssetDaily> chronological = new ArrayList<>(dailyPoints);
+            Collections.reverse(chronological);
+
+            List<Double> livePrices = new ArrayList<>();
+            List<Long> liveDays = new ArrayList<>();
+
+            if (!chronological.isEmpty()) {
+                AssetDaily latestPoint = chronological.get(chronological.size() - 1);
+                LocalDate latestLocalDate = Instant.ofEpochMilli(latestPoint.getLastRefresh())
+                        .atZone(stockholmZone)
+                        .toLocalDate();
+
+                for (AssetDaily point : chronological) {
+                    LocalDate pointLocalDate = Instant.ofEpochMilli(point.getLastRefresh())
+                            .atZone(stockholmZone)
+                            .toLocalDate();
+                    if (pointLocalDate.equals(latestLocalDate)) {
+                        livePrices.add(point.getCurrentPrice());
+                        liveDays.add(point.getLastRefresh());
+                    }
+                }
+            }
 
             InveBDto newDto = new InveBDto(
                     symbol,
@@ -74,7 +133,9 @@ public class InveBService {
                     totalVolume,
                     lastRefresh,
                     this.historyPrices,
-                    this.historyDays);
+                    this.historyDays,
+                    livePrices,
+                    liveDays);
 
             this.cachedData.set(newDto);
             return newDto;

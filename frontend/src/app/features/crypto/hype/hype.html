@@ -14,7 +14,7 @@
             <div class="flex flex-col w-full md:w-3/5">
                 <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-                    Performance Annuelle
+                    Annual Performance
                 </h3>
                 <app-price-chart [prices]="historyPrices()" [labels]="historyDays()" currency="$"></app-price-chart>
             </div>
@@ -22,7 +22,7 @@
             <div class="flex flex-col w-full md:w-2/5">
                 <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-                    Live 24h
+                    24h Live
                 </h3>
                 <app-daily-chart [prices]="livePrices()" [labels]="liveDays()" currency="$"></app-daily-chart>
             </div>
