@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-06-02 · **Tâches actives** : 23
+> **Mise à jour** : 2026-06-02 · **Tâches actives** : 19
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -14,21 +14,6 @@
 ## 🟠 ÉLEVÉ
 
 ### Backend — Architecture
-
-- [ ] **BACK-20** — Extraire le mapping final vers un `HypeMapper` dédié
-  - 📁 `HypeService.java`
-  - `mapToDto` porte encore la préparation de données (`history`/`daily`) + assemblage DTO.
-  - → Créer un `HypeMapper` (ou équivalent) pour isoler le mapping et réduire la responsabilité du service.
-
-- [ ] **BACK-21** — Découper le cache/récupération HYPE par thème pour isoler les pannes partielles
-  - 📁 `HypeService.java`
-  - Cache et récupération actuels sont globaux : si une source échoue, le fallback peut dégrader tout l'agrégat.
-  - → Séparer par thèmes (`summary`, `timedData`, `supply`, `blockchain`, `hlp`, `valuation`) avec cache/fallback dédiés pour ne dégrader que le secteur en erreur.
-
-- [ ] **BACK-04** — `HypeService.getData()` trop long (~70 lignes)
-  - 📁 `HypeService.java` L63-134
-  - Mélange appels API, logique métier, persistance DB, et gestion du cache.
-  - → Séparer la récupération de données, la logique métier, et la persistance.
 
 - [ ] **BACK-05** — Pas de retry/timeout sur les appels API externes
   - 📁 `CoinGeckoClient.java`, `HyperliquidClient.java`, `FMPClient.java`, `BlockChainClient.java`
@@ -86,10 +71,11 @@
 
 ### Backend
 
-- [ ] **BACK-13** — NPE potentiels dans HyperliquidClient
-  - 📁 `HyperliquidClient.java` L132, L168-182
-  - Chaîne d'accès `node.get(n).get("name").get("stats")...` sans null-check.
-  - → Null-checks ou Optional sur les nœuds JSON.
+- [ ] **BACK-21** — Découper le cache/récupération HYPE par thème pour isoler les pannes partielles
+  - 📁 `HypeService.java`
+  - Cache et récupération actuels sont globaux : si une source échoue, le fallback peut dégrader tout l'agrégat.
+  - → Séparer par thèmes (`summary`, `timedData`, `supply`, `blockchain`, `hlp`, `valuation`) avec cache/fallback dédiés pour ne dégrader que le secteur en erreur.
+  - Priorisation : à traiter après **BACK-05** (stabilité providers) et **FRONT-12** (gestion UI du dégradé par section).
 
 - [ ] **BACK-14** — `HypeDto.error()` ignore le paramètre `symbol`
   - 📁 `HypeDto.java` L95-103
@@ -105,11 +91,6 @@
   - 📁 `AssetDaily.java` L17, `AssetSnapshot.java` L18
   - `AUTO` peut générer une table de séquences séparée. Moins performant.
   - → `@GeneratedValue(strategy = GenerationType.IDENTITY)`
-
-- [ ] **BACK-18** — `@Bean` statique et redondant sur `RestClient.Builder`
-  - 📁 `DashboardApplication.java` L13-18
-  - Spring Boot auto-configure déjà un `RestClient.Builder`. Ce bean est redondant.
-  - → Supprimer, ou le garder mais configurer timeouts dedans.
 
 - [ ] **BACK-22** — Corriger la propagation du symbole dans `InveBDto.error()`
   - 📁 `InveBService.java` L87
@@ -165,6 +146,6 @@
 | Sévérité | Restant |
 |----------|---------|
 | 🔴 Critique | 0 |
-| 🟠 Élevé | 10 |
-| 🟡 Moyen | 13 |
+| 🟠 Élevé | 7 |
+| 🟡 Moyen | 12 |
 | 🔵 Info | 0 |

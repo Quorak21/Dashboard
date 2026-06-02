@@ -8,17 +8,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
-import com.dokkcorp.dashboard.features.crypto.hype.maths.HypeCalculator;
-import com.dokkcorp.dashboard.features.crypto.hype.models.HypeBlockchainDto;
-import com.dokkcorp.dashboard.features.crypto.hype.models.HypeHlpDto;
-import com.dokkcorp.dashboard.features.crypto.hype.models.HypeSupplyDto;
-import com.dokkcorp.dashboard.features.crypto.hype.models.HypeTimedDataDto;
-import com.dokkcorp.dashboard.features.crypto.hype.models.HypeValuationDto;
 import com.dokkcorp.dashboard.model.entity.AssetDaily;
 import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
 import com.dokkcorp.dashboard.providers.blockchain.BlockChainClient;
@@ -37,7 +30,7 @@ class HypeServiceTest {
     private final BlockChainClient blockChainClient = mock(BlockChainClient.class);
     private final AssetDailyRepository assetDailyRepository = mock(AssetDailyRepository.class);
     private final AssetSnapshotRepository assetSnapshotRepository = mock(AssetSnapshotRepository.class);
-    private final HypeCalculator hypeCalculator = mock(HypeCalculator.class);
+    private final HypeMapper hypeMapper = mock(HypeMapper.class);
 
     private final HypeService service = new HypeService(
             coinGeckoClient,
@@ -45,14 +38,14 @@ class HypeServiceTest {
             blockChainClient,
             assetDailyRepository,
             assetSnapshotRepository,
-            hypeCalculator);
+            hypeMapper);
 
     @Test
     void getLastHypeData_returnsCachedValueWithoutExternalCalls() {
         stubHappyPathProviders();
-        stubRepositoryReadsForMapping();
+        stubHistoryInitializationCheck();
         when(assetDailyRepository.save(any(AssetDaily.class))).thenReturn(buildSavedDaily());
-        stubCalculatorDtos();
+        when(hypeMapper.toDto(any(), any(), any())).thenReturn(HypeDto.error("HYPE"));
 
         HypeDto firstResult = service.getData();
         HypeDto cachedResult = service.getLastHypeData();
@@ -79,9 +72,9 @@ class HypeServiceTest {
     @Test
     void getData_returnsCachedValueWhenProviderFailsAfterFirstSuccess() {
         stubHappyPathProviders();
-        stubRepositoryReadsForMapping();
+        stubHistoryInitializationCheck();
         when(assetDailyRepository.save(any(AssetDaily.class))).thenReturn(buildSavedDaily());
-        stubCalculatorDtos();
+        when(hypeMapper.toDto(any(), any(), any())).thenReturn(HypeDto.error("HYPE"));
         HypeDto cached = service.getData();
 
         when(hyperliquidClient.getHlData()).thenThrow(new RuntimeException("failed"));
@@ -108,7 +101,7 @@ class HypeServiceTest {
         });
     }
 
-    private void stubRepositoryReadsForMapping() {
+    private void stubHistoryInitializationCheck() {
         AssetSnapshot snapshot = new AssetSnapshot();
         snapshot.setDay(1L);
         snapshot.setPrice(1d);
@@ -116,12 +109,6 @@ class HypeServiceTest {
         snapshot.setBurnedHype("1");
         snapshot.setCirculatingSupply("10");
         when(assetSnapshotRepository.findFirstByOrderByDayDesc()).thenReturn(Optional.of(snapshot));
-        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE")).thenReturn(List.of(snapshot));
-
-        AssetDaily daily = new AssetDaily();
-        daily.setLastRefresh(1L);
-        daily.setCurrentPrice(1d);
-        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(List.of(daily));
     }
 
     private AssetDaily buildSavedDaily() {
@@ -135,13 +122,4 @@ class HypeServiceTest {
         return daily;
     }
 
-    private void stubCalculatorDtos() {
-        when(hypeCalculator.computeTimedData(any(), any(), any())).thenReturn(new HypeTimedDataDto(
-                1d, 2d, 3d, 4d, 5d, 6d, 7d, List.of(), List.of(), List.of(), List.of()));
-        when(hypeCalculator.computeSupplyData(any())).thenReturn(new HypeSupplyDto(1d, 2d, 3d, 4d));
-        when(hypeCalculator.computeBlockchainData(any(), any())).thenReturn(new HypeBlockchainDto(1d, 2d, 3d, 4d));
-        when(hypeCalculator.computeHlpData(any())).thenReturn(new HypeHlpDto(1d, 2d, 3d));
-        when(hypeCalculator.computeValuationData(any(), any(), any())).thenReturn(new HypeValuationDto(
-                1d, 2d, 3d, 4d, 5d, 6d, 7d, 8d, 9d, 10d, 11d));
-    }
 }

@@ -2,9 +2,17 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 37**
+- **Tâches réalisée depuis l'implémentation du workflow : 41**
 
 ---
+
+- **BACK-18** — `@Bean` statique et redondant sur `RestClient.Builder` : retrait du bean custom dans `DashboardApplication` pour laisser l'auto-configuration Spring Boot fournir `RestClient.Builder`, avec nettoyage de l'import résiduel.
+
+- **BACK-13** — NPE potentiels dans HyperliquidClient : hardening complet du parsing JSON (accès défensifs via `path`, vérifications de structure et fallbacks sûrs) pour éviter les null dereference sur payloads API partielles.
+
+- **BACK-20** — Extraire le mapping final vers un `HypeMapper` dédié : extraction complète du mapping HYPE vers `HypeMapper`, avec `HypeService` recentré sur l'orchestration et tests non-régression validés.
+
+- **BACK-04** — `HypeService.getData()` trop long (~70 lignes) : découpage de `getData()` en sous-méthodes d'orchestration (fetch providers, build entity, persist/cache, fallback) sans changement de contrat ni de comportement.
 
 - **TEST-01** — Couverture backend renforcée : ajout de tests unitaires ciblés pour `HypeService`, `AssetSyncJob` et consolidation de `DashboardControllerTest` avec assertions métier utiles.
 
