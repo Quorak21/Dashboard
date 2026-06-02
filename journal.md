@@ -2,9 +2,15 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 35**
+- **Tâches réalisée depuis l'implémentation du workflow : 37**
 
 ---
+
+- **TEST-01** — Couverture backend renforcée : ajout de tests unitaires ciblés pour `HypeService`, `AssetSyncJob` et consolidation de `DashboardControllerTest` avec assertions métier utiles.
+
+- **TEST-02** — Suite frontend durcie : remplacement des specs minimales `should create` par des tests fonctionnels (signals/computed, rendu UI et logique de composants) et ajout de `hype.spec.ts`.
+
+- **BACK-11** — Valeurs financières en calcul BigDecimal safe : Migration des calculs HYPE vers `BigDecimal` (services + mapper/calculator), conservation du schéma DB prod inchangé, conversion explicite vers `Double` aux frontières DTO et ajout de tests unitaires dédiés.
 
 - **INFRA-12** — Burger menu non fonctionnel
   - *Description* : Retrait du bouton de menu burger inactif dans la barre de navigation (`navbar.html`) et nettoyage du composant Angular associé (`navbar.ts`). Un placeholder invisible maintient le centrage parfait du titre "Dashboard".

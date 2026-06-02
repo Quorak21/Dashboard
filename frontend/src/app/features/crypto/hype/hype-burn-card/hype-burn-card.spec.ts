@@ -14,10 +14,23 @@ describe('HypeBurnCard', () => {
     fixture = TestBed.createComponent(HypeBurnCard);
     component = fixture.componentInstance;
     fixture.componentRef.setInput('burned24h', 100);
+    fixture.componentRef.setInput('hypeBurned100', '12.5');
+    fixture.componentRef.setInput('currentPrice', 2);
     await fixture.whenStable();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('computes burned value in USD from burned amount and price', () => {
+    expect(component.burnedValueUsd()).toBe('200');
+  });
+
+  it('computes gauge stroke-dasharray from burned percentage', () => {
+    expect(component.dashArrayStyle()).toBe('21.75 174');
+  });
+
+  it('caps dasharray when percentage is below zero', () => {
+    fixture.componentRef.setInput('hypeBurned100', '-5');
+    fixture.detectChanges();
+
+    expect(component.dashArrayStyle()).toBe('0 174');
   });
 });

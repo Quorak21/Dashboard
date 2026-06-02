@@ -18,7 +18,14 @@ describe('Navbar', () => {
     await fixture.whenStable();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('renders dashboard title and home link', () => {
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+    const text = element.textContent ?? '';
+    const homeLink = element.querySelector('a[routerLink=""]');
+
+    expect(text).toContain('Dashboard');
+    expect(homeLink).toBeTruthy();
+    expect(homeLink?.getAttribute('aria-label')).toBe('Go to homepage');
   });
 });

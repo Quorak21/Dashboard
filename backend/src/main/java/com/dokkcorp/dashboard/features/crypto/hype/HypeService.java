@@ -3,6 +3,7 @@ package com.dokkcorp.dashboard.features.crypto.hype;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.math.BigDecimal;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -112,17 +113,18 @@ public class HypeService {
                         AssetDaily newPoint = new AssetDaily();
                         newPoint.setSymbol("HYPE");
                         newPoint.setCurrentPrice(hypeRaw.currentPrice());
-                        double circulatingSupply = safeParseDouble(hyperliquidData.circulatingSupply(),
+                        BigDecimal circulatingSupply = safeParseDecimal(hyperliquidData.circulatingSupply(),
                                         "hyperliquid.circulatingSupply");
-                        newPoint.setMarketCap(hypeRaw.currentPrice() * circulatingSupply);
+                        BigDecimal marketCap = BigDecimal.valueOf(hypeRaw.currentPrice()).multiply(circulatingSupply);
+                        newPoint.setMarketCap(marketCap.doubleValue());
                         newPoint.setPriceChangePercentage24h(hypeRaw.priceChangePercentage24h());
                         newPoint.setTotalVolume(hypeRaw.totalVolume());
                         newPoint.setLastRefresh(System.currentTimeMillis());
                         newPoint.setBurnedHype(hyperliquidData.hypeBurned());
                         newPoint.setCirculatingSupply(hyperliquidData.circulatingSupply());
-                        newPoint.setFeesDaily(
-                                        String.valueOf(Double.parseDouble(hyperliquidData.dailyVolume())
-                                                        * HypeConstants.FEE_RATE));
+                        BigDecimal feesDaily = safeParseDecimal(hyperliquidData.dailyVolume(), "hyperliquid.dailyVolume")
+                                        .multiply(BigDecimal.valueOf(HypeConstants.FEE_RATE));
+                        newPoint.setFeesDaily(String.valueOf(feesDaily.doubleValue()));
                         newPoint.setDailyVolume(hyperliquidData.dailyVolume());
                         newPoint.setOpenInterest(hyperliquidData.openInterest());
                         newPoint.setProviderTvl(hyperliquidData.providerTvl());
@@ -248,16 +250,16 @@ public class HypeService {
                 return this.hypeCalculator.computeValuationData(hyperliquidData, entity, history);
         }
 
-        private double safeParseDouble(String value, String fieldName) {
+        private BigDecimal safeParseDecimal(String value, String fieldName) {
                 if (value == null || value.isBlank()) {
                         logger.warn("Valeur manquante pour {}", fieldName);
-                        return 0d;
+                        return BigDecimal.ZERO;
                 }
                 try {
-                        return Double.parseDouble(value);
+                        return new BigDecimal(value);
                 } catch (NumberFormatException e) {
                         logger.warn("Valeur invalide pour {} : {}", fieldName, value);
-                        return 0d;
+                        return BigDecimal.ZERO;
                 }
         }
 

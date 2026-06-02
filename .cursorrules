@@ -1,12 +1,12 @@
-# Dashboard — règles Cursor
+# Dashboard — Règles Cursor (Orchestration)
 
-Les règles du projet sont dans `.cursor/rules/` :
+Les règles et agents du projet sont définis dans `.cursor/rules/` :
 
-- `monorepo.mdc` — toujours actif (pré-apprentissage, persona, pas de code sauf demande, suivi dette technique)
-- `angular-frontend.mdc` — fichiers `frontend/**/*`
-- `spring-backend.mdc` — fichiers `backend/**/*`
+- `odin.mdc` (@odin) — Toujours actif. Grand Chef, planification, architecture et suivi dette technique.
+- `alex.mdc` (@alex) — Actif sur `frontend/**/*`. Logique Angular 21 et validation TypeScript.
+- `enderman.mdc` (@enderman) — Actif sur `backend/**/*`. Base de données et logique Spring Boot 4.
+- `picasso.mdc` (@picasso) — Actif sur les fichiers front-end. Design UI, HTML/CSS et intégration Tailwind.
 
-Suivi dette technique : `code_review.md` (backlog actif) + `journal.md` (historique résolu).
-Cartes projet : `AGENTS.md` (racine), `frontend/AGENTS.md`, `backend/AGENTS.md`.
+Suivi de la dette technique : géré exclusivement par `@odin` dans `code_review.md` (backlog actif) et `journal.md` (historique résolu).
 
 Ne pas dupliquer de règles ici.

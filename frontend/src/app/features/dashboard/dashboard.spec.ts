@@ -11,7 +11,9 @@ describe('Mon Premier Test Dashboard', () => {
     getData: (cle: string) => {
       // Si le composant demande 'hype', on lui répond direct 1.25 $ avec +5.42% de hausse
       if (cle === 'hype') {
-        return of({ currentPrice: 1.25, priceChangePercentage24h: 5.42 });
+        return of({
+          summary: { currentPrice: 1.25, priceChangePercentage24h: 5.42 }
+        });
       }
       // Si le composant demande 'inveb', on lui répond direct 245.50 SEK avec -1.25% de baisse
       if (cle === 'inveb') {

@@ -2,6 +2,8 @@ package com.dokkcorp.dashboard.features.crypto.hype.maths;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,11 @@ import org.slf4j.LoggerFactory;
 @Service
 public class HypeCalculator {
 
+    private static final int DIVISION_SCALE = 12;
+    private static final int OUTPUT_SCALE = 8;
+    private static final BigDecimal BD_100 = BigDecimal.valueOf(100);
+    private static final BigDecimal BD_365 = BigDecimal.valueOf(365);
+
     private final Logger logger = LoggerFactory.getLogger(HypeCalculator.class);
 
     // Timed data Calculation
@@ -33,65 +40,71 @@ public class HypeCalculator {
         String openInterestLast24h = h24 != null ? h24.getOpenInterest() : null;
         String providerTvlLast24h = h24 != null ? h24.getProviderTvl() : null;
 
-        double hypeBurnedDouble = safeParseDouble(hyperliquidData.hypeBurned(), "hypeBurned");
-        double dailyVolumeDouble = safeParseDouble(hyperliquidData.dailyVolume(), "dailyVolume");
-        double openInterestDouble = safeParseDouble(hyperliquidData.openInterest(), "openInterest");
-        double providerTvlDouble = safeParseDouble(hyperliquidData.providerTvl(), "providerTvl");
-        double dailyVolumeLast24hDouble = safeParseDouble(dailyVolumeLast24h, "dailyVolumeLast24h");
-        double openInterestLast24hDouble = safeParseDouble(openInterestLast24h, "openInterestLast24h");
-        double providerTvlLast24hDouble = safeParseDouble(providerTvlLast24h, "providerTvlLast24h");
-        double circulatingSupplyDouble = safeParseDouble(hyperliquidData.circulatingSupply(), "circulatingSupply");
+        BigDecimal hypeBurned = safeParseDecimal(hyperliquidData.hypeBurned(), "hypeBurned");
+        BigDecimal dailyVolume = safeParseDecimal(hyperliquidData.dailyVolume(), "dailyVolume");
+        BigDecimal openInterest = safeParseDecimal(hyperliquidData.openInterest(), "openInterest");
+        BigDecimal providerTvl = safeParseDecimal(hyperliquidData.providerTvl(), "providerTvl");
+        BigDecimal dailyVolumeLast24hValue = safeParseDecimal(dailyVolumeLast24h, "dailyVolumeLast24h");
+        BigDecimal openInterestLast24hValue = safeParseDecimal(openInterestLast24h, "openInterestLast24h");
+        BigDecimal providerTvlLast24hValue = safeParseDecimal(providerTvlLast24h, "providerTvlLast24h");
+        BigDecimal circulatingSupply = safeParseDecimal(hyperliquidData.circulatingSupply(), "circulatingSupply");
 
-        double burned24h = computeBurned24h(h24, hypeBurnedDouble);
+        BigDecimal burned24h = computeBurned24h(h24, hypeBurned);
         VolatilityResult volatility = computeVolatility(
                 h24,
-                dailyVolumeDouble,
-                openInterestDouble,
-                providerTvlDouble,
-                dailyVolumeLast24hDouble,
-                openInterestLast24hDouble,
-                providerTvlLast24hDouble);
-        ThirtyDayResult thirtyDay = computeThirtyDayMetrics(history, hypeBurnedDouble, circulatingSupplyDouble);
+                dailyVolume,
+                openInterest,
+                providerTvl,
+                dailyVolumeLast24hValue,
+                openInterestLast24hValue,
+                providerTvlLast24hValue);
+        ThirtyDayResult thirtyDay = computeThirtyDayMetrics(history, hypeBurned, circulatingSupply);
         FluxResult flux = computeFluxSeries(history);
 
         return new HypeTimedDataDto(
-                burned24h,
-                volatility.volatVolume(),
-                volatility.volatOpenInterest(),
-                volatility.volatHlpProvider(),
-                thirtyDay.burned30d(),
-                thirtyDay.circulating30d(),
-                thirtyDay.flux30d(),
+                toDouble(burned24h),
+                toDouble(volatility.volatVolume()),
+                toDouble(volatility.volatOpenInterest()),
+                toDouble(volatility.volatHlpProvider()),
+                toDouble(thirtyDay.burned30d()),
+                toDouble(thirtyDay.circulating30d()),
+                toDouble(thirtyDay.flux30d()),
                 flux.fluxBurned(),
                 flux.fluxIssued(),
                 flux.fluxNetFlow(),
                 flux.fluxDays());
     }
 
-    private double computeBurned24h(AssetDaily h24, double hypeBurnedDouble) {
-        double oldBurned = h24 != null && h24.getBurnedHype() != null
-                ? safeParseDouble(h24.getBurnedHype(), "h24.burnedHype")
-                : hypeBurnedDouble;
-        return hypeBurnedDouble - oldBurned;
+    private BigDecimal computeBurned24h(AssetDaily h24, BigDecimal hypeBurned) {
+        BigDecimal oldBurned = h24 != null && h24.getBurnedHype() != null
+                ? safeParseDecimal(h24.getBurnedHype(), "h24.burnedHype")
+                : hypeBurned;
+        return hypeBurned.subtract(oldBurned);
     }
 
     private VolatilityResult computeVolatility(
             AssetDaily h24,
-            double dailyVolumeDouble,
-            double openInterestDouble,
-            double providerTvlDouble,
-            double dailyVolumeLast24hDouble,
-            double openInterestLast24hDouble,
-            double providerTvlLast24hDouble) {
-        double volatVolume = 0;
-        double volatOpenInterest = 0;
-        double volatHlpProvider = 0;
+            BigDecimal dailyVolume,
+            BigDecimal openInterest,
+            BigDecimal providerTvl,
+            BigDecimal dailyVolumeLast24hValue,
+            BigDecimal openInterestLast24hValue,
+            BigDecimal providerTvlLast24hValue) {
+        BigDecimal volatVolume = BigDecimal.ZERO;
+        BigDecimal volatOpenInterest = BigDecimal.ZERO;
+        BigDecimal volatHlpProvider = BigDecimal.ZERO;
         try {
-            if (h24 != null && dailyVolumeLast24hDouble != 0 && openInterestLast24hDouble != 0
-                    && providerTvlLast24hDouble != 0) {
-                volatVolume = ((dailyVolumeDouble / dailyVolumeLast24hDouble) - 1) * 100;
-                volatOpenInterest = ((openInterestDouble / openInterestLast24hDouble) - 1) * 100;
-                volatHlpProvider = ((providerTvlDouble / providerTvlLast24hDouble) - 1) * 100;
+            if (h24 != null && isNonZero(dailyVolumeLast24hValue) && isNonZero(openInterestLast24hValue)
+                    && isNonZero(providerTvlLast24hValue)) {
+                volatVolume = safeDivide(dailyVolume, dailyVolumeLast24hValue, "volatVolume")
+                        .subtract(BigDecimal.ONE)
+                        .multiply(BD_100);
+                volatOpenInterest = safeDivide(openInterest, openInterestLast24hValue, "volatOpenInterest")
+                        .subtract(BigDecimal.ONE)
+                        .multiply(BD_100);
+                volatHlpProvider = safeDivide(providerTvl, providerTvlLast24hValue, "volatHlpProvider")
+                        .subtract(BigDecimal.ONE)
+                        .multiply(BD_100);
             }
         } catch (ArithmeticException | NumberFormatException e) {
             logger.warn("Calcul volatilité impossible (donnée manquante ou division par zéro) : {}", e.getMessage());
@@ -101,11 +114,11 @@ public class HypeCalculator {
         return new VolatilityResult(volatVolume, volatOpenInterest, volatHlpProvider);
     }
 
-    private ThirtyDayResult computeThirtyDayMetrics(List<AssetSnapshot> history, double hypeBurnedDouble,
-            double circulatingSupplyDouble) {
-        double burned30d = 0;
-        double circulating30d = 0;
-        double flux30d = 0;
+    private ThirtyDayResult computeThirtyDayMetrics(List<AssetSnapshot> history, BigDecimal hypeBurned,
+            BigDecimal circulatingSupply) {
+        BigDecimal burned30d = BigDecimal.ZERO;
+        BigDecimal circulating30d = BigDecimal.ZERO;
+        BigDecimal flux30d = BigDecimal.ZERO;
         try {
             List<AssetSnapshot> historyWithData = history.stream()
                     .filter(s -> s.getBurnedHype() != null && s.getCirculatingSupply() != null).toList();
@@ -117,24 +130,25 @@ public class HypeCalculator {
                 AssetSnapshot reference = historyWithData.get(size - period);
                 AssetSnapshot latest = historyWithData.get(size - 1);
 
-                double latestBurned = safeParseDouble(latest.getBurnedHype(), "latest.burnedHype");
-                double refBurned = safeParseDouble(reference.getBurnedHype(), "reference.burnedHype");
-                double latestCirc = safeParseDouble(latest.getCirculatingSupply(), "latest.circulatingSupply");
-                double refCirc = safeParseDouble(reference.getCirculatingSupply(), "reference.circulatingSupply");
+                BigDecimal latestBurned = safeParseDecimal(latest.getBurnedHype(), "latest.burnedHype");
+                BigDecimal refBurned = safeParseDecimal(reference.getBurnedHype(), "reference.burnedHype");
+                BigDecimal latestCirc = safeParseDecimal(latest.getCirculatingSupply(), "latest.circulatingSupply");
+                BigDecimal refCirc = safeParseDecimal(reference.getCirculatingSupply(), "reference.circulatingSupply");
 
-                double burnedAvg;
-                double circAvg;
+                BigDecimal burnedAvg;
+                BigDecimal circAvg;
 
                 if (period > 1) {
-                    burnedAvg = safeDivide(latestBurned - refBurned, period - 1, "burnedAvg period");
-                    circAvg = safeDivide(latestCirc - refCirc, period - 1, "circAvg period");
+                    BigDecimal periodDivisor = BigDecimal.valueOf(period - 1L);
+                    burnedAvg = safeDivide(latestBurned.subtract(refBurned), periodDivisor, "burnedAvg period");
+                    circAvg = safeDivide(latestCirc.subtract(refCirc), periodDivisor, "circAvg period");
                 } else {
-                    burnedAvg = hypeBurnedDouble - latestBurned;
-                    circAvg = circulatingSupplyDouble - latestCirc;
+                    burnedAvg = hypeBurned.subtract(latestBurned);
+                    circAvg = circulatingSupply.subtract(latestCirc);
                 }
 
                 burned30d = burnedAvg;
-                circulating30d = circAvg + burnedAvg;
+                circulating30d = circAvg.add(burnedAvg);
                 flux30d = circAvg;
             }
         } catch (ArithmeticException | NumberFormatException e) {
@@ -159,16 +173,16 @@ public class HypeCalculator {
                 if (current.getBurnedHype() != null && previous.getBurnedHype() != null
                         && current.getCirculatingSupply() != null
                         && previous.getCirculatingSupply() != null) {
-                    double burnedDelta = safeParseDouble(current.getBurnedHype(), "current.burnedHype")
-                            - safeParseDouble(previous.getBurnedHype(), "previous.burnedHype");
-                    double circulatingDelta = safeParseDouble(current.getCirculatingSupply(),
+                    BigDecimal burnedDelta = safeParseDecimal(current.getBurnedHype(), "current.burnedHype")
+                            .subtract(safeParseDecimal(previous.getBurnedHype(), "previous.burnedHype"));
+                    BigDecimal circulatingDelta = safeParseDecimal(current.getCirculatingSupply(),
                             "current.circulatingSupply")
-                            - safeParseDouble(previous.getCirculatingSupply(), "previous.circulatingSupply");
-                    double issuedDelta = circulatingDelta + burnedDelta;
-                    double netFlow = circulatingDelta;
-                    fluxBurned.add(burnedDelta);
-                    fluxIssued.add(issuedDelta);
-                    fluxNetFlow.add(netFlow);
+                            .subtract(safeParseDecimal(previous.getCirculatingSupply(), "previous.circulatingSupply"));
+                    BigDecimal issuedDelta = circulatingDelta.add(burnedDelta);
+                    BigDecimal netFlow = circulatingDelta;
+                    fluxBurned.add(toDouble(burnedDelta));
+                    fluxIssued.add(toDouble(issuedDelta));
+                    fluxNetFlow.add(toDouble(netFlow));
                     fluxDays.add(current.getDay());
                 }
             }
@@ -180,10 +194,10 @@ public class HypeCalculator {
         return new FluxResult(fluxBurned, fluxIssued, fluxNetFlow, fluxDays);
     }
 
-    private record VolatilityResult(double volatVolume, double volatOpenInterest, double volatHlpProvider) {
+    private record VolatilityResult(BigDecimal volatVolume, BigDecimal volatOpenInterest, BigDecimal volatHlpProvider) {
     }
 
-    private record ThirtyDayResult(double burned30d, double circulating30d, double flux30d) {
+    private record ThirtyDayResult(BigDecimal burned30d, BigDecimal circulating30d, BigDecimal flux30d) {
     }
 
     private record FluxResult(List<Double> fluxBurned, List<Double> fluxIssued, List<Double> fluxNetFlow,
@@ -194,108 +208,131 @@ public class HypeCalculator {
     public HypeSupplyDto computeSupplyData(HyperliquidDto hyperliquidData) {
 
         // Changement de type variable pour les calculs
-        double circulatingSupply = safeParseDouble(hyperliquidData.circulatingSupply(), "circulatingSupply");
-        double maxSupply = safeParseDouble(hyperliquidData.maxSupply(), "maxSupply");
-        double hypeBurned = safeParseDouble(hyperliquidData.hypeBurned(), "hypeBurned");
+        BigDecimal circulatingSupply = safeParseDecimal(hyperliquidData.circulatingSupply(), "circulatingSupply");
+        BigDecimal maxSupply = safeParseDecimal(hyperliquidData.maxSupply(), "maxSupply");
+        BigDecimal hypeBurned = safeParseDecimal(hyperliquidData.hypeBurned(), "hypeBurned");
 
         // Hype brulé % pourcentage
-        double hypeBurned100 = (hypeBurned / HypeConstants.TOTAL_SUPPLY) * 100;
+        BigDecimal hypeBurned100 = safeDivide(hypeBurned, BigDecimal.valueOf(HypeConstants.TOTAL_SUPPLY), "hypeBurned100")
+                .multiply(BD_100);
         // % en circulation
-        double circulating100 = maxSupply != 0 ? (circulatingSupply / maxSupply) * 100 : 0;
+        BigDecimal circulating100 = safeDivide(circulatingSupply, maxSupply, "circulating100").multiply(BD_100);
 
-        return new HypeSupplyDto(circulatingSupply, maxSupply, hypeBurned100, circulating100);
+        return new HypeSupplyDto(toDouble(circulatingSupply), toDouble(maxSupply), toDouble(hypeBurned100),
+                toDouble(circulating100));
     }
 
     // Blockchain data Calculation
     public HypeBlockchainDto computeBlockchainData(BlockChainDto blockchainData, HyperliquidDto hyperliquidData) {
-        double bridgedHype = safeParseDouble(blockchainData.bridgedHype(), "bridgedHype");
-        double liquidStaked = safeParseDouble(blockchainData.liquidStaked(), "liquidStaked");
-        double circulatingSupply = safeParseDouble(hyperliquidData.circulatingSupply(), "circulatingSupply");
+        BigDecimal bridgedHype = safeParseDecimal(blockchainData.bridgedHype(), "bridgedHype");
+        BigDecimal liquidStaked = safeParseDecimal(blockchainData.liquidStaked(), "liquidStaked");
+        BigDecimal circulatingSupply = safeParseDecimal(hyperliquidData.circulatingSupply(), "circulatingSupply");
 
         // % bridged hype sur EVM
-        double ratioBridged = safeDivide(bridgedHype, circulatingSupply, "ratioBridged circulatingSupply") * 100;
+        BigDecimal ratioBridged = safeDivide(bridgedHype, circulatingSupply, "ratioBridged circulatingSupply")
+                .multiply(BD_100);
         // % staké evm vs core
-        double stakedEvmCore = safeDivide(liquidStaked, circulatingSupply, "stakedEvmCore circulatingSupply") * 100;
+        BigDecimal stakedEvmCore = safeDivide(liquidStaked, circulatingSupply, "stakedEvmCore circulatingSupply")
+                .multiply(BD_100);
 
-        return new HypeBlockchainDto(bridgedHype, liquidStaked, ratioBridged, stakedEvmCore);
+        return new HypeBlockchainDto(toDouble(bridgedHype), toDouble(liquidStaked), toDouble(ratioBridged),
+                toDouble(stakedEvmCore));
     }
 
     // HLP data Calculation
     public HypeHlpDto computeHlpData(HyperliquidDto hyperliquidData) {
-        double providerTvl = safeParseDouble(hyperliquidData.providerTvl(), "providerTvl");
-        double providerApr = safeParseDouble(hyperliquidData.providerApr(), "providerApr");
+        BigDecimal providerTvl = safeParseDecimal(hyperliquidData.providerTvl(), "providerTvl");
+        BigDecimal providerApr = safeParseDecimal(hyperliquidData.providerApr(), "providerApr");
 
         // Volume TVL HLP
-        double volume = safeParseDouble(hyperliquidData.dailyVolume(), "dailyVolume");
-        double ratioVolTvl = safeDivide(volume, providerTvl, "ratioVolTvl providerTvl");
+        BigDecimal volume = safeParseDecimal(hyperliquidData.dailyVolume(), "dailyVolume");
+        BigDecimal ratioVolTvl = safeDivide(volume, providerTvl, "ratioVolTvl providerTvl");
 
-        return new HypeHlpDto(providerTvl, providerApr, ratioVolTvl);
+        return new HypeHlpDto(toDouble(providerTvl), toDouble(providerApr), toDouble(ratioVolTvl));
     }
 
     // Valuation data Calculation
     public HypeValuationDto computeValuationData(HyperliquidDto hyperliquidData, AssetDaily entity,
             List<AssetSnapshot> history) {
 
-        double maxSupply = safeParseDouble(hyperliquidData.maxSupply(), "maxSupply");
-        double totalStakedHype = safeParseDouble(hyperliquidData.totalStakedHype(), "totalStakedHype");
+        BigDecimal maxSupply = safeParseDecimal(hyperliquidData.maxSupply(), "maxSupply");
+        BigDecimal totalStakedHype = safeParseDecimal(hyperliquidData.totalStakedHype(), "totalStakedHype");
 
         // FDV
-        double fdv = maxSupply * entity.getCurrentPrice();
+        BigDecimal fdv = maxSupply.multiply(toBigDecimal(entity.getCurrentPrice()));
 
         // Ratio Mcap/FDV
-        double ratioMcapFdv = safeDivide(entity.getMarketCap(), fdv, "ratioMcapFdv fdv");
+        BigDecimal marketCap = toBigDecimal(entity.getMarketCap());
+        BigDecimal ratioMcapFdv = safeDivide(marketCap, fdv, "ratioMcapFdv fdv");
 
         // Ratio OI/Mcap
-        double ratioOImcap = safeDivide(
-                safeParseDouble(hyperliquidData.openInterest(), "openInterest"),
-                entity.getMarketCap(),
+        BigDecimal ratioOImcap = safeDivide(
+                safeParseDecimal(hyperliquidData.openInterest(), "openInterest"),
+                marketCap,
                 "ratioOImcap marketCap");
 
         // Estimation fees
-        double volume = safeParseDouble(hyperliquidData.dailyVolume(), "dailyVolume");
-        double feesDaily = volume * HypeConstants.FEE_RATE;
-        double averageDailyFees = history.stream()
+        BigDecimal volume = safeParseDecimal(hyperliquidData.dailyVolume(), "dailyVolume");
+        BigDecimal feesDaily = volume.multiply(BigDecimal.valueOf(HypeConstants.FEE_RATE));
+        BigDecimal averageDailyFees = history.stream()
                 .filter(snapshot -> snapshot.getFees24h() != null)
-                .mapToDouble(AssetSnapshot::getFees24h)
-                .average()
+                .map(snapshot -> toBigDecimal(snapshot.getFees24h()))
+                .reduce(BigDecimal::add)
+                .map(sum -> safeDivide(sum, BigDecimal.valueOf(history.stream().filter(snapshot -> snapshot.getFees24h() != null).count()), "averageDailyFees"))
                 .orElse(feesDaily);
-        double feesAnnual = averageDailyFees * 365;
+        BigDecimal feesAnnual = averageDailyFees.multiply(BD_365);
 
         // Staking APR
-        double stakingApr = safeParseDouble(hyperliquidData.stakingApr(), "stakingApr");
+        BigDecimal stakingApr = safeParseDecimal(hyperliquidData.stakingApr(), "stakingApr");
 
         // Open Interest
-        double openInterest = safeParseDouble(hyperliquidData.openInterest(), "openInterest");
+        BigDecimal openInterest = safeParseDecimal(hyperliquidData.openInterest(), "openInterest");
 
         // Ratio Price to Fees
-        double ratioPriceFees = safeDivide(entity.getMarketCap(), feesAnnual, "ratioPriceFees feesAnnual");
+        BigDecimal ratioPriceFees = safeDivide(marketCap, feesAnnual, "ratioPriceFees feesAnnual");
 
         // Ratio % staké
-        double ratioStaked = safeDivide(totalStakedHype, maxSupply, "ratioStaked maxSupply") * 100;
+        BigDecimal ratioStaked = safeDivide(totalStakedHype, maxSupply, "ratioStaked maxSupply").multiply(BD_100);
 
-        return new HypeValuationDto(fdv, ratioMcapFdv, ratioOImcap, volume, openInterest, feesDaily, feesAnnual,
-                ratioPriceFees, stakingApr, totalStakedHype, ratioStaked);
+        return new HypeValuationDto(toDouble(fdv), toDouble(ratioMcapFdv), toDouble(ratioOImcap), toDouble(volume),
+                toDouble(openInterest), toDouble(feesDaily), toDouble(feesAnnual), toDouble(ratioPriceFees),
+                toDouble(stakingApr), toDouble(totalStakedHype), toDouble(ratioStaked));
     }
 
     // Fonctions de sécurisation des données
-    private double safeParseDouble(String value, String fieldName) {
+    private BigDecimal safeParseDecimal(String value, String fieldName) {
         if (value == null || value.isBlank()) {
             logger.warn("Valeur manquante pour {}", fieldName);
-            return 0d;
+            return BigDecimal.ZERO;
         }
         try {
-            return Double.parseDouble(value);
+            return new BigDecimal(value);
         } catch (NumberFormatException e) {
             logger.warn("Valeur invalide pour {} : {}", fieldName, value);
-            return 0d;
+            return BigDecimal.ZERO;
         }
     }
 
-    private double safeDivide(double numerator, double denominator, String operationName) {
-        if (denominator == 0d) {
+    private BigDecimal safeDivide(BigDecimal numerator, BigDecimal denominator, String operationName) {
+        if (!isNonZero(denominator)) {
             logger.warn("Division impossible pour {}: denominateur a 0", operationName);
+            return BigDecimal.ZERO;
+        }
+        return numerator.divide(denominator, DIVISION_SCALE, RoundingMode.HALF_UP);
+    }
+
+    private boolean isNonZero(BigDecimal value) {
+        return value != null && value.compareTo(BigDecimal.ZERO) != 0;
+    }
+
+    private BigDecimal toBigDecimal(Double value) {
+        return value == null ? BigDecimal.ZERO : BigDecimal.valueOf(value);
+    }
+
+    private double toDouble(BigDecimal value) {
+        if (value == null) {
             return 0d;
         }
-        return numerator / denominator;
+        return value.setScale(OUTPUT_SCALE, RoundingMode.HALF_UP).doubleValue();
     }
 }

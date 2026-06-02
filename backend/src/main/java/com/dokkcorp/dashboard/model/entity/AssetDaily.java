@@ -12,8 +12,8 @@ import lombok.Data;
 @Entity
 @Table(name = "asset_daily")
 public class AssetDaily {
-    // TODO Changer les type de variable, avec du double ou du bigdecimal mais bonne
-    // chance a toi pour la gestion de la DB derrière Dokk du futur
+    // BACK-11 safe mode: keep entity numeric fields as Double to avoid
+    // accidental schema drift in existing production databases.
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

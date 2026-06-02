@@ -1,17 +1,13 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-05-28 · **Tâches actives** : 28
+> **Mise à jour** : 2026-06-02 · **Tâches actives** : 23
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
 ---
 
 ## 🔴 CRITIQUE
-<!-- Non urgent vu la taille du projet -->
-- [ ] **SEC-05** — Aucune authentification sur l'API
-  - 📁 `pom.xml` L43-48
-  - `spring-boot-starter-security` est commenté. Tout est ouvert.
-  - → À terme, ajouter l'auth sur les endpoints sensibles.
+*(Plus de tâche critique active !)*
 
 ---
 
@@ -49,11 +45,6 @@
   - → Lancer des exceptions métier typées, ou retourner `Optional`
 
 ### Backend — Données
-
-- [ ] **BACK-08** — Types `String` pour des valeurs numériques partout
-  - 📁 `AssetDaily.java` L25-30, `AssetSnapshot.java` L27-28, `HypeDto.java`, `HyperliquidDto.java`
-  - Force des `Double.parseDouble()` partout (~25 appels), risque de `NumberFormatException`.
-  - → Migrer vers `BigDecimal` pour financier, `double` pour métriques. Nécessite migration DB.
 
 - [ ] **BACK-09** — `Long` pour les timestamps au lieu de types temporels
   - 📁 `AssetDaily.java` L24, `AssetSnapshot.java` L22
@@ -94,11 +85,6 @@
 ## 🟡 MOYEN
 
 ### Backend
-
-- [ ] **BACK-11** — `Double` pour les valeurs financières dans les entités
-  - 📁 `AssetDaily.java` L14-23, `AssetSnapshot.java` L14-26
-  - Flottants IEEE754 causent des erreurs d'arrondi. OK pour lecture seule, problème si calculs.
-  - → Migrer vers `BigDecimal` quand BACK-08 est fait.
 
 - [ ] **BACK-13** — NPE potentiels dans HyperliquidClient
   - 📁 `HyperliquidClient.java` L132, L168-182
@@ -161,15 +147,16 @@
 
 ## 🔵 INFO
 
-- [ ] **TEST-01** — Couverture backend quasi nulle
-  - 📁 `DashboardApplicationTests.java` — seul `contextLoads()`
-  - Zéro test pour les services, calculs, providers, jobs.
-  - → Priorité : `HypeService`, `AssetSyncJob`, puis les clients API.
+*(Plus de tâche info active !)*
 
-- [ ] **TEST-02** — Tests frontend ultra-minimaux
-  - 14 fichiers `.spec.ts`, tous `should create` sauf `dashboard.spec.ts`.
-  - `price-chart` et `hype.ts` n'ont pas de fichier spec.
-  - → Tester les `computed()` dans `hype.ts` et `inveb.ts`.
+---
+
+## 💀 MÊME PAS EN RÊVE (Dette technique acceptée ad aeternam)
+
+- **BACK-08** — Types `String` pour des valeurs numériques partout
+  - *Pourquoi ?* : Trop risqué de migrer la base de données en production de VARCHAR vers DOUBLE PRECISION. On a déjà corrigé tous les DTO en `Double` (ou presque !), le reste tiendra très bien comme ça.
+- **SEC-05** — Aucune authentification sur l'API
+  - *Pourquoi ?* : C'est un portfolio d'apprentissage personnel, pas besoin d'ajouter une usine à gaz comme Spring Security pour des données publiques en lecture seule.
 
 ---
 
@@ -177,7 +164,7 @@
 
 | Sévérité | Restant |
 |----------|---------|
-| 🔴 Critique | 1 |
-| 🟠 Élevé | 11 |
-| 🟡 Moyen | 14 |
-| 🔵 Info | 2 |
+| 🔴 Critique | 0 |
+| 🟠 Élevé | 10 |
+| 🟡 Moyen | 13 |
+| 🔵 Info | 0 |

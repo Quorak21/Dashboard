@@ -16,7 +16,12 @@ describe('Background', () => {
     await fixture.whenStable();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('renders decorative background image with expected source', () => {
+    fixture.detectChanges();
+    const image = fixture.nativeElement.querySelector('img') as HTMLImageElement | null;
+
+    expect(image).toBeTruthy();
+    expect(image?.getAttribute('src')).toBe('assets/images/background.png');
+    expect(image?.getAttribute('alt')).toContain('background');
   });
 });

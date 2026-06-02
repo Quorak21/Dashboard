@@ -16,7 +16,12 @@ describe('Footer', () => {
     await fixture.whenStable();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('exposes current year and renders copyright text', () => {
+    fixture.detectChanges();
+    const text = fixture.nativeElement.textContent as string;
+    const currentYear = new Date().getFullYear();
+
+    expect(component.currentYear).toBe(currentYear);
+    expect(text).toContain(`© ${currentYear} Dokk Corp.`);
   });
 });
