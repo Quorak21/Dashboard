@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-06-04 · **Tâches actives** : 15
+> **Mise à jour** : 2026-06-04 · **Tâches actives** : 13
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -12,18 +12,6 @@
 ---
 
 ## 🟠 ÉLEVÉ
-
-### Backend — Données
-
-- [ ] **BACK-09** — `Long` pour les timestamps au lieu de types temporels
-  - 📁 `AssetDaily.java` L24, `AssetSnapshot.java` L22
-  - `System.currentTimeMillis()` stocké en Long. Illisible en DB, requêtes temporelles compliquées.
-  - → Utiliser `Instant` avec `@Column(columnDefinition = "TIMESTAMP")`
-
-- [ ] **BACK-10** — Pas d'index DB explicites
-  - 📁 `AssetDaily.java`, `AssetSnapshot.java`
-  - Les requêtes filtrent par `symbol` et trient par `lastRefresh`/`day`, mais aucun `@Index`.
-  - → `@Table(indexes = @Index(columnList = "symbol, lastRefresh DESC"))`
 
 ### Infra / CI
 
@@ -115,6 +103,8 @@
 
 - **BACK-08** — Types `String` pour des valeurs numériques partout
   - *Pourquoi ?* : Trop risqué de migrer la base de données en production de VARCHAR vers DOUBLE PRECISION. On a déjà corrigé tous les DTO en `Double` (ou presque !), le reste tiendra très bien comme ça.
+- **BACK-10** — Pas d'index DB explicites (`symbol` + `lastRefresh` / `day`)
+  - *Pourquoi ?* : Peu d'actifs (2 aujourd'hui, ~10 max), tables petites (rétention 7j / 1 an) — gain perf négligeable sur ce VPS. Bon réflexe à réutiliser sur un prochain projet si volumes ou requêtes lourdes.
 - **SEC-05** — Aucune authentification sur l'API
   - *Pourquoi ?* : C'est un portfolio d'apprentissage personnel, pas besoin d'ajouter une usine à gaz comme Spring Security pour des données publiques en lecture seule.
 
@@ -125,6 +115,6 @@
 | Sévérité | Restant |
 |----------|---------|
 | 🔴 Critique | 0 |
-| 🟠 Élevé | 4 |
+| 🟠 Élevé | 2 |
 | 🟡 Moyen | 11 |
 | 🔵 Info | 0 |

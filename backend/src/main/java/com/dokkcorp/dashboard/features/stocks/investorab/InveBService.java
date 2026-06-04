@@ -73,7 +73,7 @@ public class InveBService {
 
             double priceChangePercentage24h = inveBRaw.priceChangePercentage24h();
             double totalVolume = inveBRaw.totalVolume();
-            long lastRefresh = System.currentTimeMillis();
+            Instant lastRefresh = Instant.now();
 
             // We check Stockholm Stock Exchange market hours
             ZoneId stockholmZone = ZoneId.of("Europe/Stockholm");
@@ -106,17 +106,17 @@ public class InveBService {
 
             if (!chronological.isEmpty()) {
                 AssetDaily latestPoint = chronological.get(chronological.size() - 1);
-                LocalDate latestLocalDate = Instant.ofEpochMilli(latestPoint.getLastRefresh())
+                LocalDate latestLocalDate = latestPoint.getLastRefresh()
                         .atZone(stockholmZone)
                         .toLocalDate();
 
                 for (AssetDaily point : chronological) {
-                    LocalDate pointLocalDate = Instant.ofEpochMilli(point.getLastRefresh())
+                    LocalDate pointLocalDate = point.getLastRefresh()
                             .atZone(stockholmZone)
                             .toLocalDate();
                     if (pointLocalDate.equals(latestLocalDate)) {
                         livePrices.add(point.getCurrentPrice());
-                        liveDays.add(point.getLastRefresh());
+                        liveDays.add(point.getLastRefresh().toEpochMilli());
                     }
                 }
             }
@@ -127,7 +127,7 @@ public class InveBService {
                     marketCap,
                     priceChangePercentage24h,
                     totalVolume,
-                    lastRefresh,
+                    lastRefresh.toEpochMilli(),
                     this.historyPrices,
                     this.historyDays,
                     livePrices,
@@ -170,7 +170,7 @@ public class InveBService {
         for (int i = snapshots.size() - 1; i >= 0; i--) {
             AssetSnapshot snap = snapshots.get(i);
             prices.add(snap.getPrice());
-            days.add(snap.getDay());
+            days.add(snap.getDay().toEpochMilli());
         }
         // On met a jour et remet le timer a 0
         this.historyPrices = prices;

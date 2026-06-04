@@ -2,9 +2,11 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 45**
+- **Tâches réalisée depuis l'implémentation du workflow : 46**
 
 ---
+
+- **BACK-09** — Timestamps entités en `Instant` (code-only) : `EpochMillisInstantConverter` sur `AssetDaily.lastRefresh` et `AssetSnapshot.day`, colonnes BIGINT Postgres inchangées, contrat API/front en epoch ms via `toEpochMilli()`.
 
 - **BACK-07** — Clients API retournent `null` au lieu d'exceptions : `ExternalProviderException` pour CoinGecko/FMP, garde NPE sur `initializeHistory`, comportement métier inchangé (cache / DTO erreur).
 

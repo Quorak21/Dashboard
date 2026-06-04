@@ -1,5 +1,6 @@
 package com.dokkcorp.dashboard.repository;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.List;
 
@@ -22,5 +23,5 @@ public interface AssetSnapshotRepository extends JpaRepository<AssetSnapshot, Lo
     // Récupérer les 365 derniers snapshots pour un symbole
     List<AssetSnapshot> findTop365BySymbolOrderByDayDesc(String symbol);
 
-    void deleteByDayBefore(Long timestamp);
+    void deleteByDayBefore(Instant timestamp);
 }

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -39,14 +40,14 @@ class HypeMapperTest {
         entity.setMarketCap(200d);
         entity.setPriceChangePercentage24h(3d);
         entity.setTotalVolume(4d);
-        entity.setLastRefresh(123L);
+        entity.setLastRefresh(Instant.ofEpochMilli(123L));
 
         AssetDaily previousDaily = new AssetDaily();
-        previousDaily.setLastRefresh(100L);
+        previousDaily.setLastRefresh(Instant.ofEpochMilli(100L));
         previousDaily.setCurrentPrice(1d);
 
         AssetSnapshot snapshot = new AssetSnapshot();
-        snapshot.setDay(90L);
+        snapshot.setDay(Instant.ofEpochMilli(90L));
         snapshot.setPrice(0.5d);
 
         when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE"))

@@ -1,5 +1,6 @@
 package com.dokkcorp.dashboard.features.crypto.hype;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.util.List;
@@ -122,7 +123,7 @@ public class HypeService {
                 newPoint.setMarketCap(marketCap.doubleValue());
                 newPoint.setPriceChangePercentage24h(hypeRaw.priceChangePercentage24h());
                 newPoint.setTotalVolume(hypeRaw.totalVolume());
-                newPoint.setLastRefresh(System.currentTimeMillis());
+                newPoint.setLastRefresh(Instant.now());
                 newPoint.setBurnedHype(hyperliquidData.hypeBurned());
                 newPoint.setCirculatingSupply(hyperliquidData.circulatingSupply());
                 BigDecimal feesDaily = safeParseDecimal(hyperliquidData.dailyVolume(), "hyperliquid.dailyVolume")
@@ -165,7 +166,7 @@ public class HypeService {
                                 AssetSnapshot s = new AssetSnapshot();
                                 s.setSymbol("HYPE");
                                 s.setPrice(history.prices().get(n).get(1));
-                                s.setDay(history.prices().get(n).get(0).longValue());
+                                s.setDay(Instant.ofEpochMilli(history.prices().get(n).get(0).longValue()));
                                 snapshots.add(s);
                         }
                         this.assetSnapshotRepository.saveAll(snapshots);

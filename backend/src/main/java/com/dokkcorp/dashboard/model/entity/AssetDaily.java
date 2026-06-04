@@ -1,5 +1,10 @@
 package com.dokkcorp.dashboard.model.entity;
 
+import java.time.Instant;
+
+import com.dokkcorp.dashboard.model.converter.EpochMillisInstantConverter;
+
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,7 +27,8 @@ public class AssetDaily {
     private Double marketCap;
     private Double priceChangePercentage24h;
     private Double totalVolume;
-    private Long lastRefresh;
+    @Convert(converter = EpochMillisInstantConverter.class)
+    private Instant lastRefresh;
     private String burnedHype;
     private String circulatingSupply;
     private String feesDaily;

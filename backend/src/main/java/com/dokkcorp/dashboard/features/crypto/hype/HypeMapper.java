@@ -68,15 +68,19 @@ public class HypeMapper {
                 entity.getMarketCap(),
                 entity.getPriceChangePercentage24h(),
                 entity.getTotalVolume(),
-                entity.getLastRefresh());
+                entity.getLastRefresh().toEpochMilli());
     }
 
     private HypeChartsDto getChartsData(List<AssetSnapshot> history, List<AssetDaily> daily) {
         List<Double> historicalPrice = history.stream().map(AssetSnapshot::getPrice).toList();
-        List<Long> historicalDays = history.stream().map(AssetSnapshot::getDay).toList();
+        List<Long> historicalDays = history.stream()
+                .map(s -> s.getDay().toEpochMilli())
+                .toList();
 
         List<Double> livePrice = daily.stream().map(AssetDaily::getCurrentPrice).toList();
-        List<Long> liveDay = daily.stream().map(AssetDaily::getLastRefresh).toList();
+        List<Long> liveDay = daily.stream()
+                .map(d -> d.getLastRefresh().toEpochMilli())
+                .toList();
 
         return new HypeChartsDto(
                 historicalPrice,

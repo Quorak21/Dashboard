@@ -1,5 +1,10 @@
 package com.dokkcorp.dashboard.model.entity;
 
+import java.time.Instant;
+
+import com.dokkcorp.dashboard.model.converter.EpochMillisInstantConverter;
+
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,7 +24,8 @@ public class AssetSnapshot {
     private Long id;
     private String symbol;
     private Double price;
-    private Long day;
+    @Convert(converter = EpochMillisInstantConverter.class)
+    private Instant day;
     private Double volume24h;
     private Double fees24h;
     private Double hlpProvider;

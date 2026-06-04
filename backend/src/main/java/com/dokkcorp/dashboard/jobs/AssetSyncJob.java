@@ -13,6 +13,9 @@ import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
 import com.dokkcorp.dashboard.repository.AssetDailyRepository;
 import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -82,7 +85,7 @@ public class AssetSyncJob {
             AssetSnapshot inveBSnapshot = new AssetSnapshot();
             inveBSnapshot.setSymbol("INVE-B");
             inveBSnapshot.setPrice(inveBData.currentPrice()); // Prix en USD
-            inveBSnapshot.setDay(System.currentTimeMillis());
+            inveBSnapshot.setDay(Instant.now());
             this.assetSnapshotRepository.save(inveBSnapshot);
         } catch (Exception e) {
             logger.error("Sauvegarde du snapshot INVESTOR AB n'a pas fonctionné", e);
@@ -93,13 +96,11 @@ public class AssetSyncJob {
     @Scheduled(cron = "0 0 0 * * SUN")
     @Transactional
     public void cleanDB() {
-        // le "L" sert a dire a Java que 1000 est un Long et non pas un Int pour pas
-        // overflow
-        long sevenDayAgo = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000);
-        long oneYearAgo = System.currentTimeMillis() - (365L * 24 * 60 * 60 * 1000);
+        Instant sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS);
+        Instant oneYearAgo = Instant.now().minus(365, ChronoUnit.DAYS);
 
-        this.assetDailyRepository.deleteByLastRefreshBefore(sevenDayAgo); // Daily, toutes les datas > 7jours
-        this.assetSnapshotRepository.deleteByDayBefore(oneYearAgo); // Snapshot, toutes les datas > 1an
+        this.assetDailyRepository.deleteByLastRefreshBefore(sevenDaysAgo);
+        this.assetSnapshotRepository.deleteByDayBefore(oneYearAgo);
     }
 
 }

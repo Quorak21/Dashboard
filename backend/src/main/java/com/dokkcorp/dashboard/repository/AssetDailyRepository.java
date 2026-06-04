@@ -1,5 +1,6 @@
 package com.dokkcorp.dashboard.repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,5 +20,5 @@ public interface AssetDailyRepository extends JpaRepository<AssetDaily, Long> {
     // Récupérer les 144 derniers éléments pour le graphique pour la chart daily, les 24 dernière heures
     List<AssetDaily> findTop144BySymbolOrderByLastRefreshDesc(String symbol);
 
-    void deleteByLastRefreshBefore(Long timestamp);
+    void deleteByLastRefreshBefore(Instant timestamp);
 }

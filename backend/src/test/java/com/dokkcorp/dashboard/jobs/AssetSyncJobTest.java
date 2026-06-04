@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,7 +49,7 @@ class AssetSyncJobTest {
     void sendDailySnapshotToDb_savesHypeAndInvebSnapshots() {
         AssetDaily daily = new AssetDaily();
         daily.setCurrentPrice(1.25d);
-        daily.setLastRefresh(1711111111L);
+        daily.setLastRefresh(Instant.ofEpochMilli(1711111111L));
         daily.setBurnedHype("10");
         daily.setCirculatingSupply("100");
         when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(Optional.of(daily));
@@ -65,15 +66,15 @@ class AssetSyncJobTest {
     void cleanDb_usesExpectedRetentionWindows() {
         job.cleanDB();
 
-        verify(assetDailyRepository).deleteByLastRefreshBefore(any(Long.class));
-        verify(assetSnapshotRepository).deleteByDayBefore(any(Long.class));
+        verify(assetDailyRepository).deleteByLastRefreshBefore(any(Instant.class));
+        verify(assetSnapshotRepository).deleteByDayBefore(any(Instant.class));
     }
 
     @Test
     void sendDailySnapshotToDb_usesDailyTimestampForHypeSnapshot() {
         AssetDaily daily = new AssetDaily();
         daily.setCurrentPrice(1.25d);
-        daily.setLastRefresh(1711111111L);
+        daily.setLastRefresh(Instant.ofEpochMilli(1711111111L));
         daily.setBurnedHype("10");
         daily.setCirculatingSupply("100");
         when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(Optional.of(daily));
@@ -86,7 +87,7 @@ class AssetSyncJobTest {
         org.mockito.ArgumentCaptor<AssetSnapshot> captor = org.mockito.ArgumentCaptor.forClass(AssetSnapshot.class);
         verify(assetSnapshotRepository, times(2)).save(captor.capture());
         AssetSnapshot hypeSnapshot = captor.getAllValues().get(0);
-        assertEquals(1711111111L, hypeSnapshot.getDay());
+        assertEquals(Instant.ofEpochMilli(1711111111L), hypeSnapshot.getDay());
         assertEquals("HYPE", hypeSnapshot.getSymbol());
     }
 

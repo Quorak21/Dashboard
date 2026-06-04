@@ -103,7 +103,7 @@ class HypeServiceTest {
 
     private void stubHistoryInitializationCheck() {
         AssetSnapshot snapshot = new AssetSnapshot();
-        snapshot.setDay(1L);
+        snapshot.setDay(java.time.Instant.ofEpochMilli(1L));
         snapshot.setPrice(1d);
         snapshot.setFees24h(0.1d);
         snapshot.setBurnedHype("1");
@@ -118,7 +118,7 @@ class HypeServiceTest {
         daily.setMarketCap(2000d);
         daily.setPriceChangePercentage24h(3d);
         daily.setTotalVolume(4d);
-        daily.setLastRefresh(123L);
+        daily.setLastRefresh(java.time.Instant.ofEpochMilli(123L));
         return daily;
     }
 

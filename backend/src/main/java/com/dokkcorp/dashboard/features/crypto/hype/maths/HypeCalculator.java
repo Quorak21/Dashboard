@@ -183,7 +183,7 @@ public class HypeCalculator {
                     fluxBurned.add(toDouble(burnedDelta));
                     fluxIssued.add(toDouble(issuedDelta));
                     fluxNetFlow.add(toDouble(netFlow));
-                    fluxDays.add(current.getDay());
+                    fluxDays.add(current.getDay().toEpochMilli());
                 }
             }
         } catch (ArithmeticException | NumberFormatException e) {
