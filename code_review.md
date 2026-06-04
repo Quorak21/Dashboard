@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-06-02 · **Tâches actives** : 18
+> **Mise à jour** : 2026-06-04 · **Tâches actives** : 17
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -110,11 +110,6 @@
   - Côté frontend : créer le composant chart (30j) une fois les données disponibles.
   - → Commencer par le modèle DB + collecte, puis le chart.
 
-- [ ] **FEAT-03** — Metrics cards pour Investor AB
-  - 📁 `frontend/src/app/features/crypto/inveb/`
-  - Ajouter les cartes de métriques clés (même esprit que les cards HYPE).
-  - → Définir quelles métriques afficher, puis créer les composants.
-
 - [ ] **FEAT-04** — Refresh automatique des prix sur le dashboard
   - Les prix affichés ne se mettent pas à jour sans rechargement manuel.
   - → Implémenter un polling périodique ou un mécanisme de refresh auto (interval RxJS).
@@ -142,5 +137,5 @@
 |----------|---------|
 | 🔴 Critique | 0 |
 | 🟠 Élevé | 6 |
-| 🟡 Moyen | 12 |
+| 🟡 Moyen | 11 |
 | 🔵 Info | 0 |

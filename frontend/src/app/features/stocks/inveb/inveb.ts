@@ -5,11 +5,12 @@ import { AssetMainCard } from '../../../shared/components/asset-main-card/asset-
 import { PriceChart } from '../../../shared/components/price-chart/price-chart';
 import { DailyChart } from '../../../shared/components/daily-chart/daily-chart';
 import { InvebDividendCard } from './inveb-dividend-card/inveb-dividend-card';
+import { InvebFundamentalsCard } from './inveb-fundamentals-card/inveb-fundamentals-card';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-inveb',
-  imports: [AssetMainCard, PriceChart, DailyChart, InvebDividendCard],
+  imports: [AssetMainCard, PriceChart, DailyChart, InvebDividendCard, InvebFundamentalsCard],
   templateUrl: './inveb.html',
   styleUrl: './inveb.css',
 })
@@ -32,6 +33,7 @@ export class Inveb {
   historyDays = computed(() => this.data()?.historyDays ?? []);
   livePrices = computed(() => this.data()?.livePrices ?? []);
   liveDays = computed(() => this.data()?.liveDays ?? []);
+
   isMarketClosed = computed(() => {
     const refreshTime = this.lastRefresh();
     if (!refreshTime) return true;

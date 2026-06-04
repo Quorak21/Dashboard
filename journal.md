@@ -2,9 +2,12 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 42**
+- **Tâches réalisée depuis l'implémentation du workflow : 43**
 
 ---
+
+- **FEAT-03** — Cartes métriques Investor AB (dividendes + fundamentals)
+  - *Description* : Page `inveb` enrichie avec `inveb-dividend-card` (historique, projection, yield estimé vs prix live) et `inveb-fundamentals-card` (7 key metrics + 10 holdings), layout 50/50 sous les charts. Données **en dur** (rapport T1 2026), mise à jour manuelle ~1×/an — pas d’API FMP dividendes (`INVE-B.ST` non exploitable côté free). Jeu de métriques fundamentals **clos** (aucune métrique supplémentaire prévue).
 
 - **BACK-05** — Pas de retry/timeout sur les appels API externes
   - *Description* : Timeouts globaux sur `RestClient` (connect/read via `RestClientConfig`), retry centralisé via `ExternalCallExecutor` (`spring-retry`, 3 tentatives + backoff), branché sur CoinGecko/FMP/Hyperliquid/BlockChain, timeouts OkHttp sur Web3j (`HyperEvmRpc`), propriétés `app.http.*` et `app.blockchain.*` dans `application.yml`. Tests Maven OK.
