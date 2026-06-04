@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-06-04 · **Tâches actives** : 13
+> **Mise à jour** : 2026-06-04 · **Tâches actives** : 12
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -12,13 +12,6 @@
 ---
 
 ## 🟠 ÉLEVÉ
-
-### Infra / CI
-
-- [ ] **INFRA-02** — Pas de tests dans le pipeline CI/CD
-  - 📁 `Dockerfile` L6 (`-DskipTests`), `deploy.yml`
-  - Un code qui casse les tests est déployé en prod automatiquement via Watchtower.
-  - → Ajouter une étape `mvn test` avant le build, ou retirer `-DskipTests`
 
 ### Frontend — Typage
 
@@ -115,6 +108,6 @@
 | Sévérité | Restant |
 |----------|---------|
 | 🔴 Critique | 0 |
-| 🟠 Élevé | 2 |
+| 🟠 Élevé | 1 |
 | 🟡 Moyen | 11 |
 | 🔵 Info | 0 |

@@ -2,9 +2,11 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 46**
+- **Tâches réalisée depuis l'implémentation du workflow : 47**
 
 ---
+
+- **INFRA-02** — Tests dans le pipeline CI/CD : étape `mvn test` (Java 21) dans `deploy.yml` avant build-push, `mvn package` sans `-DskipTests` dans le Dockerfile, config test H2 (`src/test/resources/application.yml`) pour CI et build image.
 
 - **BACK-09** — Timestamps entités en `Instant` (code-only) : `EpochMillisInstantConverter` sur `AssetDaily.lastRefresh` et `AssetSnapshot.day`, colonnes BIGINT Postgres inchangées, contrat API/front en epoch ms via `toEpochMilli()`.
 

@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+
+app:
+  http:
+    connect-timeout-ms: 2000
+    read-timeout-ms: 5000
+    retry:
+      max-attempts: 3
+      backoff-ms: 300
+  coingecko:
+    api-key: ""
+    base-url: "https://api.coingecko.com/api/v3"
+  blockchain:
+    rpc-url: ""
+    connect-timeout-ms: 2000
+    read-timeout-ms: 5000
+  fmp:
+    api-key: ""
+    base-url: "https://financialmodelingprep.com/stable"
+  cors:
+    allowed-origins: "http://localhost:4200"
