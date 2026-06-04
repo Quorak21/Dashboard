@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-06-04 · **Tâches actives** : 17
+> **Mise à jour** : 2026-06-04 · **Tâches actives** : 16
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -14,10 +14,6 @@
 ## 🟠 ÉLEVÉ
 
 ### Backend — Architecture
-
-- [ ] **BACK-06** — Appels API séquentiels dans HyperliquidClient (6 appels HTTP)
-  - 📁 `HyperliquidClient.java` L24-45, `BlockChainClient.java` L44-52
-  - → Paralléliser avec `CompletableFuture` ou Virtual Threads (Java 21)
 
 - [ ] **BACK-07** — Clients API retournent `null` au lieu d'exceptions
   - 📁 `CoinGeckoClient.java` L38-41/L55-58, `FMPClient.java` L46
@@ -136,6 +132,6 @@
 | Sévérité | Restant |
 |----------|---------|
 | 🔴 Critique | 0 |
-| 🟠 Élevé | 6 |
+| 🟠 Élevé | 5 |
 | 🟡 Moyen | 11 |
 | 🔵 Info | 0 |

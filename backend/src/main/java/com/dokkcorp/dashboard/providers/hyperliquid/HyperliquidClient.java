@@ -11,6 +11,11 @@ import tools.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ExecutionException;
+
 @Service
 public class HyperliquidClient {
 
@@ -31,17 +36,40 @@ public class HyperliquidClient {
 
                 // Les mini DTO pour récup plusieurs data en un seul appel ont été divisé en plusieur class dans le meme dossier
                 // Permet aussi de déserialiser directement le JSON dans un objet avec Jackson
-                CirculatingSupply supply = fetchTokenData();
-                ProviderHlp hlp = fetchProviderData();
-                Volume24H volume24H = fetchVolume24H();
-                OpenInterest openInterest = fetchOpenInterest();
-                Staking staking = fetchStaking();
-                MaxSupply maxSupply = fetchHypeBurned();
 
-                return new HyperliquidDto(supply != null ? supply.circulatingSupply() : "0", hlp != null ? hlp.providerTvl() : "0", hlp != null ? hlp.providerApr() : "0",
-                                volume24H != null ? volume24H.dailyVolume() : "0", openInterest != null ? openInterest.openInterest() : "0", staking != null ? staking.stakingApr() : "0",
-                                maxSupply != null ? maxSupply.maxSupply() : "0", maxSupply != null ? maxSupply.hypeBurned() : "0", staking != null ? staking.totalStakedHype() : "0");
+                // On utilise des Virtual Threads pour paralléliser les appels API et éviter la latence entre chaque requete
+                try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                        Future<CirculatingSupply> f1 = executor.submit(() -> fetchTokenData());
+                        Future<ProviderHlp> f2 = executor.submit(() -> fetchProviderData());
+                        Future<Volume24H> f3 = executor.submit(() -> fetchVolume24H());
+                        Future<OpenInterest> f4 = executor.submit(() -> fetchOpenInterest());
+                        Future<Staking> f5 = executor.submit(() -> fetchStaking());
+                        Future<MaxSupply> f6 = executor.submit(() -> fetchHypeBurned());
 
+                        CirculatingSupply supply = f1.get();
+                        ProviderHlp hlp = f2.get();
+                        Volume24H volume24H = f3.get();
+                        OpenInterest openInterest = f4.get();
+                        Staking staking = f5.get();
+                        MaxSupply maxSupply = f6.get();
+
+                        return new HyperliquidDto(supply != null ? supply.circulatingSupply() : "0", hlp != null ? hlp.providerTvl() : "0", hlp != null ? hlp.providerApr() : "0",
+                                        volume24H != null ? volume24H.dailyVolume() : "0", openInterest != null ? openInterest.openInterest() : "0", staking != null ? staking.stakingApr() : "0",
+                                        maxSupply != null ? maxSupply.maxSupply() : "0", maxSupply != null ? maxSupply.hypeBurned() : "0", staking != null ? staking.totalStakedHype() : "0");
+
+                } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        logger.error("Interrupted while fetching Hyperliquid data: {}", e.getMessage());
+                        return hyperliquidDtoFallback();
+                } catch (ExecutionException e) {
+                        logger.error("Error fetching Hyperliquid data: {}",
+                                        e.getCause() != null ? e.getCause().getMessage() : e.getMessage());
+                        return hyperliquidDtoFallback();
+                }
+        }
+
+        private static HyperliquidDto hyperliquidDtoFallback() {
+                return new HyperliquidDto("0", "0", "0", "0", "0", "0", "0", "0", "0");
         }
 
         // Supply circulante de HYPE
@@ -92,7 +120,8 @@ public class HyperliquidClient {
         private Volume24H fetchVolume24H() {
 
                 try {
-                        return externalCallExecutor.execute(() -> this.restClient.post().uri("/info").header("Content-Type", "application/json").body("{ \"type\": \"globalStats\"}").retrieve().body(Volume24H.class));
+                        return externalCallExecutor.execute(
+                                        () -> this.restClient.post().uri("/info").header("Content-Type", "application/json").body("{ \"type\": \"globalStats\"}").retrieve().body(Volume24H.class));
                 } catch (Exception e) {
                         logger.error("Erreur récupération Volume24H: {}", e.getMessage());
                         return null;
@@ -105,7 +134,8 @@ public class HyperliquidClient {
                 double openInterest = 0;
 
                 try {
-                        JsonNode node = externalCallExecutor.execute(() -> this.restClient.post().uri("/info").header("Content-Type", "application/json").body("{ \"type\": \"metaAndAssetCtxs\"}").retrieve().body(JsonNode.class));
+                        JsonNode node = externalCallExecutor.execute(
+                                        () -> this.restClient.post().uri("/info").header("Content-Type", "application/json").body("{ \"type\": \"metaAndAssetCtxs\"}").retrieve().body(JsonNode.class));
 
                         JsonNode assets = node != null ? node.path(1) : null;
                         if (assets == null || !assets.isArray()) {
@@ -139,7 +169,8 @@ public class HyperliquidClient {
 
                 //APR
                 try {
-                        JsonNode node = externalCallExecutor.execute(() -> this.restClient.post().uri("/info").header("Content-Type", "application/json").body("{ \"type\": \"validatorSummaries\"}").retrieve().body(JsonNode.class));
+                        JsonNode node = externalCallExecutor.execute(() -> this.restClient.post().uri("/info").header("Content-Type", "application/json").body("{ \"type\": \"validatorSummaries\"}")
+                                        .retrieve().body(JsonNode.class));
 
                         if (node == null || !node.isArray()) {
                                 logger.warn("Format inattendu pour staking: node manquant ou invalide");

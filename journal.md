@@ -2,9 +2,12 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 43**
+- **Tâches réalisée depuis l'implémentation du workflow : 44**
 
 ---
+
+- **BACK-06** — Appels API séquentiels (Hyperliquid + BlockChain)
+  - *Description* : Parallélisation via `Executors.newVirtualThreadPerTaskExecutor()` — 6 POST Hyperliquid en parallèle dans `getHlData()`, `getBlockchainData()` (bridged + liquid), et RPC on-chain (stHYPE / kHYPE×4 / mkHYPE×2) avec dégradation inchangée (`null` / `"0"`).
 
 - **FEAT-03** — Cartes métriques Investor AB (dividendes + fundamentals)
   - *Description* : Page `inveb` enrichie avec `inveb-dividend-card` (historique, projection, yield estimé vs prix live) et `inveb-fundamentals-card` (7 key metrics + 10 holdings), layout 50/50 sous les charts. Données **en dur** (rapport T1 2026), mise à jour manuelle ~1×/an — pas d’API FMP dividendes (`INVE-B.ST` non exploitable côté free). Jeu de métriques fundamentals **clos** (aucune métrique supplémentaire prévue).
