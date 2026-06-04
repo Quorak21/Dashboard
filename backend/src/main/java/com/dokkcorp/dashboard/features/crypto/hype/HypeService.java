@@ -104,10 +104,7 @@ public class HypeService {
                 }
 
                 try {
-                        CoinGeckoDto[] data = this.coingeckoclient.getData();
-                        if (data != null && data.length > 0) {
-                                hypeRaw = data[0];
-                        }
+                        hypeRaw = this.coingeckoclient.getData()[0];
                 } catch (Exception e) {
                         logger.warn("Echec API CoinGecko : {}", e.getMessage());
                 }
@@ -161,22 +158,20 @@ public class HypeService {
         // Fonction si la DB pour le chart annuel est vide, on la remplit pour avoir une
         // base
         private void initializeHistory() {
-
-                CoinGeckoHistoryDto history = this.coingeckoclient.getHistory();
-
-                List<AssetSnapshot> snapshots = new ArrayList<>();
-                for (int n = 0; n < history.prices().size(); n++) {
-                        AssetSnapshot s = new AssetSnapshot();
-
-                        s.setSymbol("HYPE");
-                        s.setPrice(history.prices().get(n).get(1));
-                        s.setDay(history.prices().get(n).get(0).longValue());
-
-                        snapshots.add(s);
-
+                try {
+                        CoinGeckoHistoryDto history = this.coingeckoclient.getHistory();
+                        List<AssetSnapshot> snapshots = new ArrayList<>();
+                        for (int n = 0; n < history.prices().size(); n++) {
+                                AssetSnapshot s = new AssetSnapshot();
+                                s.setSymbol("HYPE");
+                                s.setPrice(history.prices().get(n).get(1));
+                                s.setDay(history.prices().get(n).get(0).longValue());
+                                snapshots.add(s);
+                        }
+                        this.assetSnapshotRepository.saveAll(snapshots);
+                } catch (Exception e) {
+                        logger.warn("Historique CoinGecko non initialisé : {}", e.getMessage());
                 }
-                this.assetSnapshotRepository.saveAll(snapshots);
-
         }
 
         private BigDecimal safeParseDecimal(String value, String fieldName) {

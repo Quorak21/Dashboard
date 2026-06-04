@@ -2,9 +2,11 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 44**
+- **Tâches réalisée depuis l'implémentation du workflow : 45**
 
 ---
+
+- **BACK-07** — Clients API retournent `null` au lieu d'exceptions : `ExternalProviderException` pour CoinGecko/FMP, garde NPE sur `initializeHistory`, comportement métier inchangé (cache / DTO erreur).
 
 - **BACK-06** — Appels API séquentiels (Hyperliquid + BlockChain)
   - *Description* : Parallélisation via `Executors.newVirtualThreadPerTaskExecutor()` — 6 POST Hyperliquid en parallèle dans `getHlData()`, `getBlockchainData()` (bridged + liquid), et RPC on-chain (stHYPE / kHYPE×4 / mkHYPE×2) avec dégradation inchangée (`null` / `"0"`).

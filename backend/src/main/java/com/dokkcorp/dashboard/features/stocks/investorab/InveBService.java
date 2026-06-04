@@ -64,11 +64,7 @@ public class InveBService {
         this.refreshHistory();
 
         try {
-            FMPDto[] response = this.fmpClient.getData("INVE-B.ST");
-            if (response == null || response.length == 0) {
-                throw new RuntimeException("Données FMP vides");
-            }
-            FMPDto inveBRaw = response[0];
+            FMPDto inveBRaw = this.fmpClient.getData("INVE-B.ST")[0];
             String symbol = inveBRaw.symbol();
 
             // FMP renvoie le prix brut en SEK (car .ST)

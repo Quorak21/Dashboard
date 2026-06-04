@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-06-04 · **Tâches actives** : 16
+> **Mise à jour** : 2026-06-04 · **Tâches actives** : 15
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -12,13 +12,6 @@
 ---
 
 ## 🟠 ÉLEVÉ
-
-### Backend — Architecture
-
-- [ ] **BACK-07** — Clients API retournent `null` au lieu d'exceptions
-  - 📁 `CoinGeckoClient.java` L38-41/L55-58, `FMPClient.java` L46
-  - `getData()` et `getHistory()` retournent `null` en erreur. NPE potentiel en cascade.
-  - → Lancer des exceptions métier typées, ou retourner `Optional`
 
 ### Backend — Données
 
@@ -132,6 +125,6 @@
 | Sévérité | Restant |
 |----------|---------|
 | 🔴 Critique | 0 |
-| 🟠 Élevé | 5 |
+| 🟠 Élevé | 4 |
 | 🟡 Moyen | 11 |
 | 🔵 Info | 0 |
