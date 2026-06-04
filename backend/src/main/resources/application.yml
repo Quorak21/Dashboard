@@ -22,11 +22,19 @@ spring:
     show-sql: true
 
 app:
+  http:
+    connect-timeout-ms: ${HTTP_CONNECT_TIMEOUT_MS:2000}
+    read-timeout-ms: ${HTTP_READ_TIMEOUT_MS:5000}
+    retry:
+      max-attempts: ${HTTP_RETRY_MAX_ATTEMPTS:3}
+      backoff-ms: ${HTTP_RETRY_BACKOFF_MS:300}
   coingecko:
     api-key: "${COINGECKO_API_KEY:}"
     base-url: "https://api.coingecko.com/api/v3"
   blockchain:
     rpc-url: "${BLOCKCHAIN_RPC_URL:}"
+    connect-timeout-ms: ${RPC_CONNECT_TIMEOUT_MS:2000}
+    read-timeout-ms: ${RPC_READ_TIMEOUT_MS:5000}
   fmp:
     api-key: "${FMP_API_KEY:}"
     base-url: "https://financialmodelingprep.com/stable"

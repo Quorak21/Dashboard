@@ -12,6 +12,7 @@ import org.web3j.utils.Convert;
 
 import org.springframework.stereotype.Service;
 
+import com.dokkcorp.dashboard.config.ExternalCallExecutor;
 import com.dokkcorp.dashboard.features.crypto.hype.maths.HypeConstants;
 import com.dokkcorp.dashboard.providers.blockchain.utils.ContractReader;
 
@@ -25,6 +26,7 @@ public class BlockChainClient {
 
         private final Web3j web3j;
         private final ContractReader contractReader;
+        private final ExternalCallExecutor externalCallExecutor;
 
         // Liste des adresses de contrats utilisées
         private static final String ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -34,9 +36,10 @@ public class BlockChainClient {
         private static final String MKHYPE_CONTRACT_ADDRESS = "0x5901e744759561C63309865Ef8822aBb041655E2";
 
 
-        public BlockChainClient(Web3j web3j, ContractReader contractReader) {
+        public BlockChainClient(Web3j web3j, ContractReader contractReader, ExternalCallExecutor externalCallExecutor) {
                 this.web3j = web3j;
                 this.contractReader = contractReader;
+                this.externalCallExecutor = externalCallExecutor;
         }
 
         // La fonction principal
@@ -58,10 +61,16 @@ public class BlockChainClient {
                 String bridgedHype = "0";
 
                 try {
-                        hypeWei = web3j
-                                        .ethGetBalance(BRIDGE_VAULT_ADDRESS,
-                                                        DefaultBlockParameterName.LATEST)
-                                        .send().getBalance();
+                        hypeWei = externalCallExecutor.execute(() -> {
+                                try {
+                                        return web3j
+                                                        .ethGetBalance(BRIDGE_VAULT_ADDRESS,
+                                                                        DefaultBlockParameterName.LATEST)
+                                                        .send().getBalance();
+                                } catch (Exception e) {
+                                        throw new IllegalStateException(e);
+                                }
+                        });
 
                         BigDecimal bridgedHypeTemp = HypeConstants.TOTAL_SUPPLY_BD
                                         .subtract(Convert.fromWei(hypeWei.toString(), Convert.Unit.ETHER));
@@ -94,7 +103,13 @@ public class BlockChainClient {
                         ERC20 stHypeContract = ERC20.load(STHYPE_CONTRACT_ADDRESS, web3j,
                                         txManager,
                                         new DefaultGasProvider());
-                        BigInteger stHypeWei = stHypeContract.totalSupply().send();
+                        BigInteger stHypeWei = externalCallExecutor.execute(() -> {
+                                try {
+                                        return stHypeContract.totalSupply().send();
+                                } catch (Exception e) {
+                                        throw new IllegalStateException(e);
+                                }
+                        });
                         stHypeStaked = Convert.fromWei(stHypeWei.toString(), Convert.Unit.ETHER);
                 } catch (Exception e) {
                         logger.error("Error fetching stHype: {}", e.getMessage());
@@ -105,26 +120,47 @@ public class BlockChainClient {
                 // buffer et le inWithdraw pour avoir un chiffre juste
                 try {
                         // buffer
-                        BigInteger bufferWei = web3j.ethGetBalance(
-                                        KHYPE_CONTRACT_ADDRESS,
-                                        DefaultBlockParameterName.LATEST)
-                                        .send()
-                                        .getBalance();
+                        BigInteger bufferWei = externalCallExecutor.execute(() -> {
+                                try {
+                                        return web3j.ethGetBalance(
+                                                        KHYPE_CONTRACT_ADDRESS,
+                                                        DefaultBlockParameterName.LATEST)
+                                                        .send()
+                                                        .getBalance();
+                                } catch (Exception e) {
+                                        throw new IllegalStateException(e);
+                                }
+                        });
                         BigDecimal khypeBuffer = Convert.fromWei(bufferWei.toString(), Convert.Unit.ETHER);
 
                         // total staked
-                        BigInteger totalStakedWei = contractReader.readContract(web3j,
-                                        KHYPE_CONTRACT_ADDRESS, "totalStaked");
+                        BigInteger totalStakedWei = externalCallExecutor.execute(() -> {
+                                try {
+                                        return contractReader.readContract(web3j, KHYPE_CONTRACT_ADDRESS, "totalStaked");
+                                } catch (Exception e) {
+                                        throw new IllegalStateException(e);
+                                }
+                        });
                         BigDecimal khypeTotalStaked = Convert.fromWei(totalStakedWei.toString(), Convert.Unit.ETHER);
 
                         // total claimed
-                        BigInteger totalClaimedWei = contractReader.readContract(web3j,
-                                        KHYPE_CONTRACT_ADDRESS, "totalClaimed");
+                        BigInteger totalClaimedWei = externalCallExecutor.execute(() -> {
+                                try {
+                                        return contractReader.readContract(web3j, KHYPE_CONTRACT_ADDRESS, "totalClaimed");
+                                } catch (Exception e) {
+                                        throw new IllegalStateException(e);
+                                }
+                        });
                         BigDecimal khypeTotalClaimed = Convert.fromWei(totalClaimedWei.toString(), Convert.Unit.ETHER);
 
                         // In withdraw
-                        BigInteger inWithdrawWei = contractReader.readContract(web3j,
-                                        KHYPE_CONTRACT_ADDRESS, "totalQueuedWithdrawals");
+                        BigInteger inWithdrawWei = externalCallExecutor.execute(() -> {
+                                try {
+                                        return contractReader.readContract(web3j, KHYPE_CONTRACT_ADDRESS, "totalQueuedWithdrawals");
+                                } catch (Exception e) {
+                                        throw new IllegalStateException(e);
+                                }
+                        });
                         BigDecimal khypeInWithdraw = Convert.fromWei(inWithdrawWei.toString(), Convert.Unit.ETHER);
 
                         // total
@@ -138,13 +174,23 @@ public class BlockChainClient {
                 // mkhype, total staked moins claimed, pas d'autres sources trouvées
                 try {
                         // total staked
-                        BigInteger mkhypeTotalStakedWei = contractReader.readContract(web3j,
-                                        MKHYPE_CONTRACT_ADDRESS, "totalStaked");
+                        BigInteger mkhypeTotalStakedWei = externalCallExecutor.execute(() -> {
+                                try {
+                                        return contractReader.readContract(web3j, MKHYPE_CONTRACT_ADDRESS, "totalStaked");
+                                } catch (Exception e) {
+                                        throw new IllegalStateException(e);
+                                }
+                        });
                         BigDecimal mkhypeTotalStaked = Convert.fromWei(mkhypeTotalStakedWei.toString(),
                                         Convert.Unit.ETHER);
                         // total claimed
-                        BigInteger mkhypeTotalClaimedWei = contractReader.readContract(web3j,
-                                        MKHYPE_CONTRACT_ADDRESS, "totalClaimed");
+                        BigInteger mkhypeTotalClaimedWei = externalCallExecutor.execute(() -> {
+                                try {
+                                        return contractReader.readContract(web3j, MKHYPE_CONTRACT_ADDRESS, "totalClaimed");
+                                } catch (Exception e) {
+                                        throw new IllegalStateException(e);
+                                }
+                        });
                         BigDecimal mkhypeTotalClaimed = Convert.fromWei(mkhypeTotalClaimedWei.toString(),
                                         Convert.Unit.ETHER);
 

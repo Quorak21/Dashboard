@@ -2,9 +2,12 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 41**
+- **Tâches réalisée depuis l'implémentation du workflow : 42**
 
 ---
+
+- **BACK-05** — Pas de retry/timeout sur les appels API externes
+  - *Description* : Timeouts globaux sur `RestClient` (connect/read via `RestClientConfig`), retry centralisé via `ExternalCallExecutor` (`spring-retry`, 3 tentatives + backoff), branché sur CoinGecko/FMP/Hyperliquid/BlockChain, timeouts OkHttp sur Web3j (`HyperEvmRpc`), propriétés `app.http.*` et `app.blockchain.*` dans `application.yml`. Tests Maven OK.
 
 - **BACK-18** — `@Bean` statique et redondant sur `RestClient.Builder` : retrait du bean custom dans `DashboardApplication` pour laisser l'auto-configuration Spring Boot fournir `RestClient.Builder`, avec nettoyage de l'import résiduel.
 

@@ -4,23 +4,23 @@ import { DashboardApiService } from '../../../core/services/dashboard-api.servic
 import { AssetMainCard } from '../../../shared/components/asset-main-card/asset-main-card';
 import { PriceChart } from '../../../shared/components/price-chart/price-chart';
 import { DailyChart } from '../../../shared/components/daily-chart/daily-chart';
+import { InvebDividendCard } from './inveb-dividend-card/inveb-dividend-card';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-inveb',
-  imports: [AssetMainCard, PriceChart, DailyChart],
+  imports: [AssetMainCard, PriceChart, DailyChart, InvebDividendCard],
   templateUrl: './inveb.html',
   styleUrl: './inveb.css',
 })
 export class Inveb {
-
   // TODO: Toujours ce problème de any
   data = signal<any>(null);
 
   private api = inject(DashboardApiService);
   private destroyRef = inject(DestroyRef);
 
-  // On récupère les data dont on a besoin de data, mis à jour au refresh tous les 3minutes 
+  // On récupère les data dont on a besoin de data, mis à jour au refresh tous les 3minutes
   currentPrice = computed(() => this.data()?.currentPrice ?? null);
   currencySymbol = computed(() => 'SEK');
   priceChangePercentage24h = computed(() => this.data()?.priceChangePercentage24h ?? null);
@@ -63,6 +63,9 @@ export class Inveb {
 
   // TODO: Message d'erreur si on reçoit plus rien, la dernière donnée valide reste mais plus de mise à jour. Appartition tag rouge "erreur donnée plus a jour"
   refresh() {
-    this.api.getData('inveb').pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => this.data.set(data));
+    this.api
+      .getData('inveb')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => this.data.set(data));
   }
 }

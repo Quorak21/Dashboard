@@ -3,6 +3,7 @@ package com.dokkcorp.dashboard.providers.hyperliquid;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import com.dokkcorp.dashboard.config.ExternalCallExecutor;
 import com.dokkcorp.dashboard.features.crypto.hype.maths.HypeConstants;
 
 import tools.jackson.databind.JsonNode;
@@ -16,9 +17,11 @@ public class HyperliquidClient {
         private static final Logger logger = LoggerFactory.getLogger(HyperliquidClient.class);
 
         private final RestClient restClient;
+        private final ExternalCallExecutor externalCallExecutor;
 
-        public HyperliquidClient(RestClient.Builder builder) {
+        public HyperliquidClient(RestClient.Builder builder, ExternalCallExecutor externalCallExecutor) {
 
+                this.externalCallExecutor = externalCallExecutor;
                 this.restClient = builder.baseUrl("https://api.hyperliquid.xyz").build();
 
         }
@@ -45,8 +48,8 @@ public class HyperliquidClient {
         private CirculatingSupply fetchTokenData() {
 
                 try {
-                        CirculatingSupply response = this.restClient.post().uri("/info").header("Content-Type", "application/json")
-                                        .body("{ \"type\": \"tokenDetails\", \"tokenId\": \"0x0d01dc56dcaaca66ad901c959b4011ec\" }").retrieve().body(CirculatingSupply.class);
+                        CirculatingSupply response = externalCallExecutor.execute(() -> this.restClient.post().uri("/info").header("Content-Type", "application/json")
+                                        .body("{ \"type\": \"tokenDetails\", \"tokenId\": \"0x0d01dc56dcaaca66ad901c959b4011ec\" }").retrieve().body(CirculatingSupply.class));
                         return response;
                 } catch (Exception e) {
                         logger.error("Erreur récupération circulating supply HYPE: {}", e.getMessage());
@@ -61,8 +64,8 @@ public class HyperliquidClient {
                 String providerTvl = "0";
 
                 try {
-                        JsonNode node = this.restClient.post().uri("/info").header("Content-Type", "application/json")
-                                        .body("{ \"type\": \"vaultDetails\", \"vaultAddress\": \"0xdfc24b077bc1425ad1dea75bcb6f8158e10df303\" }").retrieve().body(JsonNode.class);
+                        JsonNode node = externalCallExecutor.execute(() -> this.restClient.post().uri("/info").header("Content-Type", "application/json")
+                                        .body("{ \"type\": \"vaultDetails\", \"vaultAddress\": \"0xdfc24b077bc1425ad1dea75bcb6f8158e10df303\" }").retrieve().body(JsonNode.class));
 
                         if (node != null) {
                                 // Récupération de l'APR
@@ -89,7 +92,7 @@ public class HyperliquidClient {
         private Volume24H fetchVolume24H() {
 
                 try {
-                        return this.restClient.post().uri("/info").header("Content-Type", "application/json").body("{ \"type\": \"globalStats\"}").retrieve().body(Volume24H.class);
+                        return externalCallExecutor.execute(() -> this.restClient.post().uri("/info").header("Content-Type", "application/json").body("{ \"type\": \"globalStats\"}").retrieve().body(Volume24H.class));
                 } catch (Exception e) {
                         logger.error("Erreur récupération Volume24H: {}", e.getMessage());
                         return null;
@@ -102,7 +105,7 @@ public class HyperliquidClient {
                 double openInterest = 0;
 
                 try {
-                        JsonNode node = this.restClient.post().uri("/info").header("Content-Type", "application/json").body("{ \"type\": \"metaAndAssetCtxs\"}").retrieve().body(JsonNode.class);
+                        JsonNode node = externalCallExecutor.execute(() -> this.restClient.post().uri("/info").header("Content-Type", "application/json").body("{ \"type\": \"metaAndAssetCtxs\"}").retrieve().body(JsonNode.class));
 
                         JsonNode assets = node != null ? node.path(1) : null;
                         if (assets == null || !assets.isArray()) {
@@ -136,7 +139,7 @@ public class HyperliquidClient {
 
                 //APR
                 try {
-                        JsonNode node = this.restClient.post().uri("/info").header("Content-Type", "application/json").body("{ \"type\": \"validatorSummaries\"}").retrieve().body(JsonNode.class);
+                        JsonNode node = externalCallExecutor.execute(() -> this.restClient.post().uri("/info").header("Content-Type", "application/json").body("{ \"type\": \"validatorSummaries\"}").retrieve().body(JsonNode.class));
 
                         if (node == null || !node.isArray()) {
                                 logger.warn("Format inattendu pour staking: node manquant ou invalide");
@@ -177,8 +180,8 @@ public class HyperliquidClient {
                 String hypeBurned = "";
 
                 try {
-                        JsonNode node = this.restClient.post().uri("/info").header("Content-Type", "application/json")
-                                        .body("{ \"type\": \"spotClearinghouseState\", \"user\": \"0xfefefefefefefefefefefefefefefefefefefefe\"}").retrieve().body(JsonNode.class);
+                        JsonNode node = externalCallExecutor.execute(() -> this.restClient.post().uri("/info").header("Content-Type", "application/json")
+                                        .body("{ \"type\": \"spotClearinghouseState\", \"user\": \"0xfefefefefefefefefefefefefefefefefefefefe\"}").retrieve().body(JsonNode.class));
 
                         JsonNode nodeBalance = node != null ? node.path("balances") : null;
                         if (nodeBalance == null || !nodeBalance.isArray()) {

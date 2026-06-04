@@ -4,7 +4,7 @@ Les règles et agents du projet sont définis dans `.cursor/rules/` :
 
 - `odin.mdc` (@odin) — Toujours actif. Grand Chef, planification, architecture et suivi dette technique.
 - `alex.mdc` (@alex) — Actif sur `frontend/**/*`. Logique Angular 21 et validation TypeScript.
-- `enderman.mdc` (@enderman) — Actif sur `backend/**/*`. Base de données et logique Spring Boot 4.
+- `steve.mdc` (@steve) — Actif sur `backend/**/*`. Base de données et logique Spring Boot 4.
 - `picasso.mdc` (@picasso) — Actif sur les fichiers front-end. Design UI, HTML/CSS et intégration Tailwind.
 
 Suivi de la dette technique : géré exclusivement par `@odin` dans `code_review.md` (backlog actif) et `journal.md` (historique résolu).

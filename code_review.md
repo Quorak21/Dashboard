@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-06-02 · **Tâches actives** : 19
+> **Mise à jour** : 2026-06-02 · **Tâches actives** : 18
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -14,11 +14,6 @@
 ## 🟠 ÉLEVÉ
 
 ### Backend — Architecture
-
-- [ ] **BACK-05** — Pas de retry/timeout sur les appels API externes
-  - 📁 `CoinGeckoClient.java`, `HyperliquidClient.java`, `FMPClient.java`, `BlockChainClient.java`
-  - Aucun timeout configuré sur RestClient/Web3j. Si une API est lente, le thread est bloqué indéfiniment.
-  - → Configurer `.connectTimeout()` et `.readTimeout()` sur RestClient, ajouter `spring-retry` ou `resilience4j`
 
 - [ ] **BACK-06** — Appels API séquentiels dans HyperliquidClient (6 appels HTTP)
   - 📁 `HyperliquidClient.java` L24-45, `BlockChainClient.java` L44-52
@@ -75,7 +70,7 @@
   - 📁 `HypeService.java`
   - Cache et récupération actuels sont globaux : si une source échoue, le fallback peut dégrader tout l'agrégat.
   - → Séparer par thèmes (`summary`, `timedData`, `supply`, `blockchain`, `hlp`, `valuation`) avec cache/fallback dédiés pour ne dégrader que le secteur en erreur.
-  - Priorisation : à traiter après **BACK-05** (stabilité providers) et **FRONT-12** (gestion UI du dégradé par section).
+  - Priorisation : à traiter après **FRONT-12** (gestion UI du dégradé par section).
 
 - [ ] **BACK-14** — `HypeDto.error()` ignore le paramètre `symbol`
   - 📁 `HypeDto.java` L95-103
@@ -146,6 +141,6 @@
 | Sévérité | Restant |
 |----------|---------|
 | 🔴 Critique | 0 |
-| 🟠 Élevé | 7 |
+| 🟠 Élevé | 6 |
 | 🟡 Moyen | 12 |
 | 🔵 Info | 0 |
