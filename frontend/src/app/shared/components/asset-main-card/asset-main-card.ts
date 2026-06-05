@@ -22,7 +22,7 @@ export class AssetMainCard {
   volume24h = input<number | null>(null);
   marketCap = input<number | null>(null);
   actualPrice = input<number | null>(null);
-  lastRefresh = input<number>(0);
+  lastRefresh = input<number | null>(null);
   currencySymbol = input<string>('$');
   marketClosed = input<boolean>(false);
 }

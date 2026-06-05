@@ -14,7 +14,7 @@ describe('HypeBurnCard', () => {
     fixture = TestBed.createComponent(HypeBurnCard);
     component = fixture.componentInstance;
     fixture.componentRef.setInput('burned24h', 100);
-    fixture.componentRef.setInput('hypeBurned100', '12.5');
+    fixture.componentRef.setInput('hypeBurned100', 12.5);
     fixture.componentRef.setInput('currentPrice', 2);
     await fixture.whenStable();
   });
@@ -28,9 +28,16 @@ describe('HypeBurnCard', () => {
   });
 
   it('caps dasharray when percentage is below zero', () => {
-    fixture.componentRef.setInput('hypeBurned100', '-5');
+    fixture.componentRef.setInput('hypeBurned100', -5);
     fixture.detectChanges();
 
     expect(component.dashArrayStyle()).toBe('0 174');
+  });
+
+  it('returns null burned value when current price is missing', () => {
+    fixture.componentRef.setInput('currentPrice', null);
+    fixture.detectChanges();
+
+    expect(component.burnedValueUsd()).toBeNull();
   });
 });

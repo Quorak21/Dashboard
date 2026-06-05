@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { vi, type Mock } from 'vitest';
 
+import type { InveBDto } from '../../../core/models';
 import { Inveb } from './inveb';
 import { DashboardApiService } from '../../../core/services/dashboard-api.service';
 
@@ -17,22 +18,24 @@ describe('Inveb', () => {
   });
 
   beforeEach(async () => {
-    getDataSpy = vi.fn().mockReturnValue(of({
-      symbol: 'INVE-B',
-      currentPrice: 245.5,
-      marketCap: 5000,
-      priceChangePercentage24h: -1.25,
-      totalVolume: 123,
-      lastRefresh: Date.UTC(2026, 5, 2, 8, 0, 0),
-      historyPrices: [1, 2],
-      historyDays: [10, 20],
-      livePrices: [3, 4],
-      liveDays: [30, 40]
-    }));
+    getDataSpy = vi.fn().mockReturnValue(
+      of({
+        symbol: 'INVE-B',
+        currentPrice: 245.5,
+        marketCap: 5000,
+        priceChangePercentage24h: -1.25,
+        totalVolume: 123,
+        lastRefresh: Date.UTC(2026, 5, 2, 8, 0, 0),
+        historyPrices: [1, 2],
+        historyDays: [10, 20],
+        livePrices: [3, 4],
+        liveDays: [30, 40],
+      } satisfies InveBDto),
+    );
 
     await TestBed.configureTestingModule({
       imports: [Inveb],
-      providers: [{ provide: DashboardApiService, useValue: { getData: getDataSpy } }]
+      providers: [{ provide: DashboardApiService, useValue: { getData: getDataSpy } }],
     }).compileComponents();
   });
 
@@ -50,7 +53,7 @@ describe('Inveb', () => {
     fixture.destroy();
   });
 
-  it('returns true for market closed when lastRefresh is missing', async () => {
+  it('hides market closed state when API returns null', async () => {
     getDataSpy.mockReturnValue(of(null));
     const fixture = TestBed.createComponent(Inveb);
     const component = fixture.componentInstance;
@@ -58,8 +61,9 @@ describe('Inveb', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    expect(component.lastRefresh()).toBe(0);
-    expect(component.isMarketClosed()).toBe(true);
+    expect(component.lastRefresh()).toBeNull();
+    expect(component.hasLiveData()).toBe(false);
+    expect(component.isMarketClosed()).toBe(false);
     fixture.destroy();
   });
 });

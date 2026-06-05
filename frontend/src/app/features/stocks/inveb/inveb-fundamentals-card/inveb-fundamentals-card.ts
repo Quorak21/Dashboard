@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 
 export interface InvebFundamentalMetric {
   label: string;
@@ -41,7 +41,19 @@ export const INVEB_TOP_HOLDINGS: InvebTopHolding[] = [
   styleUrl: './inveb-fundamentals-card.css',
 })
 export class InvebFundamentalsCard {
-  readonly metrics = INVEB_FUNDAMENTALS_METRICS;
-  readonly topHoldings = INVEB_TOP_HOLDINGS;
-  readonly sourceLabel = 'Source: Q1 2026 report';
+  hasData = input<boolean>(false);
+
+  metrics = computed(() =>
+    this.hasData()
+      ? INVEB_FUNDAMENTALS_METRICS
+      : INVEB_FUNDAMENTALS_METRICS.map((metric) => ({ label: metric.label, value: '-' })),
+  );
+
+  topHoldings = computed(() =>
+    this.hasData()
+      ? INVEB_TOP_HOLDINGS
+      : INVEB_TOP_HOLDINGS.map((holding) => ({ name: holding.name, weight: '-' })),
+  );
+
+  sourceLabel = computed(() => (this.hasData() ? 'Source: Q1 2026 report' : '-'));
 }

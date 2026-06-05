@@ -82,11 +82,23 @@ public class HypeMapper {
                 .map(d -> d.getLastRefresh().toEpochMilli())
                 .toList();
 
+        List<AssetSnapshot> activitySnapshots = history.stream()
+                .filter(s -> s.getVolume24h() != null && s.getOpenInterest() != null)
+                .toList();
+        List<Double> activityVolume = activitySnapshots.stream().map(AssetSnapshot::getVolume24h).toList();
+        List<Double> activityOpenInterest = activitySnapshots.stream().map(AssetSnapshot::getOpenInterest).toList();
+        List<Long> activityDays = activitySnapshots.stream()
+                .map(s -> s.getDay().toEpochMilli())
+                .toList();
+
         return new HypeChartsDto(
                 historicalPrice,
                 historicalDays,
                 livePrice,
-                liveDay);
+                liveDay,
+                activityVolume,
+                activityOpenInterest,
+                activityDays);
     }
 
     private HypeTimedDataDto getTimedData(HyperliquidDto hyperliquidData, List<AssetDaily> daily,

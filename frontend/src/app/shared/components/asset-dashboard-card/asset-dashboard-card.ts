@@ -13,7 +13,7 @@ export class AssetDashboardCard {
   asset = input.required<string>();
   title = input<string>();
   price = input<number | null>(null);
-  change = input<number>(0);
+  change = input<number | null>(null);
   currencySymbol = input<string>('$');
 
   logo = computed(() => "assets/logos/" + this.asset() + ".png");

@@ -26,18 +26,20 @@ describe('HypeSupplyDistribution', () => {
   });
 
   it('computes circulating, burned and unissued supply correctly', () => {
-    fixture.componentRef.setInput('circulatingSupply', '300000000');
-    fixture.componentRef.setInput('maxSupply', '900000000');
+    fixture.componentRef.setInput('circulatingSupply', 300000000);
+    fixture.componentRef.setInput('maxSupply', 900000000);
     fixture.detectChanges();
 
     expect(component.supplyData()).toEqual([300000000, 100000000, 600000000]);
+    expect(component.hasData()).toBe(true);
   });
 
-  it('falls back to defaults when inputs are invalid', () => {
-    fixture.componentRef.setInput('circulatingSupply', '');
-    fixture.componentRef.setInput('maxSupply', '');
+  it('returns null when inputs are missing', () => {
+    fixture.componentRef.setInput('circulatingSupply', null);
+    fixture.componentRef.setInput('maxSupply', null);
     fixture.detectChanges();
 
-    expect(component.supplyData()).toEqual([0, 0, 1000000000]);
+    expect(component.supplyData()).toBeNull();
+    expect(component.hasData()).toBe(false);
   });
 });

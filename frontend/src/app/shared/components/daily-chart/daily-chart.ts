@@ -1,10 +1,12 @@
-import { Component, input, viewChild, ElementRef, inject, DestroyRef, effect } from '@angular/core';
+import { Component, input, viewChild, ElementRef, inject, DestroyRef, effect, computed } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
+import { ChartEmptyState } from '../chart-empty-state/chart-empty-state';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-daily-chart',
+  imports: [ChartEmptyState],
   templateUrl: './daily-chart.html',
   styleUrl: './daily-chart.css',
 })
@@ -18,6 +20,8 @@ export class DailyChart {
   labels = input<number[]>([]);
   currency = input<string>('');
 
+  hasData = computed(() => this.labels().length > 0);
+
   private chart: Chart | undefined;
 
   constructor() {
@@ -27,12 +31,16 @@ export class DailyChart {
     });
     effect(() => {
       const canvas = this.chartCanvas();
-      if (canvas && this.labels().length > 0) {
-        if (!this.chart) { // Si la chart n'existe pas, on la crée
-          this.createChart();
-        } else { // Si la chart existe, on la met à jour
-          this.updateChart();
-        }
+      if (!canvas || !this.hasData()) {
+        this.chart?.destroy();
+        this.chart = undefined;
+        return;
+      }
+
+      if (!this.chart) {
+        this.createChart();
+      } else {
+        this.updateChart();
       }
     });
   }

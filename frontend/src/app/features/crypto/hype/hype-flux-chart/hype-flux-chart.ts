@@ -1,11 +1,13 @@
-import { Component, input, viewChild, ElementRef, effect, inject, DestroyRef } from '@angular/core';
+import { Component, input, viewChild, ElementRef, effect, inject, DestroyRef, computed } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { formatNumber } from '../../../../core/services/format-number';
+import { ChartEmptyState } from '../../../../shared/components/chart-empty-state/chart-empty-state';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-hype-flux-chart',
+  imports: [ChartEmptyState],
   templateUrl: './hype-flux-chart.html',
   styleUrl: './hype-flux-chart.css',
 })
@@ -22,6 +24,8 @@ export class HypeFluxChart {
   labels = input<number[]>([]);
   historyPrices = input<number[]>([]);
 
+  hasData = computed(() => this.labels().length > 0);
+
   private chart: Chart | undefined;
 
   constructor() {
@@ -31,12 +35,16 @@ export class HypeFluxChart {
     });
     effect(() => {
       const canvas = this.chartCanvas();
-      if (canvas && this.labels().length > 0) {
-        if (!this.chart) {
-          this.createChart();
-        } else {
-          this.updateChart();
-        }
+      if (!canvas || !this.hasData()) {
+        this.chart?.destroy();
+        this.chart = undefined;
+        return;
+      }
+
+      if (!this.chart) {
+        this.createChart();
+      } else {
+        this.updateChart();
       }
     });
   }

@@ -14,6 +14,9 @@
     </h3>
 
     <div class="relative z-10 flex-grow min-h-[250px] w-full flex items-center justify-center">
-        <canvas #chartCanvas></canvas>
+        <canvas #chartCanvas [class.invisible]="!hasData()"></canvas>
+        @if (!hasData()) {
+        <app-chart-empty-state />
+        }
     </div>
 </div>

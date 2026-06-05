@@ -1,20 +1,21 @@
 import { Component, ElementRef, viewChild, input, effect, inject, DestroyRef, computed } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { formatNumber } from '../../../../core/services/format-number';
+import { ChartEmptyState } from '../../../../shared/components/chart-empty-state/chart-empty-state';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-hype-supply-distribution',
-  imports: [],
+  imports: [ChartEmptyState],
   templateUrl: './hype-supply-distribution.html',
   styleUrl: './hype-supply-distribution.css',
 })
 export class HypeSupplyDistribution {
 
   chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
-  circulatingSupply = input<string>('');
-  maxSupply = input<string>('');
+  circulatingSupply = input<number | null>(null);
+  maxSupply = input<number | null>(null);
 
   private chart: Chart | undefined;
 
@@ -30,7 +31,11 @@ export class HypeSupplyDistribution {
       const canvas = this.chartCanvas();
       const data = this.supplyData();
 
-      if (!canvas || data[0] === 0) return;
+      if (!canvas || !this.hasData() || data === null) {
+        this.chart?.destroy();
+        this.chart = undefined;
+        return;
+      }
 
       if (!this.chart) {
         this.createChart(canvas.nativeElement, data);
@@ -40,11 +45,19 @@ export class HypeSupplyDistribution {
     });
   }
 
+  hasData = computed(
+    () => this.circulatingSupply() !== null && this.maxSupply() !== null,
+  );
+
   // Calcul des données
-  supplyData = computed<number[]>(() => {
+  supplyData = computed<number[] | null>(() => {
+    const circulating = this.circulatingSupply();
+    const currentMaxSupply = this.maxSupply();
+    if (circulating === null || currentMaxSupply === null) {
+      return null;
+    }
+
     const ORIGINAL_TOTAL_SUPPLY = 1000000000;
-    const currentMaxSupply = parseFloat(this.maxSupply()) || ORIGINAL_TOTAL_SUPPLY;
-    const circulating = parseFloat(this.circulatingSupply()) || 0;
     const burned = Math.max(0, ORIGINAL_TOTAL_SUPPLY - currentMaxSupply);
     const unissued = Math.max(0, currentMaxSupply - circulating);
     return [circulating, burned, unissued];

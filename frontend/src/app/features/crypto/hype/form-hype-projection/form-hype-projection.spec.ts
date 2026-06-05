@@ -14,7 +14,7 @@ describe('FormHypeProjection', () => {
     fixture = TestBed.createComponent(FormHypeProjection);
     component = fixture.componentInstance;
     fixture.componentRef.setInput('currentPrice', 10);
-    fixture.componentRef.setInput('stakingApr', '12');
+    fixture.componentRef.setInput('stakingApr', 12);
     await fixture.whenStable();
   });
 
@@ -33,5 +33,24 @@ describe('FormHypeProjection', () => {
     expect(component.effectivePrice()).toBe(20);
     expect(component.projectedValueUsd()).toBe('2K');
     expect(component.hypeProjectionYearlyUsd()).toBe('240');
+  });
+
+  it('keeps projected price placeholder empty when current price is missing', () => {
+    fixture.componentRef.setInput('currentPrice', null);
+    fixture.detectChanges();
+
+    expect(component.projectedPricePlaceholder()).toBe('');
+  });
+
+  it('computes projections from manual APR when API APR is missing', () => {
+    fixture.componentRef.setInput('stakingApr', null);
+    component.aprInput.set(10);
+    component.hypeProjectionAmount.set(100);
+    component.projectedPriceValue.set(5);
+    fixture.detectChanges();
+
+    expect(component.effectiveAprPercent()).toBe(10);
+    expect(component.hypeProjectionYearly()).toBe('10');
+    expect(component.projectedValueUsd()).toBe('500');
   });
 });

@@ -21,22 +21,39 @@ export const INVEB_DIVIDEND_HISTORY_PLACEHOLDER = [
   templateUrl: './inveb-dividend-card.html',
   styleUrl: './inveb-dividend-card.css',
 })
-
 export class InvebDividendCard {
-  readonly historyYears = INVEB_DIVIDEND_HISTORY_PLACEHOLDER;
-  readonly projectionYear = 2027;
-  /** Projected annual dividend per share (SEK), placeholder until API. */
-  readonly projectionDividendSek = "6.00";
-  readonly avgGrowth10Y = '8.40 %';
+  private readonly projectionYearValue = 2027;
+  private readonly projectionDividendSekValue = '6.00';
+  private readonly avgGrowth10YValue = '8.40 %';
 
   currentPrice = input<number | null>(null);
+  hasData = input<boolean>(false);
+
+  historyRows = computed(() => {
+    const rows = INVEB_DIVIDEND_HISTORY_PLACEHOLDER.slice(-5);
+    if (!this.hasData()) {
+      return rows.map((row) => ({ year: row.year, amount: '-' }));
+    }
+    return rows.map((row) => ({ year: row.year, amount: row.amount }));
+  });
+
+  avgGrowth10Y = computed(() => (this.hasData() ? this.avgGrowth10YValue : '-'));
+
+  projectionYear = computed(() => (this.hasData() ? this.projectionYearValue : '-'));
+
+  projectionDividendSek = computed(() =>
+    this.hasData() ? `${this.projectionDividendSekValue} SEK` : '-',
+  );
 
   estimatedYield = computed(() => {
+    if (!this.hasData()) {
+      return null;
+    }
     const price = this.currentPrice();
     if (price == null || price <= 0) {
       return null;
     }
-    return (Number(this.projectionDividendSek) / price) * 100;
+    return (Number(this.projectionDividendSekValue) / price) * 100;
   });
 
   estimatedYieldLabel = computed(() => {

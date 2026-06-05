@@ -29,6 +29,7 @@ describe('InvebDividendCard', () => {
   });
 
   it('computes estimated yield from current price and projected dividend', () => {
+    fixture.componentRef.setInput('hasData', true);
     fixture.componentRef.setInput('currentPrice', 300);
     fixture.detectChanges();
 
@@ -38,12 +39,14 @@ describe('InvebDividendCard', () => {
     expect(text).toContain('2%');
   });
 
-  it('shows placeholder yield when current price is missing', () => {
+  it('shows dashes when live data is unavailable', () => {
+    fixture.componentRef.setInput('hasData', false);
     fixture.componentRef.setInput('currentPrice', null);
     fixture.detectChanges();
 
+    expect(fixture.componentInstance.avgGrowth10Y()).toBe('-');
+    expect(fixture.componentInstance.projectionDividendSek()).toBe('-');
+    expect(fixture.componentInstance.historyRows().every((row) => row.amount === '-')).toBe(true);
     expect(fixture.componentInstance.estimatedYield()).toBeNull();
-    const text = fixture.nativeElement.textContent as string;
-    expect(text).toContain('Est. Yield');
   });
 });

@@ -1,5 +1,6 @@
 import { Component, inject, computed, DestroyRef } from '@angular/core';
 import { signal } from '@angular/core';
+import type { InveBDto } from '../../../core/models';
 import { DashboardApiService } from '../../../core/services/dashboard-api.service';
 import { AssetMainCard } from '../../../shared/components/asset-main-card/asset-main-card';
 import { PriceChart } from '../../../shared/components/price-chart/price-chart';
@@ -15,8 +16,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrl: './inveb.css',
 })
 export class Inveb {
-  // TODO: Toujours ce problème de any
-  data = signal<any>(null);
+  data = signal<InveBDto | null>(null);
 
   private api = inject(DashboardApiService);
   private destroyRef = inject(DestroyRef);
@@ -28,15 +28,17 @@ export class Inveb {
   totalVolume = computed(() => this.data()?.totalVolume ?? null);
   marketCap = computed(() => this.data()?.marketCap ?? null);
   symbol = computed(() => this.data()?.symbol ?? 'INVE-B');
-  lastRefresh = computed(() => this.data()?.lastRefresh ?? 0);
+  lastRefresh = computed(() => this.data()?.lastRefresh ?? null);
   historyPrices = computed(() => this.data()?.historyPrices ?? []);
   historyDays = computed(() => this.data()?.historyDays ?? []);
   livePrices = computed(() => this.data()?.livePrices ?? []);
   liveDays = computed(() => this.data()?.liveDays ?? []);
 
+  hasLiveData = computed(() => this.currentPrice() !== null);
+
   isMarketClosed = computed(() => {
     const refreshTime = this.lastRefresh();
-    if (!refreshTime) return true;
+    if (!refreshTime) return false;
 
     try {
       const date = new Date(refreshTime);
@@ -68,6 +70,6 @@ export class Inveb {
     this.api
       .getData('inveb')
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => this.data.set(data));
+      .subscribe((data: InveBDto | null) => this.data.set(data));
   }
 }

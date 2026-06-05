@@ -2,9 +2,23 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 47**
+- **Tâches réalisée depuis l'implémentation du workflow : 52**
 
 ---
+
+- **FEAT-01** — Chart Volume + Open Interest HYPE (365j) : séries `activityVolume` / `activityOpenInterest` / `activityDays` exposées via `HypeChartsDto` (snapshots filtrés) ; composant `hype-activity-chart` dual-axis (2 lignes, pleine largeur Section 5 sous donut + form) ; courbe progressive sans backfill.
+
+- **FEAT-04** — Refresh auto dashboard : `toSignal` remplacé par signals + `refresh()` + polling 3 min (même pattern que HYPE / INVE-B) ; test mount `getData('hype'|'inveb')`.
+
+- **FRONT-05** — Duplication charts : ticket archivé en dette acceptée — charts volontairement distincts par asset (comportement + rendu), pas de fusion `BaseChart`.
+
+- **FRONT-10** — Magic numbers : ticket archivé en dette acceptée — quelques littéraux (`180000`, `86400000`, supply initiale HYPE), lisibles en contexte, pas d'extraction en constantes.
+
+- **FRONT-12** — État dégradé HYPE / INVE-B (`null` ≠ `0`) : computed front en `number | null`, summary + dashboard + metric cards + burn/donut/form avec `-` ou empty state ; `chart-empty-state` réutilisable ; formulaire projection (APR éditable, placeholder vide) ; INVE-B dividend/fundamentals masquent les valeurs en dur si pas de prix live, tag « Fermé » caché sans données.
+
+- **FRONT-02** — Signals typés HYPE / INVE-B : `signal<HypeDto | null>` et `signal<InveBDto | null>` dans `hype.ts` / `inveb.ts`, chaîne `computed` vérifiée par le compilateur ; helper `toInputString` pour les `input<string>` enfants.
+
+- **FRONT-01** — Typage API front : interfaces `HypeDto` / `InveBDto` dans `core/models/` (miroir DTO Java), `DashboardApiService.getData` sans `any` ni `String`, retour `Observable<HypeDto | InveBDto | null>`.
 
 - **INFRA-02** — Tests dans le pipeline CI/CD : étape `mvn test` (Java 21) dans `deploy.yml` avant build-push, `mvn package` sans `-DskipTests` dans le Dockerfile, config test H2 (`src/test/resources/application.yml`) pour CI et build image.
 

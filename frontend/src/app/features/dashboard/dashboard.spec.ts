@@ -1,51 +1,62 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
+import { vi } from 'vitest';
+import type { HypeDto, InveBDto } from '../../core/models';
 import { Dashboard } from './dashboard';
 import { DashboardApiService } from '../../core/services/dashboard-api.service';
 
 describe('Mon Premier Test Dashboard', () => {
+  const hypeDto = {
+    summary: { currentPrice: 1.25, priceChangePercentage24h: 5.42 },
+  } as HypeDto;
 
-  // 1. On fabrique notre téléphone jouet (le mock)
-  const fauxServiceApi = {
-    getData: (cle: string) => {
-      // Si le composant demande 'hype', on lui répond direct 1.25 $ avec +5.42% de hausse
-      if (cle === 'hype') {
-        return of({
-          summary: { currentPrice: 1.25, priceChangePercentage24h: 5.42 }
-        });
-      }
-      // Si le composant demande 'inveb', on lui répond direct 245.50 SEK avec -1.25% de baisse
-      if (cle === 'inveb') {
-        return of({ currentPrice: 245.50, priceChangePercentage24h: -1.25 });
-      }
-      return of(null);
+  const invebDto = { currentPrice: 245.5, priceChangePercentage24h: -1.25 } as InveBDto;
+
+  const getData = vi.fn((cle: string) => {
+    if (cle === 'hype') {
+      return of(hypeDto);
     }
-  };
+    if (cle === 'inveb') {
+      return of(invebDto);
+    }
+    return of(null);
+  });
+
+  const fauxServiceApi = { getData };
+
+  beforeEach(() => {
+    getData.mockClear();
+  });
 
   it('devrait bien recevoir et stocker les prix de Hype et Inveb', () => {
-    // 2. On prépare la scène de théâtre
     TestBed.configureTestingModule({
       imports: [Dashboard],
-      providers: [
-        { provide: DashboardApiService, useValue: fauxServiceApi }, // On donne le jouet
-        provideRouter([]) // Requis pour éviter les erreurs de liens
-      ]
+      providers: [{ provide: DashboardApiService, useValue: fauxServiceApi }, provideRouter([])],
     });
 
-    // 3. On fait entrer l'acteur sur scène
     const fixture = TestBed.createComponent(Dashboard);
     const composant = fixture.componentInstance;
 
-    // 4. "Action !" (On force Angular à charger les données)
     fixture.detectChanges();
 
-    // 5. On vérifie si les variables de prix contiennent bien nos valeurs simulées
     expect(composant.hypePrice()).toBe(1.25);
-    expect(composant.invebPrice()).toBe(245.50);
-
-    // 6. On vérifie également les pourcentages de variation
+    expect(composant.invebPrice()).toBe(245.5);
     expect(composant.hypeChange()).toBe(5.42);
     expect(composant.invebChange()).toBe(-1.25);
+  });
+
+  it('devrait appeler getData pour hype et inveb au mount', () => {
+    TestBed.configureTestingModule({
+      imports: [Dashboard],
+      providers: [{ provide: DashboardApiService, useValue: fauxServiceApi }, provideRouter([])],
+    });
+
+    const fixture = TestBed.createComponent(Dashboard);
+    fixture.detectChanges();
+
+    expect(getData).toHaveBeenCalledWith('hype');
+    expect(getData).toHaveBeenCalledWith('inveb');
+    expect(getData).toHaveBeenCalledTimes(2);
   });
 });

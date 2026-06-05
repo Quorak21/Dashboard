@@ -1,6 +1,7 @@
 package com.dokkcorp.dashboard.features.crypto.hype;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -77,5 +78,89 @@ class HypeMapperTest {
         verify(hypeCalculator).computeBlockchainData(any(), any());
         verify(hypeCalculator).computeHlpData(any());
         verify(hypeCalculator).computeValuationData(any(), any(), any());
+    }
+
+    @Test
+    void toDto_mapsActivitySeriesFromSnapshotsWithVolumeAndOpenInterest() {
+        AssetDaily entity = new AssetDaily();
+        entity.setSymbol("HYPE");
+        entity.setCurrentPrice(2d);
+        entity.setMarketCap(200d);
+        entity.setPriceChangePercentage24h(3d);
+        entity.setTotalVolume(4d);
+        entity.setLastRefresh(Instant.ofEpochMilli(123L));
+
+        AssetSnapshot priceOnly = new AssetSnapshot();
+        priceOnly.setDay(Instant.ofEpochMilli(10L));
+        priceOnly.setPrice(0.1d);
+
+        AssetSnapshot withActivity = new AssetSnapshot();
+        withActivity.setDay(Instant.ofEpochMilli(20L));
+        withActivity.setPrice(0.2d);
+        withActivity.setVolume24h(1000d);
+        withActivity.setOpenInterest(5000d);
+
+        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE"))
+                .thenReturn(List.of());
+        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE"))
+                .thenReturn(List.of(withActivity, priceOnly));
+
+        stubCalculatorDefaults();
+
+        HypeDto result = mapper.toDto(
+                entity,
+                new HyperliquidDto("1000", "100", "0.1", "200", "300", "0.2", "2000", "10", "500"),
+                new BlockChainDto("100", "50"));
+
+        assertEquals(List.of(1000d), result.charts().activityVolume());
+        assertEquals(List.of(5000d), result.charts().activityOpenInterest());
+        assertEquals(List.of(20L), result.charts().activityDays());
+    }
+
+    @Test
+    void toDto_excludesSnapshotsWithoutVolumeOrOpenInterestFromActivitySeries() {
+        AssetDaily entity = new AssetDaily();
+        entity.setSymbol("HYPE");
+        entity.setCurrentPrice(2d);
+        entity.setMarketCap(200d);
+        entity.setPriceChangePercentage24h(3d);
+        entity.setTotalVolume(4d);
+        entity.setLastRefresh(Instant.ofEpochMilli(123L));
+
+        AssetSnapshot missingOi = new AssetSnapshot();
+        missingOi.setDay(Instant.ofEpochMilli(10L));
+        missingOi.setPrice(0.1d);
+        missingOi.setVolume24h(1000d);
+
+        AssetSnapshot missingVolume = new AssetSnapshot();
+        missingVolume.setDay(Instant.ofEpochMilli(20L));
+        missingVolume.setPrice(0.2d);
+        missingVolume.setOpenInterest(5000d);
+
+        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE"))
+                .thenReturn(List.of());
+        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE"))
+                .thenReturn(List.of(missingVolume, missingOi));
+
+        stubCalculatorDefaults();
+
+        HypeDto result = mapper.toDto(
+                entity,
+                new HyperliquidDto("1000", "100", "0.1", "200", "300", "0.2", "2000", "10", "500"),
+                new BlockChainDto("100", "50"));
+
+        assertTrue(result.charts().activityVolume().isEmpty());
+        assertTrue(result.charts().activityOpenInterest().isEmpty());
+        assertTrue(result.charts().activityDays().isEmpty());
+    }
+
+    private void stubCalculatorDefaults() {
+        when(hypeCalculator.computeTimedData(any(), any(), any())).thenReturn(new HypeTimedDataDto(
+                1d, 2d, 3d, 4d, 5d, 6d, 7d, List.of(), List.of(), List.of(), List.of()));
+        when(hypeCalculator.computeSupplyData(any())).thenReturn(new HypeSupplyDto(1d, 2d, 3d, 4d));
+        when(hypeCalculator.computeBlockchainData(any(), any())).thenReturn(new HypeBlockchainDto(1d, 2d, 3d, 4d));
+        when(hypeCalculator.computeHlpData(any())).thenReturn(new HypeHlpDto(1d, 2d, 3d));
+        when(hypeCalculator.computeValuationData(any(), any(), any())).thenReturn(new HypeValuationDto(
+                1d, 2d, 3d, 4d, 5d, 6d, 7d, 8d, 9d, 10d, 11d));
     }
 }

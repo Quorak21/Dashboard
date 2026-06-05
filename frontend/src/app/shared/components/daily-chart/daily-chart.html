@@ -1,5 +1,8 @@
 <div class="daily-chart-container">
-  <canvas #chartCanvas>
+  <canvas #chartCanvas [class.invisible]="!hasData()">
     <p class="sr-only">Line chart showing the live 24-hour price variations of the asset.</p>
   </canvas>
+  @if (!hasData()) {
+  <app-chart-empty-state />
+  }
 </div>

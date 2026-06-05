@@ -94,7 +94,7 @@ class AssetSyncJobTest {
     private HypeDto buildHypeDto() {
         return new HypeDto(
                 new HypeSummaryDto("HYPE", 1d, 2d, 3d, 4d, 5L),
-                new HypeChartsDto(List.of(), List.of(), List.of(), List.of()),
+                new HypeChartsDto(List.of(), List.of(), List.of(), List.of(), List.of(), List.of(), List.of()),
                 new HypeTimedDataDto(1d, 2d, 3d, 4d, 5d, 6d, 7d, List.of(), List.of(), List.of(), List.of()),
                 new HypeSupplyDto(1d, 2d, 3d, 4d),
                 new HypeBlockchainDto(1d, 2d, 3d, 4d),

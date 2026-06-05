@@ -19,19 +19,28 @@ describe('InvebFundamentalsCard', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('renders fundamentals metrics and source', () => {
+  it('renders fundamentals metrics and source when data is available', () => {
+    fixture.componentRef.setInput('hasData', true);
+    fixture.detectChanges();
+
     const text = fixture.nativeElement.textContent as string;
     expect(text).toContain('Fundamentals');
     expect(text).toContain('Key Metrics');
-    expect(text).toContain('5Y Avg Discount');
+    expect(text).toContain('5Y NAV CAGR');
     expect(text).toContain('15%');
-    expect(text).toContain('Patricia Industries Weight');
+    expect(text).toContain('Atlas Copco');
     expect(text).toContain('Holdings');
     expect(text).toContain('ABB');
-    expect(text).toContain('AstraZeneca');
-    expect(text).toContain('Mölnlycke');
-    expect(text).toContain('Nasdaq');
-    expect(text).toContain('Saab');
-    expect(text).toContain('rapport 1er trimestre 2026');
+    expect(text).toContain('Q1 2026 report');
+  });
+
+  it('renders dashes when live data is unavailable', () => {
+    fixture.componentRef.setInput('hasData', false);
+    fixture.detectChanges();
+
+    const component = fixture.componentInstance;
+    expect(component.metrics().every((metric) => metric.value === '-')).toBe(true);
+    expect(component.topHoldings().every((holding) => holding.weight === '-')).toBe(true);
+    expect(component.sourceLabel()).toBe('-');
   });
 });

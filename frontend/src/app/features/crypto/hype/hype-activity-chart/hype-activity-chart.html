@@ -1,0 +1,12 @@
+<div
+    class="relative w-full min-h-[320px] bg-dark-800/40 rounded-3xl border border-orange-500/30 p-6 flex flex-col group hover:border-orange-500/60 transition-all duration-500 overflow-hidden">
+
+    <div class="flex-grow relative min-h-[260px]">
+        <canvas #chartCanvas [class.invisible]="!hasData()">
+            <p class="sr-only">Line chart displaying daily trading volume and open interest of HYPE over up to 365 days.</p>
+        </canvas>
+        @if (!hasData()) {
+        <app-chart-empty-state />
+        }
+    </div>
+</div>

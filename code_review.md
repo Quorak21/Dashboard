@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-06-04 · **Tâches actives** : 12
+> **Mise à jour** : 2026-06-05 · **Tâches actives** : 5
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -13,22 +13,7 @@
 
 ## 🟠 ÉLEVÉ
 
-### Frontend — Typage
-
-- [ ] **FRONT-01** — `Observable<any>` + `String` wrapper dans le service API
-  - 📁 `dashboard-api.service.ts` L11
-  - Aucun typage des réponses API. `String` wrapper au lieu de `string` primitif.
-  - → Créer les interfaces `HypeDto`, `InveBDto` dans `core/models/`, typer les réponses.
-
-- [ ] **FRONT-02** — `signal<any>(null)` dans les composants principaux
-  - 📁 `hype.ts` L32, `inveb.ts` L18
-  - 50+ `computed()` en cascade sans aucune sécurité de type.
-  - → Typer avec l'interface DTO correspondante.
-
-- [ ] **FRONT-12** — HYPE : résumé d’erreur = champs `null` (pas de zéros factices)
-  - Convention : en cas d’échec API / état dégradé, `HypeSummaryDto` expose des **`null`** pour marquer « pas de donnée », à distinguer d’une vraie valeur `0`.
-  - 📁 Back : `HypeDto.java`, `HypeSummaryDto.java`, factory `error()` — garder cette convention alignée sur l’agrégat.
-  - → Front (quand refactor HYPE branché) : lire `summaryDto` / `summary`, UI « indisponible » si `null`, optional chaining ; ne pas traiter `0` comme erreur pour le bloc summary.
+*(Plus de tâche élevée active !)*
 
 ---
 
@@ -40,7 +25,7 @@
   - 📁 `HypeService.java`
   - Cache et récupération actuels sont globaux : si une source échoue, le fallback peut dégrader tout l'agrégat.
   - → Séparer par thèmes (`summary`, `timedData`, `supply`, `blockchain`, `hlp`, `valuation`) avec cache/fallback dédiés pour ne dégrader que le secteur en erreur.
-  - Priorisation : à traiter après **FRONT-12** (gestion UI du dégradé par section).
+  - Priorisation : **FRONT-12 résolu** — UI HYPE gère déjà le dégradé section par section (`null` → `-` / empty state). Prochaine étape : isoler le fallback côté back.
 
 - [ ] **BACK-14** — `HypeDto.error()` ignore le paramètre `symbol`
   - 📁 `HypeDto.java` L95-103
@@ -58,31 +43,10 @@
   - → `@GeneratedValue(strategy = GenerationType.IDENTITY)`
 
 - [ ] **BACK-22** — Corriger la propagation du symbole dans `InveBDto.error()`
-  - 📁 `InveBService.java` L87
+  - 📁 `InveBService.java` L87 · `InveBDto.java`
   - `InveBService` propage `"ERROR"` comme symbole lors d'une exception dans `InveBDto.error()`.
   - → Utiliser le bon symbole `"INVE-B"` lors de l'appel.
-
-### Frontend
-
-- [ ] **FRONT-05** — Duplication massive des composants Chart
-  - 📁 `price-chart.ts` + `daily-chart.ts`
-  - ~80% de code identique (constructor/effect/createChart/updateChart, config tooltip/scales). CSS aussi quasi identique.
-  - → Créer un `BaseChart` abstrait ou un composant configurable unique.
-
-- [ ] **FRONT-10** — Magic numbers dans les composants
-  - 📁 `hype.ts` L171 (`180000`), `inveb.ts` L39 (`180000`), `hype-flux-chart.ts` L61 (`86400000`), `hype-supply-distribution.ts` L45 (`1000000000`)
-  - → Extraire en constantes nommées.
-
-### Fonctionnalités planifiées
-
-- [ ] **FEAT-01** — Chart volume + Open Interest de HYPE sur 30 jours
-  - Nécessite côté backend : persister les données volume/OI en base quotidiennement via le job de sync.
-  - Côté frontend : créer le composant chart (30j) une fois les données disponibles.
-  - → Commencer par le modèle DB + collecte, puis le chart.
-
-- [ ] **FEAT-04** — Refresh automatique des prix sur le dashboard
-  - Les prix affichés ne se mettent pas à jour sans rechargement manuel.
-  - → Implémenter un polling périodique ou un mécanisme de refresh auto (interval RxJS).
+  - → Aligner `InveBDto.error()` sur la convention HYPE : champs financiers en `null` (pas de `0.0` factice) pour que le front dégrade proprement.
 
 ---
 
@@ -100,6 +64,10 @@
   - *Pourquoi ?* : Peu d'actifs (2 aujourd'hui, ~10 max), tables petites (rétention 7j / 1 an) — gain perf négligeable sur ce VPS. Bon réflexe à réutiliser sur un prochain projet si volumes ou requêtes lourdes.
 - **SEC-05** — Aucune authentification sur l'API
   - *Pourquoi ?* : C'est un portfolio d'apprentissage personnel, pas besoin d'ajouter une usine à gaz comme Spring Security pour des données publiques en lecture seule.
+- **FRONT-05** — Duplication massive des composants Chart
+  - *Pourquoi ?* : Chaque chart a son identité visuelle et son comportement (flux symétrique, doughnut supply, prix live vs daily…). La fusion en `BaseChart` appauvrirait le rendu pour un gain de maintenance marginal sur un petit nombre de composants.
+- **FRONT-10** — Magic numbers dans les composants
+  - *Pourquoi ?* : Quelques littéraux isolés (`180000`, `86400000`, `1_000_000_000`), sens évident en contexte — pas la peine d'extraire des constantes pour si peu.
 
 ---
 
@@ -108,6 +76,6 @@
 | Sévérité | Restant |
 |----------|---------|
 | 🔴 Critique | 0 |
-| 🟠 Élevé | 1 |
-| 🟡 Moyen | 11 |
+| 🟠 Élevé | 0 |
+| 🟡 Moyen | 5 |
 | 🔵 Info | 0 |

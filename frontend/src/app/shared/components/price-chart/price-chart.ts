@@ -1,10 +1,12 @@
-import { Component, ElementRef, viewChild, input, effect, inject, DestroyRef } from '@angular/core';
+import { Component, ElementRef, viewChild, input, effect, inject, DestroyRef, computed } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
+import { ChartEmptyState } from '../chart-empty-state/chart-empty-state';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-price-chart',
+  imports: [ChartEmptyState],
   templateUrl: './price-chart.html',
   styleUrl: './price-chart.css',
 })
@@ -13,6 +15,8 @@ export class PriceChart {
   prices = input<number[]>([]);
   labels = input<number[]>([]);
   currency = input<string>('');
+
+  hasData = computed(() => this.labels().length > 0);
 
   private chart: Chart | undefined;
 
@@ -25,12 +29,16 @@ export class PriceChart {
     });
     effect(() => {
       const canvas = this.chartCanvas();
-      if (canvas && this.labels().length > 0) {
-        if (!this.chart) { // Si la chart n'existe pas, on la crée
-          this.createChart();
-        } else { // Si la chart existe, on la met à jour
-          this.updateChart();
-        }
+      if (!canvas || !this.hasData()) {
+        this.chart?.destroy();
+        this.chart = undefined;
+        return;
+      }
+
+      if (!this.chart) {
+        this.createChart();
+      } else {
+        this.updateChart();
       }
     });
   }
