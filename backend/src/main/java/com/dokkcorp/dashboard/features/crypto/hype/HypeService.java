@@ -51,6 +51,8 @@ public class HypeService {
 
         private final HypeThemeCache themeCache = new HypeThemeCache();
 
+        private final Object loadLock = new Object();
+
         public HypeService(CoinGeckoClient client, HyperliquidClient hyperliquidClient,
                         BlockChainClient blockChainClient, AssetDailyRepository assetDailyRepository,
                         AssetSnapshotRepository assetSnapshotRepository, HypeMapper hypeMapper) {
@@ -67,7 +69,14 @@ public class HypeService {
                 if (cached != null) {
                         return cached;
                 }
-                return this.getData();
+                synchronized (loadLock) {
+                        // re-vérification : une autre requête a peut-être déjà rempli le cache pendant l'attente du verrou
+                        cached = themeCache.assemble();
+                        if (cached != null) {
+                                return cached;
+                        }
+                        return this.getData();
+                }
         }
 
         public HypeDto getData() {

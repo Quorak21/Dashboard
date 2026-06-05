@@ -13,8 +13,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/dokkcorp_db
-    username: dokkadmin
-    password: dokksecret
+    username: ${POSTGRES_USER:dokkadmin}
+    password: ${POSTGRES_PASSWORD:localdev}
 
   jpa:
     hibernate:

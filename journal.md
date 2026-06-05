@@ -2,9 +2,13 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 58**
+- **Tâches réalisée depuis l'implémentation du workflow : 60**
 
 ---
+
+- **SEC-07** — Secret partagé dev/prod en clair : `dokksecret` retiré de `compose.dev.yaml` et du profil dev d'`application.yml`, remplacé par des variables avec défaut local anodin (`${POSTGRES_USER:-dokkadmin}` / `${POSTGRES_PASSWORD:-localdev}` côté Compose, `${POSTGRES_USER:dokkadmin}` / `${POSTGRES_PASSWORD:localdev}` côté Spring). GitHub n'expose plus le secret de prod. Volume local à recréer (`down -v` / `up -d`). Tests Maven OK (23/0).
+
+- **BACK-24** — Garde anti « thundering herd » au cold-start : double-checked locking (single-flight) sur `HypeService.getLastHypeData()` et `InveBService.getLastInveBData()` via un `loadLock` dédié — au boot (cache vide), une seule requête exécute `getData()`, les autres attendent puis lisent le cache. 1er check hors verrou (chemin chaud sans contention), `getData()`/`autoSync()` inchangés. Tests Maven OK.
 
 - **SEC-06** — Secret Postgres en clair dans le compose prod : `POSTGRES_USER`/`POSTGRES_PASSWORD` externalisés en `${VAR}` sur les services `postgres` et `backend` de `backend/docker-compose.yml`, ajout d'un `backend/.env.example` documenté (placeholders, sans secret), `.env` couvert par le `.gitignore` racine. Déploiement : créer `backend/.env` sur le VPS avec les vraies valeurs.
 

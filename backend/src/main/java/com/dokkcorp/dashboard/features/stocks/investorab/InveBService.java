@@ -44,6 +44,7 @@ public class InveBService {
 
     // volatile pour les listes pour aller uniquement dans la RAM chercher les données fraîches
     private final AtomicReference<InveBDto> cachedData = new AtomicReference<>();
+    private final Object loadLock = new Object();
     private volatile List<Double> historyPrices = new ArrayList<>();
     private volatile List<Long> historyDays = new ArrayList<>();
     private volatile long lastHistoryRefresh = 0;
@@ -55,7 +56,14 @@ public class InveBService {
         if (data != null) {
             return data;
         }
-        return this.getData();
+        synchronized (loadLock) {
+            // re-vérification : une autre requête a peut-être déjà rempli le cache pendant l'attente du verrou
+            data = this.cachedData.get();
+            if (data != null) {
+                return data;
+            }
+            return this.getData();
+        }
     }
 
     // Récupération des données + mise en cache et mise a jour BD si tout va bien

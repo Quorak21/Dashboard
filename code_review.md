@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-06-05 · **Tâches actives** : 1
+> **Mise à jour** : 2026-06-05 · **Tâches actives** : 0
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -25,13 +25,7 @@
 
 ## 🔵 INFO
 
-### Backend
-
-- [ ] **BACK-24** — Pas de garde anti-« thundering herd » sur le cold-start du cache
-  - 📁 `HypeService.getLastHypeData()` / `InveBService.getLastInveBData()`
-  - Tant que le cache (`AtomicReference`) est vide (boot avant le 1er cron), chaque requête publique déclenche un `getData()` complet (6+ appels externes + insert DB). Plusieurs requêtes concurrentes lancent autant de `getData()` en parallèle (pas de single-flight) → appels externes redondants + lignes `AssetDaily` dupliquées.
-  - Impact réel **faible** (mono-utilisateur, fenêtre = quelques secondes au boot), d'où INFO.
-  - → Option simple : un `synchronized`/lock léger ou un flag `loading` pour mutualiser le 1er remplissage. À garder en tête, pas urgent.
+*(Plus de tâche info active !)*
 
 ---
 
@@ -49,6 +43,8 @@
   - *Pourquoi ?* : Chaque chart a son identité visuelle et son comportement (flux symétrique, doughnut supply, prix live vs daily…). La fusion en `BaseChart` appauvrirait le rendu pour un gain de maintenance marginal sur un petit nombre de composants.
 - **FRONT-10** — Magic numbers dans les composants
   - *Pourquoi ?* : Quelques littéraux isolés (`180000`, `86400000`, `1_000_000_000`), sens évident en contexte — pas la peine d'extraire des constantes pour si peu.
+- **SEC-08** — Mot de passe prod historique (`dokksecret`) non rotationné
+  - *Pourquoi ?* : Le secret reste dans l'historique git mais la base de prod n'est exposée nulle part (aucun port public, backend bindé `127.0.0.1`). Risque réel négligeable pour un portfolio. Bon réflexe pour un vrai projet : rotationner tout secret ayant fuité dans l'historique (`ALTER USER` + `.env`).
 
 ---
 
@@ -59,4 +55,4 @@
 | 🔴 Critique | 0 |
 | 🟠 Élevé | 0 |
 | 🟡 Moyen | 0 |
-| 🔵 Info | 1 |
+| 🔵 Info | 0 |
