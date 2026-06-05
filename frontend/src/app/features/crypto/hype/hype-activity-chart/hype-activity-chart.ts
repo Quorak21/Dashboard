@@ -5,6 +5,9 @@ import { ChartEmptyState } from '../../../../shared/components/chart-empty-state
 
 Chart.register(...registerables);
 
+const VOLUME_COLOR = '#c97b3d';
+const OPEN_INTEREST_COLOR = '#5eb3f6';
+
 @Component({
   selector: 'app-hype-activity-chart',
   imports: [ChartEmptyState],
@@ -49,6 +52,12 @@ export class HypeActivityChart {
     );
   }
 
+  private formatAxisTick(value: string | number) {
+    const num = Number(value);
+    if (Number.isNaN(num)) return '';
+    return `${formatNumber(num)} $`;
+  }
+
   private updateChart() {
     if (!this.chart) return;
     this.chart.data.labels = this.formatDateLabels();
@@ -76,23 +85,27 @@ export class HypeActivityChart {
             label: 'Volume',
             data: this.volume(),
             yAxisID: 'y',
-            borderColor: '#b87333',
-            backgroundColor: 'rgba(184, 115, 51, 0.1)',
-            borderWidth: 2,
+            borderColor: VOLUME_COLOR,
+            backgroundColor: 'rgba(201, 123, 61, 0.12)',
+            borderWidth: 2.5,
             pointRadius: 0,
             pointHoverRadius: 5,
-            tension: 0.3,
+            pointStyle: 'circle',
+            tension: 0.45,
+            cubicInterpolationMode: 'monotone',
           },
           {
             label: 'Open Interest',
             data: this.openInterest(),
             yAxisID: 'y1',
-            borderColor: '#f97316',
-            backgroundColor: 'rgba(249, 115, 22, 0.08)',
-            borderWidth: 2,
+            borderColor: OPEN_INTEREST_COLOR,
+            backgroundColor: 'rgba(94, 179, 246, 0.1)',
+            borderWidth: 2.5,
             pointRadius: 0,
             pointHoverRadius: 5,
-            tension: 0.3,
+            pointStyle: 'circle',
+            tension: 0.45,
+            cubicInterpolationMode: 'monotone',
           },
         ],
       },
@@ -106,9 +119,12 @@ export class HypeActivityChart {
             position: 'top',
             align: 'end',
             labels: {
-              color: 'rgba(255, 255, 255, 0.7)',
-              boxWidth: 12,
-              boxHeight: 2,
+              color: 'rgba(255, 255, 255, 0.75)',
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 8,
+              boxHeight: 8,
+              padding: 16,
               font: { size: 11 },
             },
           },
@@ -116,10 +132,12 @@ export class HypeActivityChart {
             backgroundColor: '#1a1a1a',
             titleColor: '#e5a075',
             bodyColor: '#f3f4f6',
-            borderColor: 'rgba(249, 115, 22, 0.3)',
+            borderColor: 'rgba(255, 255, 255, 0.12)',
             borderWidth: 1,
             padding: 14,
             displayColors: true,
+            usePointStyle: true,
+            boxPadding: 8,
             callbacks: {
               title: items => {
                 const date = new Date(this.labels()[items[0].dataIndex]);
@@ -131,9 +149,14 @@ export class HypeActivityChart {
               },
               label: ctx => {
                 const value = ctx.parsed.y;
-                if (value === null) return `${ctx.dataset.label}: -`;
-                return `${ctx.dataset.label}: ${formatNumber(value)} $`;
+                if (value === null) return `  ${ctx.dataset.label}: -`;
+                return `  ${ctx.dataset.label}: ${formatNumber(value)} $`;
               },
+              labelColor: ctx => ({
+                borderColor: 'transparent',
+                backgroundColor: ctx.dataset.borderColor as string,
+                borderWidth: 0,
+              }),
             },
           },
         },
@@ -147,9 +170,10 @@ export class HypeActivityChart {
             position: 'left',
             grid: { color: 'rgba(255, 255, 255, 0.05)' },
             ticks: {
-              color: 'rgba(184, 115, 51, 0.8)',
+              color: VOLUME_COLOR,
               font: { size: 10 },
-              callback: val => Number(val).toLocaleString(),
+              maxTicksLimit: 5,
+              callback: val => this.formatAxisTick(val),
             },
           },
           y1: {
@@ -157,9 +181,10 @@ export class HypeActivityChart {
             position: 'right',
             grid: { drawOnChartArea: false },
             ticks: {
-              color: 'rgba(249, 115, 22, 0.8)',
+              color: OPEN_INTEREST_COLOR,
               font: { size: 10 },
-              callback: val => Number(val).toLocaleString(),
+              maxTicksLimit: 5,
+              callback: val => this.formatAxisTick(val),
             },
           },
         },
