@@ -1,17 +1,17 @@
 import { Component, computed, input } from '@angular/core';
 
-export interface InvebFundamentalMetric {
+interface InvebFundamentalMetric {
   label: string;
   value: string;
 }
 
-export interface InvebTopHolding {
+interface InvebTopHolding {
   name: string;
   weight: string;
 }
 
 /** Hardcoded Q1 2026 report — updated manually ~once per year. */
-export const INVEB_FUNDAMENTALS_METRICS: InvebFundamentalMetric[] = [
+const INVEB_FUNDAMENTALS_METRICS: InvebFundamentalMetric[] = [
   { label: 'Trailing P/E', value: '6.11' },
   { label: 'Debt Leverage', value: '1.2%' },
   { label: 'Management Cost', value: '0.09%' },
@@ -21,7 +21,7 @@ export const INVEB_FUNDAMENTALS_METRICS: InvebFundamentalMetric[] = [
   { label: 'Cash Inflow', value: '~11.5B SEK' },
 ];
 
-export const INVEB_TOP_HOLDINGS: InvebTopHolding[] = [
+const INVEB_TOP_HOLDINGS: InvebTopHolding[] = [
   { name: 'ABB', weight: '16.5%' },
   { name: 'Atlas Copco', weight: '15%' },
   { name: 'SEB', weight: '11.5%' },

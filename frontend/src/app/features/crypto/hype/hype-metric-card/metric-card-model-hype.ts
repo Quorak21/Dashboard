@@ -1,5 +1,5 @@
 // Affichage des data avec label
-export interface MetricRow {
+interface MetricRow {
     label: string;
     value: string;
     colorClass?: string;

@@ -10,8 +10,8 @@ services:
         max-file: "3"
     environment:
       - 'POSTGRES_DB=dokkcorp_db'
-      - 'POSTGRES_USER=dokkadmin'
-      - 'POSTGRES_PASSWORD=dokksecret'
+      - 'POSTGRES_USER=${POSTGRES_USER}'
+      - 'POSTGRES_PASSWORD=${POSTGRES_PASSWORD}'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     deploy:
@@ -36,8 +36,8 @@ services:
         max-file: "3"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - POSTGRES_USER=dokkadmin
-      - POSTGRES_PASSWORD=dokksecret
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - COINGECKO_API_KEY=${COINGECKO_API_KEY}
       - BLOCKCHAIN_RPC_URL=${BLOCKCHAIN_RPC_URL}
       - FMP_API_KEY=${FMP_API_KEY}

@@ -1,7 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 import { formatNumber } from '../../../../core/services/format-number';
 
-export const INVEB_DIVIDEND_HISTORY_PLACEHOLDER = [
+const INVEB_DIVIDEND_HISTORY_PLACEHOLDER = [
   { year: 2016, amount: '2.50 SEK' },
   { year: 2017, amount: '2.75 SEK' },
   { year: 2018, amount: '3.00 SEK' },

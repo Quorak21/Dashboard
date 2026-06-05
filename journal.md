@@ -2,9 +2,23 @@
 
 Historique des tâches et de la dette technique résolues sur le monorepo (Spring Boot + Angular).
 
-- **Tâches réalisée depuis l'implémentation du workflow : 52**
+- **Tâches réalisée depuis l'implémentation du workflow : 58**
 
 ---
+
+- **SEC-06** — Secret Postgres en clair dans le compose prod : `POSTGRES_USER`/`POSTGRES_PASSWORD` externalisés en `${VAR}` sur les services `postgres` et `backend` de `backend/docker-compose.yml`, ajout d'un `backend/.env.example` documenté (placeholders, sans secret), `.env` couvert par le `.gitignore` racine. Déploiement : créer `backend/.env` sur le VPS avec les vraies valeurs.
+
+- **BACK-23** — NPE latent au snapshot de minuit : `sendDailySnapshotToDb()` éclaté en `sendHypeSnapshot()`/`sendInveBSnapshot()` (indépendance par symbole), valeurs gardées en `Double` avec contrôle `null` + `logger.warn` explicite avant save — fini l'auto-unboxing qui faisait sauter le snapshot en silence sur API dégradée. Tests Maven OK (23/0).
+
+- **BACK-21** — Cache HYPE par thème : `HypeThemeCache` (7 sections), fetch providers inchangé (zéro appel API en plus), fallback cache ciblé par thème, save `AssetDaily` seulement si CoinGecko + Hyperliquid OK ; builders exposés dans `HypeMapper` ; 6 scénarios partiels dans `HypeServiceTest`.
+
+- **BACK-17** — `GenerationType.IDENTITY` : ticket archivé en dette acceptée — schéma prod + `validate`, pas de migration ; réflexe à appliquer dès le bootstrap du prochain projet.
+
+- **BACK-16** — Timestamp INVE-B dans `AssetSyncJob` : snapshot `day` aligné sur `AssetDaily.lastRefresh` (symétrie HYPE), plus `Instant.now()` au cron ; test miroir `AssetSyncJobTest`.
+
+- **BACK-22** — Propagation du symbole dans `InveBDto.error()` : `InveBService` appelle `error("INVE-B")`, factory alignée HYPE (champs financiers `null`, plus de `0.0` factice), types `Double` + test `InveBDtoTest`.
+
+- **BACK-14** — Propagation du symbole dans `HypeDto.error()` : résolu par refactor mini-DTOs (`HypeSummaryDto.error(symbol)` propage le symbole) ; état dégradé HYPE affiche `HYPE` et non `ERROR`.
 
 - **FEAT-01** — Chart Volume + Open Interest HYPE (365j) : séries `activityVolume` / `activityOpenInterest` / `activityDays` exposées via `HypeChartsDto` (snapshots filtrés) ; composant `hype-activity-chart` dual-axis (2 lignes, pleine largeur Section 5 sous donut + form) ; courbe progressive sans backfill.
 

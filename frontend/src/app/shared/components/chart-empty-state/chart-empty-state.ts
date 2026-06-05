@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-export const CHART_EMPTY_MESSAGE = 'Pas de données actuellement disponible';
+const CHART_EMPTY_MESSAGE = 'Pas de données actuellement disponible';
 
 @Component({
   selector: 'app-chart-empty-state',

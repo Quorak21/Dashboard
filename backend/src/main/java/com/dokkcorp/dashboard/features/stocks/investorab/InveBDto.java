@@ -2,20 +2,19 @@ package com.dokkcorp.dashboard.features.stocks.investorab;
 
 import java.util.List;
 
-// TODO: Refactorisé en mini-DTO pour allégé et separer les données
 public record InveBDto(
 
                 String symbol,
 
-                double currentPrice,
+                Double currentPrice,
 
-                double marketCap,
+                Double marketCap,
 
-                double priceChangePercentage24h,
+                Double priceChangePercentage24h,
 
-                double totalVolume,
+                Double totalVolume,
 
-                double lastRefresh,
+                Long lastRefresh,
 
                 List<Double> historyPrices,
 
@@ -27,9 +26,9 @@ public record InveBDto(
 
         public static InveBDto error(String symbol) {
                 return new InveBDto(
-                                "ERROR", 0.0, 0.0, 0.0, 0.0, (double) System.currentTimeMillis(),
-                                java.util.List.of(), java.util.List.of(),
-                                java.util.List.of(), java.util.List.of());
+                                symbol, null, null, null, null, null,
+                                List.of(), List.of(),
+                                List.of(), List.of());
         }
 
 }

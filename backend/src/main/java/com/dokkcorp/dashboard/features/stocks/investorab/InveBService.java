@@ -135,20 +135,13 @@ public class InveBService {
 
             this.cachedData.set(newDto);
             return newDto;
-        } catch (ArithmeticException | NumberFormatException e) {
-            logger.warn("Erreur de calcul");
-            InveBDto data = this.cachedData.get();
-            if (data != null) {
-                return data;
-            }
-            return InveBDto.error("ERROR");
         } catch (Exception e) {
             logger.error("API FMP HS", e);
             InveBDto data = this.cachedData.get();
             if (data != null) {
                 return data;
             }
-            return InveBDto.error("ERROR");
+            return InveBDto.error("INVE-B");
         }
 
     }

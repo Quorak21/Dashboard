@@ -38,24 +38,19 @@ class AssetSyncJobTest {
     private final AssetSyncJob job = new AssetSyncJob(assetSnapshotRepository, assetDailyRepository, hypeService, inveBService);
 
     @Test
-    void autoSync_callsBothProviders() {
-        job.autoSync();
-
-        verify(hypeService).getData();
-        verify(inveBService).getData();
-    }
-
-    @Test
     void sendDailySnapshotToDb_savesHypeAndInvebSnapshots() {
-        AssetDaily daily = new AssetDaily();
-        daily.setCurrentPrice(1.25d);
-        daily.setLastRefresh(Instant.ofEpochMilli(1711111111L));
-        daily.setBurnedHype("10");
-        daily.setCirculatingSupply("100");
-        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(Optional.of(daily));
+        AssetDaily hypeDaily = new AssetDaily();
+        hypeDaily.setCurrentPrice(1.25d);
+        hypeDaily.setLastRefresh(Instant.ofEpochMilli(1711111111L));
+        hypeDaily.setBurnedHype("10");
+        hypeDaily.setCirculatingSupply("100");
+        AssetDaily invebDaily = new AssetDaily();
+        invebDaily.setLastRefresh(Instant.ofEpochMilli(1712222222L));
+        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(Optional.of(hypeDaily));
+        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("INVE-B")).thenReturn(Optional.of(invebDaily));
         when(hypeService.getData()).thenReturn(buildHypeDto());
         when(inveBService.getLastInveBData()).thenReturn(new InveBDto(
-                "INVE-B", 250d, 1d, 2d, 3d, 1711112222d, List.of(), List.of(), List.of(), List.of()));
+                "INVE-B", 250d, 1d, 2d, 3d, 1711112222L, List.of(), List.of(), List.of(), List.of()));
 
         job.sendDailySnapshotToDb();
 
@@ -72,15 +67,18 @@ class AssetSyncJobTest {
 
     @Test
     void sendDailySnapshotToDb_usesDailyTimestampForHypeSnapshot() {
-        AssetDaily daily = new AssetDaily();
-        daily.setCurrentPrice(1.25d);
-        daily.setLastRefresh(Instant.ofEpochMilli(1711111111L));
-        daily.setBurnedHype("10");
-        daily.setCirculatingSupply("100");
-        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(Optional.of(daily));
+        AssetDaily hypeDaily = new AssetDaily();
+        hypeDaily.setCurrentPrice(1.25d);
+        hypeDaily.setLastRefresh(Instant.ofEpochMilli(1711111111L));
+        hypeDaily.setBurnedHype("10");
+        hypeDaily.setCirculatingSupply("100");
+        AssetDaily invebDaily = new AssetDaily();
+        invebDaily.setLastRefresh(Instant.ofEpochMilli(1712222222L));
+        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(Optional.of(hypeDaily));
+        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("INVE-B")).thenReturn(Optional.of(invebDaily));
         when(hypeService.getData()).thenReturn(buildHypeDto());
         when(inveBService.getLastInveBData()).thenReturn(new InveBDto(
-                "INVE-B", 250d, 1d, 2d, 3d, 1711112222d, List.of(), List.of(), List.of(), List.of()));
+                "INVE-B", 250d, 1d, 2d, 3d, 1711112222L, List.of(), List.of(), List.of(), List.of()));
 
         job.sendDailySnapshotToDb();
 
@@ -89,6 +87,9 @@ class AssetSyncJobTest {
         AssetSnapshot hypeSnapshot = captor.getAllValues().get(0);
         assertEquals(Instant.ofEpochMilli(1711111111L), hypeSnapshot.getDay());
         assertEquals("HYPE", hypeSnapshot.getSymbol());
+        AssetSnapshot invebSnapshot = captor.getAllValues().get(1);
+        assertEquals(Instant.ofEpochMilli(1712222222L), invebSnapshot.getDay());
+        assertEquals("INVE-B", invebSnapshot.getSymbol());
     }
 
     private HypeDto buildHypeDto() {

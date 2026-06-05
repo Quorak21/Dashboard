@@ -1,6 +1,6 @@
 # 📋 Dashboard — Backlog dette technique
 
-> **Mise à jour** : 2026-06-05 · **Tâches actives** : 5
+> **Mise à jour** : 2026-06-05 · **Tâches actives** : 1
 >
 > Tâches résolues → `journal.md`. Jamais de secrets en clair.
 
@@ -19,40 +19,19 @@
 
 ## 🟡 MOYEN
 
-### Backend
-
-- [ ] **BACK-21** — Découper le cache/récupération HYPE par thème pour isoler les pannes partielles
-  - 📁 `HypeService.java`
-  - Cache et récupération actuels sont globaux : si une source échoue, le fallback peut dégrader tout l'agrégat.
-  - → Séparer par thèmes (`summary`, `timedData`, `supply`, `blockchain`, `hlp`, `valuation`) avec cache/fallback dédiés pour ne dégrader que le secteur en erreur.
-  - Priorisation : **FRONT-12 résolu** — UI HYPE gère déjà le dégradé section par section (`null` → `-` / empty state). Prochaine étape : isoler le fallback côté back.
-
-- [ ] **BACK-14** — `HypeDto.error()` ignore le paramètre `symbol`
-  - 📁 `HypeDto.java` L95-103
-  - Le paramètre `symbol` est reçu mais `"ERROR"` est utilisé à la place.
-  - → Utiliser le paramètre dans le record.
-
-- [ ] **BACK-16** — Incohérence du timestamp dans `AssetSyncJob`
-  - 📁 `AssetSyncJob.java` L69 vs L86
-  - HYPE utilise `ad.getLastRefresh()`, INVE-B utilise `System.currentTimeMillis()`.
-  - → Harmoniser la source du timestamp.
-
-- [ ] **BACK-17** — `@GeneratedValue(strategy = AUTO)` avec Postgres
-  - 📁 `AssetDaily.java` L17, `AssetSnapshot.java` L18
-  - `AUTO` peut générer une table de séquences séparée. Moins performant.
-  - → `@GeneratedValue(strategy = GenerationType.IDENTITY)`
-
-- [ ] **BACK-22** — Corriger la propagation du symbole dans `InveBDto.error()`
-  - 📁 `InveBService.java` L87 · `InveBDto.java`
-  - `InveBService` propage `"ERROR"` comme symbole lors d'une exception dans `InveBDto.error()`.
-  - → Utiliser le bon symbole `"INVE-B"` lors de l'appel.
-  - → Aligner `InveBDto.error()` sur la convention HYPE : champs financiers en `null` (pas de `0.0` factice) pour que le front dégrade proprement.
+*(Plus de tâche moyenne active !)*
 
 ---
 
 ## 🔵 INFO
 
-*(Plus de tâche info active !)*
+### Backend
+
+- [ ] **BACK-24** — Pas de garde anti-« thundering herd » sur le cold-start du cache
+  - 📁 `HypeService.getLastHypeData()` / `InveBService.getLastInveBData()`
+  - Tant que le cache (`AtomicReference`) est vide (boot avant le 1er cron), chaque requête publique déclenche un `getData()` complet (6+ appels externes + insert DB). Plusieurs requêtes concurrentes lancent autant de `getData()` en parallèle (pas de single-flight) → appels externes redondants + lignes `AssetDaily` dupliquées.
+  - Impact réel **faible** (mono-utilisateur, fenêtre = quelques secondes au boot), d'où INFO.
+  - → Option simple : un `synchronized`/lock léger ou un flag `loading` pour mutualiser le 1er remplissage. À garder en tête, pas urgent.
 
 ---
 
@@ -60,6 +39,8 @@
 
 - **BACK-08** — Types `String` pour des valeurs numériques partout
   - *Pourquoi ?* : Trop risqué de migrer la base de données en production de VARCHAR vers DOUBLE PRECISION. On a déjà corrigé tous les DTO en `Double` (ou presque !), le reste tiendra très bien comme ça.
+- **BACK-17** — `@GeneratedValue(strategy = AUTO)` avec Postgres
+  - *Pourquoi ?* : Schéma prod déjà en place + `ddl-auto: validate` — risque de boot en échec sans gain réel sur ce volume. À faire dès le départ sur le prochain projet (`GenerationType.IDENTITY`).
 - **BACK-10** — Pas d'index DB explicites (`symbol` + `lastRefresh` / `day`)
   - *Pourquoi ?* : Peu d'actifs (2 aujourd'hui, ~10 max), tables petites (rétention 7j / 1 an) — gain perf négligeable sur ce VPS. Bon réflexe à réutiliser sur un prochain projet si volumes ou requêtes lourdes.
 - **SEC-05** — Aucune authentification sur l'API
@@ -77,5 +58,5 @@
 |----------|---------|
 | 🔴 Critique | 0 |
 | 🟠 Élevé | 0 |
-| 🟡 Moyen | 5 |
-| 🔵 Info | 0 |
+| 🟡 Moyen | 0 |
+| 🔵 Info | 1 |

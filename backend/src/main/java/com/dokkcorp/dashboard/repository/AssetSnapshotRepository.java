@@ -17,9 +17,6 @@ public interface AssetSnapshotRepository extends JpaRepository<AssetSnapshot, Lo
     // Récupérer le dernier snapshot créé
     Optional<AssetSnapshot> findFirstByOrderByDayDesc();
 
-    // Récupérer le dernier snapshot pour un symbole
-    Optional<AssetSnapshot> findFirstBySymbolOrderByDayDesc(String symbol);
-
     // Récupérer les 365 derniers snapshots pour un symbole
     List<AssetSnapshot> findTop365BySymbolOrderByDayDesc(String symbol);
 

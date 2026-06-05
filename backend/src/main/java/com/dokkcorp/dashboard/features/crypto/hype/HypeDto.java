@@ -8,7 +8,6 @@ import com.dokkcorp.dashboard.features.crypto.hype.models.HypeSupplyDto;
 import com.dokkcorp.dashboard.features.crypto.hype.models.HypeTimedDataDto;
 import com.dokkcorp.dashboard.features.crypto.hype.models.HypeValuationDto;
 
-// TODO: Refactorisé en mini-DTO pour allégé et separer les données
 public record HypeDto(
 
         HypeSummaryDto summary,
@@ -26,18 +25,4 @@ public record HypeDto(
         HypeValuationDto valuation
 
 ) {
-
-    // Pour gérer les futures erreur et éviter de tout se retaper a la main
-    public static HypeDto error(String symbol) {
-        return new HypeDto(
-
-                HypeSummaryDto.error(symbol),
-                HypeChartsDto.error(symbol),
-                HypeTimedDataDto.error(symbol),
-                HypeSupplyDto.error(symbol),
-                HypeBlockchainDto.error(symbol),
-                HypeHlpDto.error(symbol),
-                HypeValuationDto.error(symbol)
-            );
-    }
 }

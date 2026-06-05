@@ -35,33 +35,32 @@ public class HypeMapper {
         this.hypeCalculator = hypeCalculator;
     }
 
-    public HypeDto toDto(AssetDaily entity, HyperliquidDto hyperliquidData, BlockChainDto blockchainData) {
+    public List<AssetSnapshot> loadHistory() {
         List<AssetSnapshot> history = new ArrayList<>(
                 this.assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE"));
         Collections.reverse(history);
+        return history;
+    }
+
+    public List<AssetDaily> loadDaily() {
         List<AssetDaily> daily = new ArrayList<>(
                 this.assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE"));
         Collections.reverse(daily);
-
-        HypeSummaryDto summaryDto = getSummaryData(entity);
-        HypeChartsDto chartsDto = getChartsData(history, daily);
-        HypeTimedDataDto timedDataDto = getTimedData(hyperliquidData, daily, history);
-        HypeSupplyDto supplyDto = getSupplyData(hyperliquidData);
-        HypeBlockchainDto blockchainDto = getBlockchainData(hyperliquidData, blockchainData);
-        HypeHlpDto hlpDto = getHlpData(hyperliquidData);
-        HypeValuationDto valuationDto = getValuationData(hyperliquidData, entity, history);
-
-        return new HypeDto(
-                summaryDto,
-                chartsDto,
-                timedDataDto,
-                supplyDto,
-                blockchainDto,
-                hlpDto,
-                valuationDto);
+        return daily;
     }
 
-    private HypeSummaryDto getSummaryData(AssetDaily entity) {
+    public HypeDto assemble(
+            HypeSummaryDto summary,
+            HypeChartsDto charts,
+            HypeTimedDataDto timedData,
+            HypeSupplyDto supply,
+            HypeBlockchainDto blockchain,
+            HypeHlpDto hlp,
+            HypeValuationDto valuation) {
+        return new HypeDto(summary, charts, timedData, supply, blockchain, hlp, valuation);
+    }
+
+    public HypeSummaryDto buildSummary(AssetDaily entity) {
         return new HypeSummaryDto(
                 entity.getSymbol(),
                 entity.getCurrentPrice(),
@@ -71,7 +70,7 @@ public class HypeMapper {
                 entity.getLastRefresh().toEpochMilli());
     }
 
-    private HypeChartsDto getChartsData(List<AssetSnapshot> history, List<AssetDaily> daily) {
+    public HypeChartsDto buildCharts(List<AssetSnapshot> history, List<AssetDaily> daily) {
         List<Double> historicalPrice = history.stream().map(AssetSnapshot::getPrice).toList();
         List<Long> historicalDays = history.stream()
                 .map(s -> s.getDay().toEpochMilli())
@@ -101,25 +100,25 @@ public class HypeMapper {
                 activityDays);
     }
 
-    private HypeTimedDataDto getTimedData(HyperliquidDto hyperliquidData, List<AssetDaily> daily,
+    public HypeTimedDataDto buildTimedData(HyperliquidDto hyperliquidData, List<AssetDaily> daily,
             List<AssetSnapshot> history) {
         AssetDaily h24 = !daily.isEmpty() ? daily.get(0) : null;
         return this.hypeCalculator.computeTimedData(hyperliquidData, h24, history);
     }
 
-    private HypeSupplyDto getSupplyData(HyperliquidDto hyperliquidData) {
+    public HypeSupplyDto buildSupply(HyperliquidDto hyperliquidData) {
         return this.hypeCalculator.computeSupplyData(hyperliquidData);
     }
 
-    private HypeBlockchainDto getBlockchainData(HyperliquidDto hyperliquidData, BlockChainDto blockchainData) {
+    public HypeBlockchainDto buildBlockchain(HyperliquidDto hyperliquidData, BlockChainDto blockchainData) {
         return this.hypeCalculator.computeBlockchainData(blockchainData, hyperliquidData);
     }
 
-    private HypeHlpDto getHlpData(HyperliquidDto hyperliquidData) {
+    public HypeHlpDto buildHlp(HyperliquidDto hyperliquidData) {
         return this.hypeCalculator.computeHlpData(hyperliquidData);
     }
 
-    private HypeValuationDto getValuationData(HyperliquidDto hyperliquidData, AssetDaily entity,
+    public HypeValuationDto buildValuation(HyperliquidDto hyperliquidData, AssetDaily entity,
             List<AssetSnapshot> history) {
         return this.hypeCalculator.computeValuationData(hyperliquidData, entity, history);
     }

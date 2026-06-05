@@ -1,5 +1,4 @@
-import { Component, inject, computed, DestroyRef } from '@angular/core';
-import { signal } from '@angular/core';
+import { Component, inject, computed, DestroyRef, signal } from '@angular/core';
 import type { InveBDto } from '../../../core/models';
 import { DashboardApiService } from '../../../core/services/dashboard-api.service';
 import { AssetMainCard } from '../../../shared/components/asset-main-card/asset-main-card';

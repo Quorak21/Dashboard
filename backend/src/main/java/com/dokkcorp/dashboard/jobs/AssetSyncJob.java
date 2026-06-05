@@ -53,17 +53,34 @@ public class AssetSyncJob {
     // Tâche de mise en BD à la cloture des marchés
     @Scheduled(cron = "0 0 0 * * ?", zone = "UTC")
     public void sendDailySnapshotToDb() {
-        // HYPE
+        // Chaque symbole est indépendant : un HYPE dégradé ne doit pas
+        // empêcher la sauvegarde du snapshot INVE-B (et inversement).
+        sendHypeSnapshot();
+        sendInveBSnapshot();
+    }
+
+    private void sendHypeSnapshot() {
         try {
             // Récup la derniere MAJ
             AssetDaily ad = this.assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")
                     .orElseThrow(() -> new IllegalStateException("Pas d'entrée hype dans la table Daily, WTF ?"));
             HypeDto data = this.hypeService.getData();
 
-            double volume24H = data.valuation().dailyVolume();
-            double fees24H = data.valuation().feesDaily();
-            double hlpProvider = data.hlp().providerTvl();
-            double openInterest = data.valuation().openInterest();
+            // On garde les Double (nullable) : les DTO en fallback renvoient null
+            // quand une API externe est dégradée. Un auto-unboxing planterait.
+            Double volume24H = data.valuation().dailyVolume();
+            Double fees24H = data.valuation().feesDaily();
+            Double hlpProvider = data.hlp().providerTvl();
+            Double openInterest = data.valuation().openInterest();
+
+            // Données essentielles manquantes : on reporte le snapshot plutôt
+            // que de perdre silencieusement la ligne du jour sur un NPE.
+            if (volume24H == null || fees24H == null || hlpProvider == null || openInterest == null) {
+                logger.warn("Snapshot HYPE reporté : données dégradées "
+                        + "(volume24h={}, fees24h={}, hlpProvider={}, openInterest={})",
+                        volume24H, fees24H, hlpProvider, openInterest);
+                return;
+            }
             // Création de l'objet a mettre en DB
             AssetSnapshot hypeSnapshot = new AssetSnapshot();
             hypeSnapshot.setSymbol("HYPE");
@@ -79,13 +96,26 @@ public class AssetSyncJob {
         } catch (Exception e) {
             logger.error("Sauvegarde du snapshot HYPE n'a pas fonctionné", e);
         }
-        // INVE-B
+    }
+
+    private void sendInveBSnapshot() {
         try {
+            AssetDaily ad = this.assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("INVE-B")
+                    .orElseThrow(() -> new IllegalStateException("Pas d'entrée INVE-B dans la table Daily, WTF ?"));
             InveBDto inveBData = this.inveBService.getLastInveBData();
+
+            // currentPrice est nullable (DTO en fallback) : on ne sauve pas
+            // un snapshot avec un prix null.
+            Double price = inveBData.currentPrice();
+            if (price == null) {
+                logger.warn("Snapshot INVE-B reporté : données dégradées (currentPrice null)");
+                return;
+            }
+
             AssetSnapshot inveBSnapshot = new AssetSnapshot();
             inveBSnapshot.setSymbol("INVE-B");
-            inveBSnapshot.setPrice(inveBData.currentPrice()); // Prix en USD
-            inveBSnapshot.setDay(Instant.now());
+            inveBSnapshot.setPrice(price); // Prix en USD
+            inveBSnapshot.setDay(ad.getLastRefresh());
             this.assetSnapshotRepository.save(inveBSnapshot);
         } catch (Exception e) {
             logger.error("Sauvegarde du snapshot INVESTOR AB n'a pas fonctionné", e);

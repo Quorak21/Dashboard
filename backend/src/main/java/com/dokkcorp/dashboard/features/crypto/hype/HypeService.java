@@ -22,6 +22,13 @@ import com.dokkcorp.dashboard.providers.hyperliquid.HyperliquidDto;
 import com.dokkcorp.dashboard.providers.blockchain.BlockChainClient;
 import com.dokkcorp.dashboard.providers.blockchain.BlockChainDto;
 import com.dokkcorp.dashboard.features.crypto.hype.maths.HypeConstants;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeBlockchainDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeChartsDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeHlpDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeSummaryDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeSupplyDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeTimedDataDto;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeValuationDto;
 import com.dokkcorp.dashboard.model.entity.AssetDaily;
 import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
 
@@ -30,6 +37,8 @@ import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
 
 @Service
 public class HypeService {
+
+        private static final String SYMBOL = "HYPE";
 
         private final CoinGeckoClient coingeckoclient;
         private final HyperliquidClient hyperliquidClient;
@@ -40,7 +49,7 @@ public class HypeService {
 
         private static final Logger logger = LoggerFactory.getLogger(HypeService.class);
 
-        private final AtomicReference<HypeDto> cachedData = new AtomicReference<>();
+        private final HypeThemeCache themeCache = new HypeThemeCache();
 
         public HypeService(CoinGeckoClient client, HyperliquidClient hyperliquidClient,
                         BlockChainClient blockChainClient, AssetDailyRepository assetDailyRepository,
@@ -53,13 +62,10 @@ public class HypeService {
                 this.hypeMapper = hypeMapper;
         }
 
-        // On reçoit la requete, on renvoie le cacho pour eviter de nouvelle requete,
-        // s'il est vide, on en créer un
         public HypeDto getLastHypeData() {
-
-                HypeDto data = this.cachedData.get();
-                if (data != null) {
-                        return data;
+                HypeDto cached = themeCache.assemble();
+                if (cached != null) {
+                        return cached;
                 }
                 return this.getData();
         }
@@ -67,24 +73,122 @@ public class HypeService {
         public HypeDto getData() {
                 ProviderPayload providerPayload = fetchProviderPayload();
 
-                // Si l'un bug, on fait pas le calcul complet
-                // (TODO: faire partiellement pour avoir une partie des chiffre)
-                // (TODO: Time out + retry)
-                if (!providerPayload.isComplete()) {
-                        logger.error("Une ou plusieurs API HS");
-                        return getCachedOrError();
+                List<AssetSnapshot> history = this.hypeMapper.loadHistory();
+                List<AssetDaily> daily = this.hypeMapper.loadDaily();
+
+                AssetDaily entityForThemes = daily.isEmpty() ? null : daily.get(daily.size() - 1);
+                AssetDaily savedEntity = null;
+
+                if (providerPayload.hypeRaw() != null && providerPayload.hyperliquidData() != null) {
+                        try {
+                                initializeHistoryIfMissing();
+                                AssetDaily newPoint = buildDailyPoint(providerPayload.hyperliquidData(),
+                                                providerPayload.hypeRaw());
+                                savedEntity = this.assetDailyRepository.save(newPoint);
+                                entityForThemes = savedEntity;
+                                daily = this.hypeMapper.loadDaily();
+                                history = this.hypeMapper.loadHistory();
+                        } catch (Exception e) {
+                                logger.error("Erreur lors de la persistance AssetDaily : {}", e.getMessage());
+                        }
                 }
 
-                // Si tout est OK, on met a jour la DB et on recréer un nouveau cache
-                try {
-                        AssetDaily newPoint = buildDailyPoint(providerPayload.hyperliquidData(), providerPayload.hypeRaw());
-                        initializeHistoryIfMissing();
-                        return persistAndCache(newPoint, providerPayload.hyperliquidData(), providerPayload.blockchainData());
-                        // Si y'a un problème, c'est que c'est dans la mise à jour DB
-                } catch (Exception e) {
-                        logger.error("Erreur non prévue, DB ? : {}", e.getMessage());
-                        return getCachedOrError();
+                HypeSummaryDto summary = resolveSummary(savedEntity);
+                HypeChartsDto charts = resolveCharts(history, daily);
+                HypeTimedDataDto timedData = resolveTimedData(providerPayload.hyperliquidData(), daily, history);
+                HypeSupplyDto supply = resolveSupply(providerPayload.hyperliquidData());
+                HypeBlockchainDto blockchain = resolveBlockchain(providerPayload.hyperliquidData(),
+                                providerPayload.blockchainData());
+                HypeHlpDto hlp = resolveHlp(providerPayload.hyperliquidData());
+                HypeValuationDto valuation = resolveValuation(providerPayload.hyperliquidData(), entityForThemes,
+                                history);
+
+                themeCache.update(summary, charts, timedData, supply, blockchain, hlp, valuation);
+
+                return this.hypeMapper.assemble(summary, charts, timedData, supply, blockchain, hlp, valuation);
+        }
+
+        private HypeSummaryDto resolveSummary(AssetDaily savedEntity) {
+                if (savedEntity != null) {
+                        return this.hypeMapper.buildSummary(savedEntity);
                 }
+                return fallback(this.themeCache.summary, HypeSummaryDto.error(SYMBOL));
+        }
+
+        private HypeChartsDto resolveCharts(List<AssetSnapshot> history, List<AssetDaily> daily) {
+                try {
+                        return this.hypeMapper.buildCharts(history, daily);
+                } catch (Exception e) {
+                        logger.warn("Echec calcul charts : {}", e.getMessage());
+                        return fallback(this.themeCache.charts, HypeChartsDto.error(SYMBOL));
+                }
+        }
+
+        private HypeTimedDataDto resolveTimedData(HyperliquidDto hyperliquidData, List<AssetDaily> daily,
+                        List<AssetSnapshot> history) {
+                if (hyperliquidData == null) {
+                        return fallback(this.themeCache.timedData, HypeTimedDataDto.error(SYMBOL));
+                }
+                try {
+                        return this.hypeMapper.buildTimedData(hyperliquidData, daily, history);
+                } catch (Exception e) {
+                        logger.warn("Echec calcul timedData : {}", e.getMessage());
+                        return fallback(this.themeCache.timedData, HypeTimedDataDto.error(SYMBOL));
+                }
+        }
+
+        private HypeSupplyDto resolveSupply(HyperliquidDto hyperliquidData) {
+                if (hyperliquidData == null) {
+                        return fallback(this.themeCache.supply, HypeSupplyDto.error(SYMBOL));
+                }
+                try {
+                        return this.hypeMapper.buildSupply(hyperliquidData);
+                } catch (Exception e) {
+                        logger.warn("Echec calcul supply : {}", e.getMessage());
+                        return fallback(this.themeCache.supply, HypeSupplyDto.error(SYMBOL));
+                }
+        }
+
+        private HypeBlockchainDto resolveBlockchain(HyperliquidDto hyperliquidData, BlockChainDto blockchainData) {
+                if (hyperliquidData == null || blockchainData == null) {
+                        return fallback(this.themeCache.blockchain, HypeBlockchainDto.error(SYMBOL));
+                }
+                try {
+                        return this.hypeMapper.buildBlockchain(hyperliquidData, blockchainData);
+                } catch (Exception e) {
+                        logger.warn("Echec calcul blockchain : {}", e.getMessage());
+                        return fallback(this.themeCache.blockchain, HypeBlockchainDto.error(SYMBOL));
+                }
+        }
+
+        private HypeHlpDto resolveHlp(HyperliquidDto hyperliquidData) {
+                if (hyperliquidData == null) {
+                        return fallback(this.themeCache.hlp, HypeHlpDto.error(SYMBOL));
+                }
+                try {
+                        return this.hypeMapper.buildHlp(hyperliquidData);
+                } catch (Exception e) {
+                        logger.warn("Echec calcul hlp : {}", e.getMessage());
+                        return fallback(this.themeCache.hlp, HypeHlpDto.error(SYMBOL));
+                }
+        }
+
+        private HypeValuationDto resolveValuation(HyperliquidDto hyperliquidData, AssetDaily entity,
+                        List<AssetSnapshot> history) {
+                if (hyperliquidData == null || entity == null) {
+                        return fallback(this.themeCache.valuation, HypeValuationDto.error(SYMBOL));
+                }
+                try {
+                        return this.hypeMapper.buildValuation(hyperliquidData, entity, history);
+                } catch (Exception e) {
+                        logger.warn("Echec calcul valuation : {}", e.getMessage());
+                        return fallback(this.themeCache.valuation, HypeValuationDto.error(SYMBOL));
+                }
+        }
+
+        private <T> T fallback(AtomicReference<T> cache, T errorValue) {
+                T cached = cache.get();
+                return cached != null ? cached : errorValue;
         }
 
         private ProviderPayload fetchProviderPayload() {
@@ -115,7 +219,7 @@ public class HypeService {
 
         private AssetDaily buildDailyPoint(HyperliquidDto hyperliquidData, CoinGeckoDto hypeRaw) {
                 AssetDaily newPoint = new AssetDaily();
-                newPoint.setSymbol("HYPE");
+                newPoint.setSymbol(SYMBOL);
                 newPoint.setCurrentPrice(hypeRaw.currentPrice());
                 BigDecimal circulatingSupply = safeParseDecimal(hyperliquidData.circulatingSupply(),
                                 "hyperliquid.circulatingSupply");
@@ -141,30 +245,13 @@ public class HypeService {
                 }
         }
 
-        private HypeDto persistAndCache(AssetDaily newPoint, HyperliquidDto hyperliquidData, BlockChainDto blockchainData) {
-                AssetDaily savedEntity = this.assetDailyRepository.save(newPoint);
-                HypeDto newDto = this.hypeMapper.toDto(savedEntity, hyperliquidData, blockchainData);
-                this.cachedData.set(newDto);
-                return newDto;
-        }
-
-        private HypeDto getCachedOrError() {
-                HypeDto data = this.cachedData.get();
-                if (data != null) {
-                        return data;
-                }
-                return HypeDto.error("HYPE");
-        }
-
-        // Fonction si la DB pour le chart annuel est vide, on la remplit pour avoir une
-        // base
         private void initializeHistory() {
                 try {
                         CoinGeckoHistoryDto history = this.coingeckoclient.getHistory();
                         List<AssetSnapshot> snapshots = new ArrayList<>();
                         for (int n = 0; n < history.prices().size(); n++) {
                                 AssetSnapshot s = new AssetSnapshot();
-                                s.setSymbol("HYPE");
+                                s.setSymbol(SYMBOL);
                                 s.setPrice(history.prices().get(n).get(1));
                                 s.setDay(Instant.ofEpochMilli(history.prices().get(n).get(0).longValue()));
                                 snapshots.add(s);
@@ -192,10 +279,58 @@ public class HypeService {
                         HyperliquidDto hyperliquidData,
                         BlockChainDto blockchainData,
                         CoinGeckoDto hypeRaw) {
-                private boolean isComplete() {
-                        return this.hyperliquidData != null
-                                        && this.blockchainData != null
-                                        && this.hypeRaw != null;
+        }
+
+        private static final class HypeThemeCache {
+
+                private final AtomicReference<HypeSummaryDto> summary = new AtomicReference<>();
+                private final AtomicReference<HypeChartsDto> charts = new AtomicReference<>();
+                private final AtomicReference<HypeTimedDataDto> timedData = new AtomicReference<>();
+                private final AtomicReference<HypeSupplyDto> supply = new AtomicReference<>();
+                private final AtomicReference<HypeBlockchainDto> blockchain = new AtomicReference<>();
+                private final AtomicReference<HypeHlpDto> hlp = new AtomicReference<>();
+                private final AtomicReference<HypeValuationDto> valuation = new AtomicReference<>();
+
+                private void update(
+                                HypeSummaryDto summary,
+                                HypeChartsDto charts,
+                                HypeTimedDataDto timedData,
+                                HypeSupplyDto supply,
+                                HypeBlockchainDto blockchain,
+                                HypeHlpDto hlp,
+                                HypeValuationDto valuation) {
+                        this.summary.set(summary);
+                        this.charts.set(charts);
+                        this.timedData.set(timedData);
+                        this.supply.set(supply);
+                        this.blockchain.set(blockchain);
+                        this.hlp.set(hlp);
+                        this.valuation.set(valuation);
+                }
+
+                private HypeDto assemble() {
+                        HypeSummaryDto summaryValue = this.summary.get();
+                        HypeChartsDto chartsValue = this.charts.get();
+                        HypeTimedDataDto timedDataValue = this.timedData.get();
+                        HypeSupplyDto supplyValue = this.supply.get();
+                        HypeBlockchainDto blockchainValue = this.blockchain.get();
+                        HypeHlpDto hlpValue = this.hlp.get();
+                        HypeValuationDto valuationValue = this.valuation.get();
+
+                        if (summaryValue == null && chartsValue == null && timedDataValue == null
+                                        && supplyValue == null && blockchainValue == null && hlpValue == null
+                                        && valuationValue == null) {
+                                return null;
+                        }
+
+                        return new HypeDto(
+                                        summaryValue != null ? summaryValue : HypeSummaryDto.error(SYMBOL),
+                                        chartsValue != null ? chartsValue : HypeChartsDto.error(SYMBOL),
+                                        timedDataValue != null ? timedDataValue : HypeTimedDataDto.error(SYMBOL),
+                                        supplyValue != null ? supplyValue : HypeSupplyDto.error(SYMBOL),
+                                        blockchainValue != null ? blockchainValue : HypeBlockchainDto.error(SYMBOL),
+                                        hlpValue != null ? hlpValue : HypeHlpDto.error(SYMBOL),
+                                        valuationValue != null ? valuationValue : HypeValuationDto.error(SYMBOL));
                 }
         }
 
