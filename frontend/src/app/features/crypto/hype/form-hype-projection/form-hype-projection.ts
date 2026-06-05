@@ -24,9 +24,21 @@ export class FormHypeProjection {
     effect(() => {
       const apiApr = this.stakingApr();
       if (this.aprInput() === null && apiApr !== null) {
-        this.aprInput.set(apiApr);
+        this.aprInput.set(this.roundApr(apiApr));
       }
     });
+  }
+
+  setApr(value: number | null) {
+    if (value === null || Number.isNaN(value)) {
+      this.aprInput.set(null);
+      return;
+    }
+    this.aprInput.set(this.roundApr(value));
+  }
+
+  private roundApr(value: number) {
+    return Math.round(value * 100) / 100;
   }
 
   projectedPricePlaceholder = computed(() => {

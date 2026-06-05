@@ -42,6 +42,13 @@ describe('FormHypeProjection', () => {
     expect(component.projectedPricePlaceholder()).toBe('');
   });
 
+  it('rounds APR input to two decimal places', () => {
+    component.setApr(12.3456);
+
+    expect(component.aprInput()).toBe(12.35);
+    expect(component.effectiveAprPercent()).toBe(12.35);
+  });
+
   it('computes projections from manual APR when API APR is missing', () => {
     fixture.componentRef.setInput('stakingApr', null);
     component.aprInput.set(10);

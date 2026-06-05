@@ -8,6 +8,21 @@ Chart.register(...registerables);
 const VOLUME_COLOR = '#c97b3d';
 const OPEN_INTEREST_COLOR = '#5eb3f6';
 
+const legendBottomMargin = {
+  id: 'legendBottomMargin',
+  beforeInit(chart: Chart) {
+    const legend = chart.legend;
+    if (!legend) return;
+    const originalFit = legend.fit.bind(legend);
+    legend.fit = function () {
+      originalFit();
+      this.height += 24;
+    };
+  },
+};
+
+Chart.register(legendBottomMargin);
+
 @Component({
   selector: 'app-hype-activity-chart',
   imports: [ChartEmptyState],
@@ -91,7 +106,7 @@ export class HypeActivityChart {
             pointRadius: 0,
             pointHoverRadius: 5,
             pointStyle: 'circle',
-            tension: 0.45,
+            tension: 0.5,
             cubicInterpolationMode: 'monotone',
           },
           {
@@ -104,7 +119,7 @@ export class HypeActivityChart {
             pointRadius: 0,
             pointHoverRadius: 5,
             pointStyle: 'circle',
-            tension: 0.45,
+            tension: 0.5,
             cubicInterpolationMode: 'monotone',
           },
         ],
@@ -113,6 +128,9 @@ export class HypeActivityChart {
         responsive: true,
         maintainAspectRatio: false,
         interaction: { intersect: false, mode: 'index' },
+        layout: {
+          padding: { top: 4, bottom: 4 },
+        },
         plugins: {
           legend: {
             display: true,
@@ -124,7 +142,7 @@ export class HypeActivityChart {
               pointStyle: 'circle',
               boxWidth: 8,
               boxHeight: 8,
-              padding: 16,
+              padding: 20,
               font: { size: 11 },
             },
           },
@@ -134,10 +152,13 @@ export class HypeActivityChart {
             bodyColor: '#f3f4f6',
             borderColor: 'rgba(255, 255, 255, 0.12)',
             borderWidth: 1,
-            padding: 14,
+            padding: 16,
             displayColors: true,
             usePointStyle: true,
-            boxPadding: 8,
+            boxPadding: 12,
+            bodySpacing: 10,
+            titleMarginBottom: 14,
+            titleSpacing: 6,
             callbacks: {
               title: items => {
                 const date = new Date(this.labels()[items[0].dataIndex]);
