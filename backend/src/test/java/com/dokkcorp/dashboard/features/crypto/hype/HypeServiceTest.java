@@ -11,7 +11,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -38,13 +37,7 @@ class HypeServiceTest {
     private final HypeCalculator hypeCalculator = new HypeCalculator();
     private final HypeMapper hypeMapper = new HypeMapper(assetDailyRepository, assetSnapshotRepository, hypeCalculator);
 
-    private final HypeService service = new HypeService(
-            coinGeckoClient,
-            hyperliquidClient,
-            blockChainClient,
-            assetDailyRepository,
-            assetSnapshotRepository,
-            hypeMapper);
+    private final HypeService service = new HypeService(coinGeckoClient, hyperliquidClient, blockChainClient, assetDailyRepository, assetSnapshotRepository, hypeMapper);
 
     @Test
     void getLastHypeData_returnsCachedValueWithoutExternalCalls() {
@@ -149,29 +142,16 @@ class HypeServiceTest {
     private void stubHappyPathProviders() {
         when(hyperliquidClient.getHlData()).thenReturn(hyperliquidDto());
         when(blockChainClient.getBlockchainData()).thenReturn(new BlockChainDto("100", "50"));
-        when(coinGeckoClient.getData()).thenReturn(new CoinGeckoDto[] {
-                new CoinGeckoDto("hype", 2d, 0d, 3d, 4d)
-        });
+        when(coinGeckoClient.getData()).thenReturn(new CoinGeckoDto[] { new CoinGeckoDto("hype", 2d, 0d, 3d, 4d) });
     }
 
     private HyperliquidDto hyperliquidDto() {
-        return new HyperliquidDto(
-                "1000",
-                "100",
-                "0.1",
-                "200",
-                "300",
-                "0.2",
-                "2000",
-                "10",
-                "500");
+        return new HyperliquidDto("1000", "100", "0.1", "200", "300", "0.2", "2000", "10", "500");
     }
 
     private void stubEmptyDb() {
-        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE"))
-                .thenReturn(Collections.emptyList());
-        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE"))
-                .thenReturn(Collections.emptyList());
+        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(Collections.emptyList());
+        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE")).thenReturn(Collections.emptyList());
     }
 
     private void stubHistoryInitializationCheck() {

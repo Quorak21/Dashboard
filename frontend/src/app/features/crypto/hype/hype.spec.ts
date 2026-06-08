@@ -93,6 +93,84 @@ describe('Hype', () => {
     fixture.destroy();
   });
 
+  it('limits flux chart series to the last 30 days', async () => {
+    const fluxSeries = Array.from({ length: 45 }, (_, i) => i + 1);
+    const historyPrices = Array.from({ length: 46 }, (_, i) => i + 100);
+
+    getDataSpy.mockReturnValue(
+      of({
+        summary: {
+          symbol: 'HYPE',
+          currentPrice: 1.25,
+          priceChangePercentage24h: 5.42,
+          marketCap: 123,
+          totalVolume: 456,
+          lastRefresh: 111,
+        },
+        charts: {
+          historyPrices,
+          historyDays: [],
+          livePrices: [],
+          liveDays: [],
+          activityVolume: [],
+          activityOpenInterest: [],
+          activityDays: [],
+        },
+        timedData: {
+          burned24h: null,
+          volatVolume: null,
+          volatOpenInterest: null,
+          volatHlpProvider: null,
+          fluxBurned: fluxSeries,
+          fluxIssued: fluxSeries,
+          fluxNetFlow: fluxSeries,
+          fluxDays: fluxSeries,
+          burned30d: null,
+          circulating30d: null,
+          flux30d: null,
+        },
+        supply: {
+          circulatingSupply: null,
+          maxSupply: null,
+          hypeBurned100: null,
+          circulating100: null,
+        },
+        blockchain: {
+          bridgedHype: null,
+          ratioBridged: null,
+          liquidStaked: null,
+          stakedEvmCore: null,
+        },
+        hlp: { providerTvl: null, providerApr: null, ratioProvider: null },
+        valuation: {
+          fdv: null,
+          ratioMcapFdv: null,
+          ratioOImcap: null,
+          dailyVolume: null,
+          openInterest: null,
+          feesDaily: null,
+          feesAnnual: null,
+          ratioPriceFees: null,
+          stakingApr: null,
+          totalStakedHype: null,
+          ratioStaked: null,
+        },
+      } satisfies HypeDto),
+    );
+
+    const fixture = TestBed.createComponent(Hype);
+    const component = fixture.componentInstance;
+
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(component.fluxBurnedChart()).toEqual(fluxSeries.slice(-30));
+    expect(component.fluxNetFlowChart()).toEqual(fluxSeries.slice(-30));
+    expect(component.fluxDaysChart()).toEqual(fluxSeries.slice(-30));
+    expect(component.fluxHistoryPricesChart()).toEqual(historyPrices.slice(-30));
+    fixture.destroy();
+  });
+
   it('keeps safe defaults when API returns null', async () => {
     getDataSpy.mockReturnValue(of(null));
     const fixture = TestBed.createComponent(Hype);

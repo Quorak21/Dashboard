@@ -1,72 +1,97 @@
-<div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col flex-grow gap-8">
+<div
+  class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col flex-grow gap-8"
+>
+  <!-- Carte titre -->
+  <div class="flex flex-wrap gap-8 justify-center">
+    <app-asset-main-card
+      asset="hype"
+      [symbol]="symbol()"
+      [actualPrice]="currentPrice()"
+      [change24h]="priceChangePercentage24h()"
+      [volume24h]="totalVolume()"
+      [marketCap]="marketCap()"
+      [lastRefresh]="lastRefresh()"
+      tag="crypto"
+    >
+    </app-asset-main-card>
+  </div>
 
-    <!-- Carte titre -->
-    <div class="flex flex-wrap gap-8 justify-center">
-        <app-asset-main-card asset="hype" [symbol]="symbol()" [actualPrice]="currentPrice()"
-            [change24h]="priceChangePercentage24h()" [volume24h]="totalVolume()" [marketCap]="marketCap()"
-            [lastRefresh]="lastRefresh()" tag="crypto">
-        </app-asset-main-card>
+  <!-- Section 1 -->
+  <div class="flex flex-col md:flex-row gap-4 w-full">
+    <!-- Chart annuelle-->
+    <div class="flex flex-col w-full md:w-3/5">
+      <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+        Annual Performance
+      </h3>
+      <app-price-chart
+        [prices]="historyPrices()"
+        [labels]="historyDays()"
+        currency="$"
+      ></app-price-chart>
     </div>
-
-    <!-- Section 1 -->
-    <div class="flex flex-col md:flex-row gap-4 w-full">
-        <!-- Chart annuelle-->
-        <div class="flex flex-col w-full md:w-3/5">
-            <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-                Annual Performance
-            </h3>
-            <app-price-chart [prices]="historyPrices()" [labels]="historyDays()" currency="$"></app-price-chart>
-        </div>
-        <!-- 24h Chart -->
-        <div class="flex flex-col w-full md:w-2/5">
-            <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-                24h Live
-            </h3>
-            <app-daily-chart [prices]="livePrices()" [labels]="liveDays()" currency="$"></app-daily-chart>
-        </div>
+    <!-- 24h Chart -->
+    <div class="flex flex-col w-full md:w-2/5">
+      <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+        24h Live
+      </h3>
+      <app-daily-chart [prices]="livePrices()" [labels]="liveDays()" currency="$"></app-daily-chart>
     </div>
+  </div>
 
-    <!-- Section 2 -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Burn Card -->
-        <app-hype-burn-card [burned24h]="burned24h()" [hypeBurned100]="hypeBurned100()"
-            [currentPrice]="currentPrice()"></app-hype-burn-card>
+  <!-- Section 2 -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Burn Card -->
+    <app-hype-burn-card
+      [burned24h]="burned24h()"
+      [hypeBurned100]="hypeBurned100()"
+      [currentPrice]="currentPrice()"
+    ></app-hype-burn-card>
 
-        <!-- Flow Chart  -->
-        <app-hype-flux-chart class="md:col-span-2" [burned]="fluxBurned()" [issued]="fluxIssued()"
-            [netFlow]="fluxNetFlow()" [labels]="fluxDays()"
-            [historyPrices]="historyPrices().slice(-fluxBurned().length)">
-        </app-hype-flux-chart>
-    </div>
+    <!-- Flow Chart  -->
+    <app-hype-flux-chart
+      class="md:col-span-2"
+      [burned]="fluxBurnedChart()"
+      [issued]="fluxIssuedChart()"
+      [netFlow]="fluxNetFlowChart()"
+      [labels]="fluxDaysChart()"
+      [historyPrices]="fluxHistoryPricesChart()"
+    >
+    </app-hype-flux-chart>
+  </div>
 
-    <!-- Section 3, metric cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        @for (card of cards(); track card.title) {
-        <app-hype-metric-card [card]="card"></app-hype-metric-card>
-        }
-    </div>
+  <!-- Section 3, metric cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    @for (card of cards(); track card.title) {
+      <app-hype-metric-card [card]="card"></app-hype-metric-card>
+    }
+  </div>
 
-    <!-- Section 4 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Donut -->
-        <app-hype-supply-distribution [circulatingSupply]="circulatingSupply()"
-            [maxSupply]="maxSupply()"></app-hype-supply-distribution>
-        <!-- Form -->
-        <app-form-hype-projection [currentPrice]="currentPrice()"
-            [stakingApr]="stakingApr()"></app-form-hype-projection>
+  <!-- Section 4 -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Donut -->
+    <app-hype-supply-distribution
+      [circulatingSupply]="circulatingSupply()"
+      [maxSupply]="maxSupply()"
+    ></app-hype-supply-distribution>
+    <!-- Form -->
+    <app-form-hype-projection
+      [currentPrice]="currentPrice()"
+      [stakingApr]="stakingApr()"
+    ></app-form-hype-projection>
+  </div>
 
-    </div>
-
-    <!-- Section 5 — Annual Activity -->
-    <div class="flex flex-col w-full">
-        <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-            Annual Activity
-        </h3>
-        <app-hype-activity-chart [volume]="activityVolume()" [openInterest]="activityOpenInterest()"
-            [labels]="activityDays()"></app-hype-activity-chart>
-    </div>
-
+  <!-- Section 5 — Annual Activity -->
+  <div class="flex flex-col w-full">
+    <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+      Annual Activity
+    </h3>
+    <app-hype-activity-chart
+      [volume]="activityVolume()"
+      [openInterest]="activityOpenInterest()"
+      [labels]="activityDays()"
+    ></app-hype-activity-chart>
+  </div>
 </div>

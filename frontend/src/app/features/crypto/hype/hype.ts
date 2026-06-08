@@ -14,6 +14,8 @@ import { HypeSupplyDistribution } from './hype-supply-distribution/hype-supply-d
 import { FormHypeProjection } from './form-hype-projection/form-hype-projection';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+const FLUX_CHART_WINDOW = 30;
+
 function formatMetric(value: number | null, suffix = ''): string {
   return value !== null ? formatNumber(value) + suffix : '-';
 }
@@ -67,6 +69,13 @@ export class Hype {
   fluxIssued = computed(() => this.data()?.timedData.fluxIssued ?? []);
   fluxNetFlow = computed(() => this.data()?.timedData.fluxNetFlow ?? []);
   fluxDays = computed(() => this.data()?.timedData.fluxDays ?? []);
+  fluxBurnedChart = computed(() => this.fluxBurned().slice(-FLUX_CHART_WINDOW));
+  fluxIssuedChart = computed(() => this.fluxIssued().slice(-FLUX_CHART_WINDOW));
+  fluxNetFlowChart = computed(() => this.fluxNetFlow().slice(-FLUX_CHART_WINDOW));
+  fluxDaysChart = computed(() => this.fluxDays().slice(-FLUX_CHART_WINDOW));
+  fluxHistoryPricesChart = computed(() =>
+    this.historyPrices().slice(-this.fluxBurnedChart().length),
+  );
   burned30d = computed(() => this.data()?.timedData.burned30d ?? null);
   circulating30d = computed(() => this.data()?.timedData.circulating30d ?? null);
   flux30d = computed(() => this.data()?.timedData.flux30d ?? null);
@@ -188,10 +197,7 @@ export class Hype {
         },
         {
           label: 'Current APR',
-          value:
-            this.providerApr() !== null
-              ? formatMetric(this.providerApr()! * 100, '%')
-              : '-',
+          value: this.providerApr() !== null ? formatMetric(this.providerApr()! * 100, '%') : '-',
           colorClass:
             this.providerApr() !== null && this.providerApr()! >= 0
               ? 'text-green-400'
