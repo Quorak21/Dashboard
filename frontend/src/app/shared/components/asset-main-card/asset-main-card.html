@@ -18,7 +18,7 @@
                     class="absolute inset-0 rounded-full bg-copper-500/15 blur-md group-hover:bg-copper-400/30 transition-all duration-500">
                 </div>
                 <!-- Lien dynamique vers le logo de l'asset -->
-                <img [src]="'/assets/logos/' + asset() + '.png'" alt="Logo de {{asset()}}"
+                <img [src]="'/assets/logos/' + (assetId() || asset() || '') + '.png'" alt="Logo de {{asset()}}"
                     class="relative z-10 w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(255,255,255,0.15)]">
             </div>
 

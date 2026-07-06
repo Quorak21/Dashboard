@@ -16,6 +16,7 @@ export class AssetMainCard {
   readonly Clock = Clock;
 
   asset = input<string>();
+  assetId = input<string>("");
   symbol = input<string>("");
   tag = input<string>("");
   change24h = input<number | null>(null);
