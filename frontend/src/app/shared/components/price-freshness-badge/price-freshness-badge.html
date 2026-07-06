@@ -1,0 +1,11 @@
+<div class="flex items-center gap-3">
+  <div [class]="'flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ' + freshness().badgeClass">
+    <span [class]="'w-2 h-2 rounded-sm ' + freshness().bulletClass"></span>
+    <span>{{ freshness().label }}</span>
+  </div>
+  @if (lastRefresh()) {
+    <span class="text-xs text-copper-300/40 font-semibold tracking-wider uppercase">
+      Mis à jour à {{ formattedTime() }}
+    </span>
+  }
+</div>

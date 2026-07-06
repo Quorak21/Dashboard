@@ -4,8 +4,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import com.dokkcorp.dashboard.features.crypto.hype.HypeService;
 import com.dokkcorp.dashboard.features.crypto.hype.HypeDto;
-import com.dokkcorp.dashboard.features.stocks.investorab.InveBService;
-import com.dokkcorp.dashboard.features.stocks.investorab.InveBDto;
+import com.dokkcorp.dashboard.features.assets.AssetRegistry;
+import com.dokkcorp.dashboard.features.assets.ConfigurableAssetService;
+import com.dokkcorp.dashboard.features.assets.MarketHoursGuard;
+import com.dokkcorp.dashboard.features.assets.ProviderCallMetrics;
+import com.dokkcorp.dashboard.features.assets.model.AssetDefinition;
+import com.dokkcorp.dashboard.features.assets.model.AssetProvider;
+import java.util.List;
+import java.util.Optional;
 
 import com.dokkcorp.dashboard.model.entity.AssetDaily;
 import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
@@ -32,14 +38,24 @@ public class AssetSyncJob {
 
     private final HypeService hypeService;
 
-    private final InveBService inveBService;
+    private final ConfigurableAssetService configurableAssetService;
+
+    private final AssetRegistry assetRegistry;
+
+    private final MarketHoursGuard marketHoursGuard;
+
+    private final ProviderCallMetrics providerCallMetrics;
 
     public AssetSyncJob(AssetSnapshotRepository assetSnapshotRepository, AssetDailyRepository assetDailyRepository,
-            HypeService hypeService, InveBService inveBService) {
+            HypeService hypeService, ConfigurableAssetService configurableAssetService, AssetRegistry assetRegistry,
+            MarketHoursGuard marketHoursGuard, ProviderCallMetrics providerCallMetrics) {
         this.assetSnapshotRepository = assetSnapshotRepository;
         this.assetDailyRepository = assetDailyRepository;
         this.hypeService = hypeService;
-        this.inveBService = inveBService;
+        this.configurableAssetService = configurableAssetService;
+        this.assetRegistry = assetRegistry;
+        this.marketHoursGuard = marketHoursGuard;
+        this.providerCallMetrics = providerCallMetrics;
     }
 
     // toutes les 10 minutes sur des chiffres ronds (00, 10, 20...)
@@ -47,16 +63,82 @@ public class AssetSyncJob {
     @Scheduled(cron = "0 0/10 * * * ?")
     public void autoSync() {
         this.hypeService.getData();
-        this.inveBService.getData();
+    }
+
+    @Scheduled(cron = "0 0/15 * * * ?")
+    public void syncFmpAssets() {
+        List<AssetDefinition> fmpAssets = this.assetRegistry.byProvider(AssetProvider.FMP);
+        if (fmpAssets != null) {
+            for (AssetDefinition asset : fmpAssets) {
+                if (asset == null) {
+                    continue;
+                }
+                try {
+                    if (this.marketHoursGuard.isOpen(asset)) {
+                        this.configurableAssetService.syncPrice(asset.id());
+                    }
+                } catch (Exception e) {
+                    logger.error("Erreur lors de la synchronisation de l'actif FMP : {}", asset.id(), e);
+                }
+            }
+        }
+        this.providerCallMetrics.logMetrics();
     }
 
     // Tâche de mise en BD à la cloture des marchés
     @Scheduled(cron = "0 0 0 * * ?", zone = "UTC")
     public void sendDailySnapshotToDb() {
         // Chaque symbole est indépendant : un HYPE dégradé ne doit pas
-        // empêcher la sauvegarde du snapshot INVE-B (et inversement).
+        // empêcher la sauvegarde des snapshots du registre (et inversement).
         sendHypeSnapshot();
-        sendInveBSnapshot();
+        sendRegistrySnapshots();
+    }
+
+    private void sendRegistrySnapshots() {
+        List<AssetDefinition> assets = this.assetRegistry.all();
+        if (assets == null) {
+            return;
+        }
+        for (AssetDefinition asset : assets) {
+            if (asset == null) {
+                continue;
+            }
+            try {
+                saveRegistrySnapshot(asset);
+            } catch (Exception e) {
+                logger.error("Sauvegarde du snapshot {} ({}) n'a pas fonctionné",
+                        asset.dbSymbol(), asset.id(), e);
+            }
+        }
+    }
+
+    private void saveRegistrySnapshot(AssetDefinition asset) {
+        Optional<AssetDaily> latest = this.assetDailyRepository
+                .findFirstBySymbolOrderByLastRefreshDesc(asset.dbSymbol());
+        if (latest.isEmpty()) {
+            logger.warn("Snapshot {} reporté : aucun point AssetDaily", asset.dbSymbol());
+            return;
+        }
+        AssetDaily ad = latest.get();
+        if (ad.getLastRefresh() == null) {
+            logger.warn("Snapshot {} reporté : timestamp de dernière mise à jour manquant", asset.dbSymbol());
+            return;
+        }
+        Double price = ad.getCurrentPrice();
+        if (price == null) {
+            logger.warn("Snapshot {} reporté : données dégradées (currentPrice null)", asset.dbSymbol());
+            return;
+        }
+        boolean exists = this.assetSnapshotRepository.existsBySymbolAndDay(asset.dbSymbol(), ad.getLastRefresh());
+        if (exists) {
+            logger.info("Snapshot {} pour la date {} déjà existant, skip", asset.dbSymbol(), ad.getLastRefresh());
+            return;
+        }
+        AssetSnapshot snapshot = new AssetSnapshot();
+        snapshot.setSymbol(asset.dbSymbol());
+        snapshot.setPrice(price);
+        snapshot.setDay(ad.getLastRefresh());
+        this.assetSnapshotRepository.save(snapshot);
     }
 
     private void sendHypeSnapshot() {
@@ -95,30 +177,6 @@ public class AssetSyncJob {
             this.assetSnapshotRepository.save(hypeSnapshot);
         } catch (Exception e) {
             logger.error("Sauvegarde du snapshot HYPE n'a pas fonctionné", e);
-        }
-    }
-
-    private void sendInveBSnapshot() {
-        try {
-            AssetDaily ad = this.assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("INVE-B")
-                    .orElseThrow(() -> new IllegalStateException("Pas d'entrée INVE-B dans la table Daily, WTF ?"));
-            InveBDto inveBData = this.inveBService.getLastInveBData();
-
-            // currentPrice est nullable (DTO en fallback) : on ne sauve pas
-            // un snapshot avec un prix null.
-            Double price = inveBData.currentPrice();
-            if (price == null) {
-                logger.warn("Snapshot INVE-B reporté : données dégradées (currentPrice null)");
-                return;
-            }
-
-            AssetSnapshot inveBSnapshot = new AssetSnapshot();
-            inveBSnapshot.setSymbol("INVE-B");
-            inveBSnapshot.setPrice(price); // Prix en USD
-            inveBSnapshot.setDay(ad.getLastRefresh());
-            this.assetSnapshotRepository.save(inveBSnapshot);
-        } catch (Exception e) {
-            logger.error("Sauvegarde du snapshot INVESTOR AB n'a pas fonctionné", e);
         }
     }
 

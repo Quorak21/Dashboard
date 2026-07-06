@@ -1,0 +1,19 @@
+asset-id: brwm
+updated-at: 2025-02-28
+source: "BlackRock World Mining Trust Annual Report 2024"
+metrics:
+  nav-discount-premium: "-13.5%"
+  total-assets: "£1.4bn"
+  management-fee: "0.70%"
+top-holdings:
+  - { name: "Glencore", weight-percent: 17.2 }
+  - { name: "BHP Group", weight-percent: 15.8 }
+  - { name: "Rio Tinto", weight-percent: 12.4 }
+  - { name: "Vale", weight-percent: 8.9 }
+  - { name: "Freeport-McMoRan", weight-percent: 7.1 }
+sector-weights:
+  - { sector: "Diversified Metals & Mining", weight-percent: 48.3 }
+  - { sector: "Copper", weight-percent: 22.1 }
+  - { sector: "Gold", weight-percent: 15.4 }
+  - { sector: "Iron Ore", weight-percent: 8.7 }
+  - { sector: "Other", weight-percent: 5.5 }

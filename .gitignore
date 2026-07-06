@@ -40,3 +40,7 @@ build/
 # Repomix outputs
 repomix-output.xml
 repomix-output.*
+
+# BMAD Method — config personnelle (non versionnée)
+_bmad/config.user.toml
+_bmad/custom/*.user.toml

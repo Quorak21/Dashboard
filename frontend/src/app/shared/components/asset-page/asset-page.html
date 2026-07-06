@@ -1,0 +1,92 @@
+<div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col flex-grow gap-8">
+  @if (loading()) {
+    <div class="flex items-center justify-center py-20">
+      <span class="text-copper-400 text-lg font-medium animate-pulse">Chargement des données...</span>
+    </div>
+  } @else if (!data()) {
+    <div class="flex items-center justify-center py-20">
+      <span class="text-red-400 text-lg font-medium">Impossible de charger les données de l'actif.</span>
+    </div>
+  } @else {
+    <!-- Price freshness badge + main card -->
+    <div class="flex flex-col gap-4">
+      <div class="flex justify-start">
+        <app-price-freshness-badge
+          [marketStatus]="marketStatus()"
+          [priceSource]="priceSource()"
+          [lastRefresh]="lastRefresh()"
+        ></app-price-freshness-badge>
+      </div>
+
+      <div class="flex flex-wrap gap-8 justify-center">
+        <app-asset-main-card
+          [asset]="assetName()"
+          [symbol]="symbol()"
+          [actualPrice]="currentPrice()"
+          [change24h]="priceChangePercentage24h()"
+          [volume24h]="totalVolume()"
+          [marketCap]="marketCap()"
+          [lastRefresh]="lastRefresh()"
+          [currencySymbol]="currency()"
+          [tag]="isEtf() ? 'etf' : 'stock'"
+          [marketClosed]="isMarketClosed()"
+        ></app-asset-main-card>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 w-full">
+      <!-- Chart annuelle -->
+      <div class="flex flex-col lg:col-span-3">
+        <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-sm bg-copper-500 animate-pulse"></span>
+          Annual Performance
+        </h3>
+        <app-price-chart
+          [prices]="historyPrices()"
+          [labels]="historyDays()"
+          [currency]="currency()"
+        ></app-price-chart>
+      </div>
+      <!-- Daily Chart -->
+      <div class="flex flex-col lg:col-span-2">
+        <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-sm bg-copper-500 animate-pulse"></span>
+          Daily Live
+        </h3>
+        <app-daily-chart
+          [prices]="livePrices()"
+          [labels]="liveDays()"
+          [currency]="currency()"
+        ></app-daily-chart>
+      </div>
+    </div>
+
+    <!-- Dividend & Fundamentals -->
+    @if (dividends() || fundamentals()) {
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full items-stretch">
+        @if (dividends()) {
+          <app-dividend-card
+            [class.md:col-span-2]="isEtf()"
+            [dividends]="dividends()"
+            [currency]="currency()"
+          ></app-dividend-card>
+        }
+        @if (fundamentals()) {
+          @if (isEtf()) {
+            <app-etf-metrics-card
+              [fundamentals]="fundamentals()"
+            ></app-etf-metrics-card>
+            <app-etf-sector-chart
+              [sectorWeights]="sectorWeights()"
+            ></app-etf-sector-chart>
+          } @else {
+            <app-fundamentals-card
+              [fundamentals]="fundamentals()"
+            ></app-fundamentals-card>
+          }
+        }
+      </div>
+    }
+  }
+</div>

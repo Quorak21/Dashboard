@@ -1,0 +1,22 @@
+asset-id: inveb
+updated-at: "2026-04-15"
+source: "Source: Q1 2026 report"
+metrics:
+  trailing-pe: 6.11
+  debt-leverage: "1.2%"
+  management-cost: "0.09%"
+  five-y-nav-cagr: "14.5%"
+  five-y-total-return: "112%"
+  dry-powder: "~18.2B SEK"
+  cash-inflow: "~11.5B SEK"
+top-holdings:
+  - { name: "ABB", weight-percent: 16.5 }
+  - { name: "Atlas Copco", weight-percent: 15.0 }
+  - { name: "SEB", weight-percent: 11.5 }
+  - { name: "AstraZeneca", weight-percent: 8.0 }
+  - { name: "Mölnlycke", weight-percent: 7.5 }
+  - { name: "Epiroc", weight-percent: 5.5 }
+  - { name: "EQT AB", weight-percent: 5.0 }
+  - { name: "Ericsson", weight-percent: 4.0 }
+  - { name: "Nasdaq", weight-percent: 3.5 }
+  - { name: "Saab", weight-percent: 3.0 }

@@ -1,0 +1,10 @@
+[
+  {
+    "symbol": "INVE-B",
+    "price": 245.5,
+    "marketCap": 1000000000,
+    "changePercentage": -1.25,
+    "volume": 123456,
+    "currency": "SEK"
+  }
+]

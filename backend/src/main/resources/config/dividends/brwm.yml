@@ -1,0 +1,8 @@
+asset-id: brwm
+forward-dividend: 0.185
+forward-dividend-currency: GBP
+frequency: semi-annual
+history:
+  - { year: 2024, amount: 0.185, currency: GBP }
+  - { year: 2023, amount: 0.130, currency: GBP }
+  - { year: 2022, amount: 0.380, currency: GBP }

@@ -10,9 +10,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/crypto/hype/hype').then(m => m.Hype)
     },
     {
-        path: 'inveb',
-        loadComponent: () => import('./features/stocks/inveb/inveb').then(m => m.Inveb)
+        path: 'asset/:assetId',
+        loadComponent: () => import('./shared/components/asset-page/asset-page').then(m => m.AssetPage)
     },
+
     // La route pour la 404, retour au dashboard
     {
         path: '**',

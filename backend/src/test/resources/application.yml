@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:classpath:config/assets-registry.yml
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
@@ -31,3 +33,5 @@ app:
     base-url: "https://financialmodelingprep.com/stable"
   cors:
     allowed-origins: "http://localhost:4200"
+  alerts:
+    fmp-calls-warn-threshold: 200

@@ -14,6 +14,8 @@ public record FMPDto(
 
         @JsonAlias("changePercentage") double priceChangePercentage24h,
 
-        @JsonAlias("volume") double totalVolume) {
+        @JsonAlias("volume") double totalVolume,
+
+        String currency) {
 
 }

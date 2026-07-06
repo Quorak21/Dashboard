@@ -20,5 +20,7 @@ public interface AssetSnapshotRepository extends JpaRepository<AssetSnapshot, Lo
     // Récupérer les 365 derniers snapshots pour un symbole
     List<AssetSnapshot> findTop365BySymbolOrderByDayDesc(String symbol);
 
+    boolean existsBySymbolAndDay(String symbol, Instant day);
+
     void deleteByDayBefore(Instant timestamp);
 }

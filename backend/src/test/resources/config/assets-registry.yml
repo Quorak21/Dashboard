@@ -1,0 +1,45 @@
+app:
+  assets-registry:
+    entries:
+      - id: inveb
+        display-name: Investor AB
+        provider: fmp
+        symbol: INVE-B.ST
+        db-symbol: INVE-B
+        type: STOCK
+        currency: SEK
+        market-hours:
+          zone: Europe/Stockholm
+          open: "09:00"
+          close: "17:35"
+        sync:
+          interval-minutes: 15
+          offset-minutes: 0
+      - id: brwm
+        display-name: BlackRock World Mining
+        provider: fmp
+        symbol: BRWM.L
+        db-symbol: BRWM
+        type: TRUST
+        currency: GBP
+        market-hours:
+          zone: Europe/London
+          open: "08:00"
+          close: "16:35"
+        sync:
+          interval-minutes: 15
+          offset-minutes: 3
+      - id: o
+        display-name: Realty Income
+        provider: fmp
+        symbol: O
+        db-symbol: O
+        type: REIT
+        currency: USD
+        market-hours:
+          zone: America/New_York
+          open: "09:30"
+          close: "16:00"
+        sync:
+          interval-minutes: 15
+          offset-minutes: 0

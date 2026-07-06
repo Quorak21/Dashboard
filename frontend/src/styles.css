@@ -14,3 +14,26 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+/* Scrollbar personnalisé Copper */
+.custom-scroll-copper {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(184, 115, 51, 0.35) transparent;
+}
+
+.custom-scroll-copper::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scroll-copper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scroll-copper::-webkit-scrollbar-thumb {
+  background-color: rgba(184, 115, 51, 0.35);
+  border-radius: 9999px;
+}
+
+.custom-scroll-copper::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(184, 115, 51, 0.55);
+}

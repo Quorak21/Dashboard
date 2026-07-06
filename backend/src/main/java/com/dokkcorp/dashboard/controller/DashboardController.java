@@ -1,15 +1,19 @@
 package com.dokkcorp.dashboard.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dokkcorp.dashboard.features.crypto.hype.HypeDto;
 import com.dokkcorp.dashboard.features.crypto.hype.HypeService;
-
-import com.dokkcorp.dashboard.features.stocks.investorab.InveBDto;
-import com.dokkcorp.dashboard.features.stocks.investorab.InveBService;
+import com.dokkcorp.dashboard.features.assets.ConfigurableAssetService;
+import com.dokkcorp.dashboard.features.assets.alerts.QuarterlyReportAlertService;
+import com.dokkcorp.dashboard.features.assets.alerts.QuarterlyAlertsResponse;
+import com.dokkcorp.dashboard.features.assets.model.AssetDto;
 
 @RestController
 @CrossOrigin(origins = "${app.cors.allowed-origins}")
@@ -17,12 +21,16 @@ import com.dokkcorp.dashboard.features.stocks.investorab.InveBService;
 public class DashboardController {
 
     private final HypeService hypeService;
+    private final ConfigurableAssetService configurableAssetService;
+    private final QuarterlyReportAlertService quarterlyReportAlertService;
 
-    private final InveBService inveBService;
-
-    public DashboardController(HypeService hypeService, InveBService inveBService) {
+    public DashboardController(
+            HypeService hypeService,
+            ConfigurableAssetService configurableAssetService,
+            QuarterlyReportAlertService quarterlyReportAlertService) {
         this.hypeService = hypeService;
-        this.inveBService = inveBService;
+        this.configurableAssetService = configurableAssetService;
+        this.quarterlyReportAlertService = quarterlyReportAlertService;
     }
 
     @GetMapping("/hype")
@@ -30,9 +38,14 @@ public class DashboardController {
         return this.hypeService.getLastHypeData();
     }
 
-    @GetMapping("/inveb")
-    public InveBDto getLastInveBData() {
-        return this.inveBService.getLastInveBData();
+    @GetMapping("/asset/{assetId}")
+    public AssetDto getAssetData(@PathVariable String assetId) {
+        return this.configurableAssetService.getData(assetId);
+    }
+
+    @GetMapping("/alerts/quarterly")
+    public QuarterlyAlertsResponse getQuarterlyAlerts() {
+        return new QuarterlyAlertsResponse(List.copyOf(this.quarterlyReportAlertService.getStaleAssets()));
     }
 
 }

@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  config:
+    import: optional:classpath:config/assets-registry.yml
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
 
@@ -40,3 +42,5 @@ app:
     base-url: "https://financialmodelingprep.com/stable"
   cors:
     allowed-origins: "${CORS_ORIGINS:http://localhost:4200,https://dashboard-six-pink-56.vercel.app,https://dashboard.dokkcorp.ch}"
+  alerts:
+    fundamentals-stale-days: 90

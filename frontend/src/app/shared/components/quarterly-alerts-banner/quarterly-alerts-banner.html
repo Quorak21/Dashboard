@@ -1,0 +1,20 @@
+@if (alerts().length > 0) {
+  <div class="bg-copper-700/10 border-b border-copper-500/20 py-2.5 px-4 text-center">
+    <div class="max-w-7xl mx-auto flex items-center justify-center gap-2 text-xs sm:text-sm font-medium text-copper-300">
+      <lucide-icon [img]="AlertCircle" class="w-4 h-4 text-copper-400 shrink-0" aria-hidden="true"></lucide-icon>
+      <span class="font-bold">Fondamentaux à vérifier :</span>
+      <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+        @for (alert of alerts(); track alert.assetId; let last = $last) {
+          @if (alert.assetId) {
+            <a [routerLink]="['/', alert.assetId]" class="hover:text-white underline decoration-dotted transition-colors">
+              {{ alert.displayName }}
+            </a>
+            @if (!last) {
+              <span class="text-copper-600/40">•</span>
+            }
+          }
+        }
+      </div>
+    </div>
+  </div>
+}

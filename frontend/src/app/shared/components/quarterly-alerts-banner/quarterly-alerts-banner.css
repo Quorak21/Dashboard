@@ -1,0 +1,5 @@
+/* Quarterly Alerts Banner styling */
+:host {
+  display: block;
+  width: 100%;
+}
