@@ -148,4 +148,39 @@ describe('DashboardApiService', () => {
       expect(emitted).toBe(true);
     });
   });
+
+  describe('getRegisteredAssets', () => {
+    const mockAssets = [
+      { id: 'inveb', displayName: 'Investor AB', type: 'STOCK', currency: 'SEK' }
+    ];
+
+    it('should retrieve registered assets successfully', () => {
+      let emitted = false;
+      service.getRegisteredAssets().subscribe((data) => {
+        expect(data).toEqual(mockAssets);
+        emitted = true;
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/api/dashboard/assets`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockAssets);
+      expect(emitted).toBe(true);
+    });
+
+    it('should return null and show error toast on failure', () => {
+      let emitted = false;
+      service.getRegisteredAssets().subscribe((data) => {
+        expect(data).toBeNull();
+        expect(toastServiceSpy.showError).toHaveBeenCalledWith(
+          'Erreur de connexion avec le serveur, veuillez réessayer plus tard'
+        );
+        emitted = true;
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/api/dashboard/assets`);
+      expect(req.request.method).toBe('GET');
+      req.flush('Error', { status: 500, statusText: 'Server Error' });
+      expect(emitted).toBe(true);
+    });
+  });
 });

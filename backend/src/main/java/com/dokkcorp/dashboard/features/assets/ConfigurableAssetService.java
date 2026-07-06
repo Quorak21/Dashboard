@@ -43,6 +43,7 @@ import com.dokkcorp.dashboard.features.assets.model.DividendHistoryEntry;
 import com.dokkcorp.dashboard.features.assets.model.FundamentalsBlock;
 import com.dokkcorp.dashboard.features.assets.model.HoldingEntry;
 import com.dokkcorp.dashboard.features.assets.model.SectorWeight;
+import com.dokkcorp.dashboard.features.assets.model.RegisteredAssetDto;
 
 @Service
 public class ConfigurableAssetService {
@@ -115,7 +116,11 @@ public class ConfigurableAssetService {
         refreshHistory(asset);
         AssetDto cached = cacheFor(assetId).get();
         if (cached == null) {
-            return AssetDto.error(assetId, asset.dbSymbol());
+            return assembleDto(
+                    asset,
+                    AssetDto.error(assetId, asset.dbSymbol(), asset.displayName(), asset.type()),
+                    null,
+                    marketHoursGuard.status(asset));
         }
         return assembleDto(asset, cached, cached.priceSource(), marketHoursGuard.status(asset));
     }
@@ -201,7 +206,11 @@ public class ConfigurableAssetService {
             cacheFor(assetId).set(cached);
             return cached;
         }
-        return AssetDto.error(assetId, asset.dbSymbol());
+        return assembleDto(
+                asset,
+                AssetDto.error(assetId, asset.dbSymbol(), asset.displayName(), asset.type()),
+                PriceSource.CACHE,
+                marketHoursGuard.status(asset));
     }
 
     private long computeStaleAgeMinutes(AssetDto cached) {
@@ -382,6 +391,12 @@ public class ConfigurableAssetService {
                 .map(entry -> new SectorWeight(entry.getSector(), entry.getWeightPercent()))
                 .collect(Collectors.toList());
 
+        List<SectorWeight> retailIndustriesList = config.getRetailIndustryWeights() == null ? List.of()
+                : config.getRetailIndustryWeights().stream()
+                        .filter(entry -> entry != null && entry.getSector() != null && entry.getWeightPercent() != null)
+                        .map(entry -> new SectorWeight(entry.getSector(), entry.getWeightPercent()))
+                        .collect(Collectors.toList());
+
         boolean stale = quarterlyReportAlertService.isStale(config.getUpdatedAt());
         return new FundamentalsBlock(
                 config.getUpdatedAt(),
@@ -389,7 +404,8 @@ public class ConfigurableAssetService {
                 stale,
                 config.getMetrics() != null ? Map.copyOf(config.getMetrics()) : Map.of(),
                 List.copyOf(holdingsList),
-                List.copyOf(sectorsList)
+                List.copyOf(sectorsList),
+                List.copyOf(retailIndustriesList)
         );
     }
 
@@ -436,5 +452,16 @@ public class ConfigurableAssetService {
     }
 
     private record LiveSeries(List<Double> prices, List<Long> days) {
+    }
+
+    public List<RegisteredAssetDto> getRegisteredAssets() {
+        return this.assetRegistry.all().stream()
+                .map(def -> new RegisteredAssetDto(
+                        def.id(),
+                        def.displayName(),
+                        def.type() != null ? def.type().name() : null,
+                        def.currency()
+                ))
+                .toList();
     }
 }

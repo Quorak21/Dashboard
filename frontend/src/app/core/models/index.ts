@@ -10,5 +10,6 @@ export type {
   FundamentalsBlock,
   AssetDto,
   StaleAssetAlert,
-  QuarterlyAlertsResponse
+  QuarterlyAlertsResponse,
+  RegisteredAssetDto
 } from './asset.dto';

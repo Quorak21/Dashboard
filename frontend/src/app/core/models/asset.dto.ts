@@ -34,6 +34,7 @@ export interface FundamentalsBlock {
   metrics: Record<string, unknown>;
   topHoldings?: HoldingEntry[];
   sectorWeights?: SectorWeight[];
+  retailIndustryWeights?: SectorWeight[];
 }
 
 export interface AssetDto {
@@ -68,4 +69,11 @@ export interface StaleAssetAlert {
 
 export interface QuarterlyAlertsResponse {
   alerts: StaleAssetAlert[];
+}
+
+export interface RegisteredAssetDto {
+  id: string;
+  displayName: string;
+  type: string;
+  currency: string;
 }

@@ -54,11 +54,20 @@ describe('Mon Premier Test Dashboard', () => {
     return of(null);
   });
 
-  const fauxServiceApi = { getData, getAsset };
+  const mockRegisteredAssets = [
+    { id: 'inveb', displayName: 'Investor AB', type: 'STOCK', currency: 'SEK' },
+    { id: 'brwm', displayName: 'World Mining', type: 'TRUST', currency: 'GBP' },
+    { id: 'o', displayName: 'Realty', type: 'REIT', currency: 'USD' }
+  ];
+
+  const getRegisteredAssets = vi.fn(() => of(mockRegisteredAssets));
+
+  const fauxServiceApi = { getData, getAsset, getRegisteredAssets };
 
   beforeEach(() => {
     getData.mockClear();
     getAsset.mockClear();
+    getRegisteredAssets.mockClear();
   });
 
   it('devrait bien recevoir et stocker les prix de Hype, Inveb, Brwm et O', () => {
@@ -93,6 +102,7 @@ describe('Mon Premier Test Dashboard', () => {
 
     expect(getData).toHaveBeenCalledWith('hype');
     expect(getData).toHaveBeenCalledTimes(1);
+    expect(getRegisteredAssets).toHaveBeenCalledTimes(1);
     expect(getAsset).toHaveBeenCalledWith('inveb');
     expect(getAsset).toHaveBeenCalledWith('brwm');
     expect(getAsset).toHaveBeenCalledWith('o');

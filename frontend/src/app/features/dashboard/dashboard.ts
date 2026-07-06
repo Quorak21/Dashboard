@@ -1,6 +1,7 @@
 import { Component, inject, computed, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subscription } from 'rxjs';
-import type { HypeDto, AssetDto } from '../../core/models';
+import type { HypeDto, AssetDto, RegisteredAssetDto } from '../../core/models';
 import { AssetDashboardCard } from '../../shared/components/asset-dashboard-card/asset-dashboard-card';
 import { DashboardApiService } from '../../core/services/dashboard-api.service';
 import { LucideAngularModule, Zap, TrendingUp, Boxes } from 'lucide-angular';
@@ -19,8 +20,7 @@ export class Dashboard {
   private api = inject(DashboardApiService);
   private destroyRef = inject(DestroyRef);
 
-  private readonly assetIds = ['inveb', 'brwm', 'o'];
-
+  registeredAssets = signal<RegisteredAssetDto[]>([]);
   private hypeData = signal<HypeDto | null>(null);
   
   // Dynamic assets map
@@ -33,12 +33,24 @@ export class Dashboard {
   hypeChange = computed(() => this.hypeData()?.summary?.priceChangePercentage24h ?? null);
 
   constructor() {
-    this.refresh();
+    this.loadRegisteredAssets();
     const intervalID = setInterval(() => this.refresh(), 180000);
     this.destroyRef.onDestroy(() => {
       clearInterval(intervalID);
       this.hypeSub?.unsubscribe();
       this.subs.forEach(sub => sub.unsubscribe());
+    });
+  }
+
+  loadRegisteredAssets() {
+    this.api
+      .getRegisteredAssets()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((assets) => {
+        if (assets) {
+          this.registeredAssets.set(assets);
+          this.refresh();
+        }
     });
   }
 
@@ -51,15 +63,25 @@ export class Dashboard {
         error: () => this.hypeData.set(null),
       });
 
-    for (const id of this.assetIds) {
-      this.subs.get(id)?.unsubscribe();
+    const currentAssets = this.registeredAssets();
+    for (const asset of currentAssets) {
+      this.subs.get(asset.id)?.unsubscribe();
       const sub = this.api
-        .getAsset(id)
+        .getAsset(asset.id)
         .subscribe({
-          next: (data) => this.assets.update(map => ({ ...map, [id]: data })),
-          error: () => this.assets.update(map => ({ ...map, [id]: null })),
+          next: (data) => this.assets.update(map => ({ ...map, [asset.id]: data })),
+          error: () => this.assets.update(map => ({ ...map, [asset.id]: null })),
         });
-      this.subs.set(id, sub);
+      this.subs.set(asset.id, sub);
+    }
+  }
+
+  getCurrencySymbol(currency: string): string {
+    switch (currency) {
+      case 'SEK': return 'SEK';
+      case 'GBP': return '£';
+      case 'USD': return '$';
+      default: return currency;
     }
   }
 }

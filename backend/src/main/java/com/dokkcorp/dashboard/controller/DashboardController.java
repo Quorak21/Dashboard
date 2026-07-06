@@ -14,6 +14,7 @@ import com.dokkcorp.dashboard.features.assets.ConfigurableAssetService;
 import com.dokkcorp.dashboard.features.assets.alerts.QuarterlyReportAlertService;
 import com.dokkcorp.dashboard.features.assets.alerts.QuarterlyAlertsResponse;
 import com.dokkcorp.dashboard.features.assets.model.AssetDto;
+import com.dokkcorp.dashboard.features.assets.model.RegisteredAssetDto;
 
 @RestController
 @CrossOrigin(origins = "${app.cors.allowed-origins}")
@@ -46,6 +47,11 @@ public class DashboardController {
     @GetMapping("/alerts/quarterly")
     public QuarterlyAlertsResponse getQuarterlyAlerts() {
         return new QuarterlyAlertsResponse(List.copyOf(this.quarterlyReportAlertService.getStaleAssets()));
+    }
+
+    @GetMapping("/assets")
+    public List<RegisteredAssetDto> getRegisteredAssets() {
+        return this.configurableAssetService.getRegisteredAssets();
     }
 
 }

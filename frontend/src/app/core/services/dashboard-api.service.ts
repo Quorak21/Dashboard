@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import type { HypeDto, AssetDto, QuarterlyAlertsResponse } from '../models';
+import type { HypeDto, AssetDto, QuarterlyAlertsResponse, RegisteredAssetDto } from '../models';
 import { ToastService } from './toastService';
 
 @Injectable({ providedIn: 'root' })
@@ -39,6 +39,17 @@ export class DashboardApiService {
 
   getQuarterlyAlerts(): Observable<QuarterlyAlertsResponse | null> {
     return this.http.get<QuarterlyAlertsResponse>(`${this.apiUrl}/api/dashboard/alerts/quarterly`).pipe(
+      catchError(() => {
+        this.toastService.showError(
+          'Erreur de connexion avec le serveur, veuillez réessayer plus tard',
+        );
+        return of(null);
+      }),
+    );
+  }
+
+  getRegisteredAssets(): Observable<RegisteredAssetDto[] | null> {
+    return this.http.get<RegisteredAssetDto[]>(`${this.apiUrl}/api/dashboard/assets`).pipe(
       catchError(() => {
         this.toastService.showError(
           'Erreur de connexion avec le serveur, veuillez réessayer plus tard',

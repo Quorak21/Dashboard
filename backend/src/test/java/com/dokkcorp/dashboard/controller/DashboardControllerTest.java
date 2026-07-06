@@ -16,6 +16,7 @@ import com.dokkcorp.dashboard.features.assets.ConfigurableAssetService;
 import com.dokkcorp.dashboard.features.assets.alerts.QuarterlyReportAlertService;
 import com.dokkcorp.dashboard.features.assets.alerts.StaleAssetAlert;
 import com.dokkcorp.dashboard.features.assets.model.AssetDto;
+import com.dokkcorp.dashboard.features.assets.model.RegisteredAssetDto;
 import com.dokkcorp.dashboard.features.assets.model.AssetType;
 import com.dokkcorp.dashboard.features.assets.model.MarketStatus;
 import com.dokkcorp.dashboard.features.assets.model.PriceSource;
@@ -98,7 +99,7 @@ class DashboardControllerTest {
         AssetDto mockAsset = new AssetDto(
                 "brwm",
                 "BRWM",
-                "BlackRock World Mining",
+                "World Mining",
                 AssetType.STOCK,
                 "GBP",
                 500.0,
@@ -155,5 +156,21 @@ class DashboardControllerTest {
 
         verify(quarterlyReportAlertService, times(1)).getStaleAssets();
         verifyNoMoreInteractions(quarterlyReportAlertService);
+    }
+
+    @Test
+    void testGetRegisteredAssets() throws Exception {
+        RegisteredAssetDto asset = new RegisteredAssetDto("inveb", "Investor AB", "STOCK", "SEK");
+        when(configurableAssetService.getRegisteredAssets()).thenReturn(List.of(asset));
+
+        mockMvc.perform(get("/api/dashboard/assets"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("inveb"))
+                .andExpect(jsonPath("$[0].displayName").value("Investor AB"))
+                .andExpect(jsonPath("$[0].type").value("STOCK"))
+                .andExpect(jsonPath("$[0].currency").value("SEK"));
+
+        verify(configurableAssetService, times(1)).getRegisteredAssets();
+        verifyNoMoreInteractions(configurableAssetService);
     }
 }
