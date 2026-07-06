@@ -1,9 +1,16 @@
 asset-id: inveb
-forward-dividend: 6.00
+forward-dividend: 6.05
 forward-dividend-currency: SEK
-frequency: annual
+frequency: semi-annual
 avg-dividend-growth-10y: 8.2
 history:
-  - { year: 2024, amount: 6.00, currency: SEK }
-  - { year: 2023, amount: 5.50, currency: SEK }
-  - { year: 2022, amount: 4.00, currency: SEK }
+  - { year: 2025, amount: 5.60, currency: SEK }
+  - { year: 2024, amount: 5.20, currency: SEK }
+  - { year: 2023, amount: 4.80, currency: SEK }
+  - { year: 2022, amount: 4.40, currency: SEK }
+  - { year: 2021, amount: 4.00, currency: SEK }
+  - { year: 2020, amount: 2.25, currency: SEK }
+  - { year: 2019, amount: 3.25, currency: SEK }
+  - { year: 2018, amount: 3.00, currency: SEK }
+  - { year: 2017, amount: 2.75, currency: SEK }
+  - { year: 2016, amount: 2.50, currency: SEK }

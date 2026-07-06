@@ -19,8 +19,8 @@ describe('QuarterlyAlertsBanner', () => {
       },
       {
         assetId: 'o',
-        displayName: 'Realty Income',
-        label: 'Realty Income',
+        displayName: 'Realty',
+        label: 'Realty',
         updatedAt: '2026-03-10',
         daysStale: 110,
       }
@@ -62,7 +62,7 @@ describe('QuarterlyAlertsBanner', () => {
     expect(bannerContainer).toBeTruthy();
     expect(element.textContent).toContain('Fondamentaux à vérifier :');
     expect(element.textContent).toContain('Investor AB');
-    expect(element.textContent).toContain('Realty Income');
+    expect(element.textContent).toContain('Realty');
     
     // Link assertions
     const links = element.querySelectorAll('a');

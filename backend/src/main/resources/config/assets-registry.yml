@@ -16,7 +16,7 @@ app:
           interval-minutes: 15
           offset-minutes: 0
       - id: brwm
-        display-name: BlackRock World Mining
+        display-name: World Mining
         provider: fmp
         symbol: BRWM.L
         db-symbol: BRWM
@@ -30,7 +30,7 @@ app:
           interval-minutes: 15
           offset-minutes: 3
       - id: o
-        display-name: Realty Income
+        display-name: Realty
         provider: fmp
         symbol: O
         db-symbol: O

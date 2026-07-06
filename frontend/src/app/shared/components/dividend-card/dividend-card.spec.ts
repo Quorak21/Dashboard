@@ -23,11 +23,16 @@ describe('DividendCard', () => {
       estimatedYield: 2.0,
       avgDividendGrowth10Y: 8.4,
       history: [
-        { year: 2022, amount: 4.0, currency: 'SEK' },
-        { year: 2023, amount: 4.4, currency: 'SEK' },
-        { year: 2024, amount: 4.8, currency: 'SEK' },
-        { year: 2025, amount: 5.2, currency: 'SEK' },
-        { year: 2026, amount: 5.6, currency: 'SEK' },
+        { year: 2017, amount: 4.0, currency: 'SEK' },
+        { year: 2018, amount: 4.1, currency: 'SEK' },
+        { year: 2019, amount: 4.2, currency: 'SEK' },
+        { year: 2020, amount: 4.3, currency: 'SEK' },
+        { year: 2021, amount: 4.4, currency: 'SEK' },
+        { year: 2022, amount: 4.5, currency: 'SEK' },
+        { year: 2023, amount: 4.6, currency: 'SEK' },
+        { year: 2024, amount: 4.7, currency: 'SEK' },
+        { year: 2025, amount: 4.8, currency: 'SEK' },
+        { year: 2026, amount: 5.2, currency: 'SEK' },
       ],
     };
 
@@ -37,21 +42,21 @@ describe('DividendCard', () => {
     fixture.detectChanges();
 
     expect(fixture.componentInstance.hasData()).toBe(true);
-    expect(fixture.componentInstance.avgGrowth10Y()).toBe('8.40 %');
+    expect(fixture.componentInstance.avgGrowth10Y()).toBe('2.96 %');
     expect(fixture.componentInstance.projectionYear()).toBe('2027');
     expect(fixture.componentInstance.projectionDividend()).toBe('6 SEK');
     expect(fixture.componentInstance.estimatedYieldLabel()).toBe('2%');
-    expect(fixture.componentInstance.historyRows().length).toBe(5);
-    expect(fixture.componentInstance.historyRows()[0]).toEqual({ year: 2022, amount: '4 SEK' });
+    expect(fixture.componentInstance.historyRows().length).toBe(10);
+    expect(fixture.componentInstance.historyRows()[0]).toEqual({ year: 2026, amount: '5.20 SEK' });
 
     // DOM Assertions
     const element: HTMLElement = fixture.nativeElement;
     expect(element.querySelector('h3')?.textContent).toContain('Dividend');
-    expect(element.querySelector('.text-lg')?.textContent).toContain('8.40 %');
+    expect(element.querySelector('.text-lg')?.textContent).toContain('2.96 %');
     const listItems = element.querySelectorAll('li');
-    expect(listItems.length).toBe(5);
-    expect(listItems[0].textContent).toContain('2022');
-    expect(listItems[0].textContent).toContain('4 SEK');
+    expect(listItems.length).toBe(10);
+    expect(listItems[0].textContent).toContain('2026');
+    expect(listItems[0].textContent).toContain('5.20 SEK');
     expect(element.querySelector('.text-3xl')?.textContent).toContain('6 SEK');
   });
 
@@ -70,8 +75,8 @@ describe('DividendCard', () => {
     // DOM Assertions
     const element: HTMLElement = fixture.nativeElement;
     const listItems = element.querySelectorAll('li');
-    expect(listItems.length).toBe(5);
-    expect(listItems[0].textContent).toContain('2021');
+    expect(listItems.length).toBe(10);
+    expect(listItems[0].textContent).toContain('2026');
     expect(listItems[0].textContent).toContain('-');
     expect(element.querySelector('.text-3xl')?.textContent).toContain('-');
   });

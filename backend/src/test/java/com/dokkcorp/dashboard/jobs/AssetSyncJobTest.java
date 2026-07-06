@@ -181,7 +181,7 @@ class AssetSyncJobTest {
     void sendRegistrySnapshots_isolatesFailuresPerAsset() {
         AssetDefinition inveb = invebDefinition();
         AssetDefinition brwm = new AssetDefinition(
-                "brwm", "BlackRock World Mining", AssetProvider.FMP,
+                "brwm", "World Mining", AssetProvider.FMP,
                 "BRWM.L", "BRWM", AssetType.TRUST, "GBP", null, null, null);
         AssetDaily invebDaily = new AssetDaily();
         invebDaily.setCurrentPrice(250d);

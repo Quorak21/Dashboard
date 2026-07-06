@@ -29,8 +29,8 @@ class AssetFundamentalsPropertiesTest {
         AssetFundamentalsProperties.FundamentalsConfig invebConfig = properties.getFundamentals().get("inveb");
         assertNotNull(invebConfig);
         assertEquals("inveb", invebConfig.getAssetId());
-        assertEquals(LocalDate.of(2026, 4, 15), invebConfig.getUpdatedAt());
-        assertEquals("Source: Q1 2026 report", invebConfig.getSource());
+        assertEquals(LocalDate.of(2026, 6, 30), invebConfig.getUpdatedAt());
+        assertEquals("Investor AB — Annual Report 2025 & Q1 2026", invebConfig.getSource());
         assertNotNull(invebConfig.getMetrics());
         assertEquals(6.11, invebConfig.getMetrics().get("trailing-pe"));
         assertEquals("1.2%", invebConfig.getMetrics().get("debt-leverage"));
@@ -46,15 +46,28 @@ class AssetFundamentalsPropertiesTest {
         AssetFundamentalsProperties.FundamentalsConfig brwmConfig = properties.getFundamentals().get("brwm");
         assertNotNull(brwmConfig);
         assertEquals("brwm", brwmConfig.getAssetId());
-        assertEquals(LocalDate.of(2025, 2, 28), brwmConfig.getUpdatedAt());
-        assertEquals("BlackRock World Mining Trust Annual Report 2024", brwmConfig.getSource());
-        assertEquals("-13.5%", brwmConfig.getMetrics().get("nav-discount-premium"));
-        assertEquals("£1.4bn", brwmConfig.getMetrics().get("total-assets"));
-        assertEquals("0.70%", brwmConfig.getMetrics().get("management-fee"));
+        assertEquals(LocalDate.of(2026, 6, 30), brwmConfig.getUpdatedAt());
+        assertEquals(
+                "BlackRock World Mining Trust — Portfolio Update Q2 2026 (30 June 2026)",
+                brwmConfig.getSource());
+        assertEquals("~5.5%", brwmConfig.getMetrics().get("five-y-avg-discount"));
+        assertEquals("6.9%", brwmConfig.getMetrics().get("gearing-leverage"));
+        assertEquals("0.95%", brwmConfig.getMetrics().get("ongoing-charges-ter"));
         assertFalse(brwmConfig.getTopHoldings().isEmpty());
-        assertEquals(5, brwmConfig.getTopHoldings().size());
+        assertEquals(10, brwmConfig.getTopHoldings().size());
         assertEquals("Glencore", brwmConfig.getTopHoldings().get(0).getName());
-        assertEquals(0, new BigDecimal("17.2").compareTo(brwmConfig.getTopHoldings().get(0).getWeightPercent()));
+        assertEquals(0, new BigDecimal("7.6").compareTo(brwmConfig.getTopHoldings().get(0).getWeightPercent()));
+
+        // o (Realty Income) — property types + retail tenant industries
+        assertTrue(properties.getFundamentals().containsKey("o"));
+        AssetFundamentalsProperties.FundamentalsConfig oConfig = properties.getFundamentals().get("o");
+        assertNotNull(oConfig);
+        assertEquals(4, oConfig.getSectorWeights().size());
+        assertEquals("Retail", oConfig.getSectorWeights().get(0).getSector());
+        assertEquals(0, new BigDecimal("78.9").compareTo(oConfig.getSectorWeights().get(0).getWeightPercent()));
+        assertFalse(oConfig.getRetailIndustryWeights().isEmpty());
+        assertEquals("Grocery", oConfig.getRetailIndustryWeights().get(0).getSector());
+        assertEquals(0, new BigDecimal("11.0").compareTo(oConfig.getRetailIndustryWeights().get(0).getWeightPercent()));
     }
 
     @Test
@@ -110,6 +123,7 @@ class AssetFundamentalsPropertiesTest {
         assertEquals(100.0, config.getMetrics().get("nav-per-share"));
         assertTrue(config.getTopHoldings().isEmpty());
         assertTrue(config.getSectorWeights().isEmpty());
+        assertTrue(config.getRetailIndustryWeights().isEmpty());
         assertTrue(AssetFundamentalsConfiguration.isValid(config));
     }
 

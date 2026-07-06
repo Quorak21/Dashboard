@@ -1,6 +1,7 @@
 package com.dokkcorp.dashboard.config.assets;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -114,13 +115,24 @@ public class AssetFundamentalsConfiguration {
                 }
             }
         }
-        if (config.getSectorWeights() != null) {
-            for (AssetFundamentalsProperties.SectorWeightProperties sector : config.getSectorWeights()) {
-                if (sector.getWeightPercent() == null ||
-                    sector.getWeightPercent().compareTo(java.math.BigDecimal.ZERO) < 0 ||
-                    sector.getWeightPercent().compareTo(new java.math.BigDecimal("100")) > 0) {
-                    return false;
-                }
+        if (!areSectorWeightsValid(config.getSectorWeights())) {
+            return false;
+        }
+        if (!areSectorWeightsValid(config.getRetailIndustryWeights())) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean areSectorWeightsValid(List<AssetFundamentalsProperties.SectorWeightProperties> weights) {
+        if (weights == null) {
+            return true;
+        }
+        for (AssetFundamentalsProperties.SectorWeightProperties sector : weights) {
+            if (sector.getWeightPercent() == null ||
+                sector.getWeightPercent().compareTo(java.math.BigDecimal.ZERO) < 0 ||
+                sector.getWeightPercent().compareTo(new java.math.BigDecimal("100")) > 0) {
+                return false;
             }
         }
         return true;

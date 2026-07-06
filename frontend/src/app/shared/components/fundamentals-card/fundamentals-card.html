@@ -37,31 +37,52 @@
       }
     </div>
 
-    <!-- Top holdings -->
+    <!-- Holdings or property-type mix -->
     <div class="flex flex-col gap-3 sm:pl-6">
       <h4
         class="text-copper-400 text-sm font-bold uppercase tracking-[0.15em] pb-2 border-b border-copper-500/20 shrink-0">
-        Holdings
+        {{ allocationTitle() }}
       </h4>
-      @if (hasData() && topHoldings().length > 0) {
+      @if (hasData() && hasAllocation()) {
         <ul
           class="custom-scroll-copper flex flex-col gap-2 flex-grow overflow-y-auto overflow-x-hidden pr-1 -mr-1 min-h-0 max-h-64 sm:max-h-none sm:aspect-square">
-          @for (holding of topHoldings(); track holding.name + '-' + $index) {
+          @for (row of allocationRows(); track row.name + '-' + $index) {
           <li
             class="flex justify-between items-center gap-3 py-2 px-3 rounded-xl bg-dark-900/40 border border-copper-500/20 hover:border-copper-500/35 transition-all duration-300">
             <span class="text-copper-300/80 text-sm font-semibold tracking-wide">{{
-              holding.name
+              row.name
               }}</span>
             <span class="font-mono font-semibold text-copper-400/70 tracking-wider">{{
-              holding.weight
+              row.weight
               }}</span>
           </li>
           }
         </ul>
       } @else {
         <div class="flex items-center justify-center flex-grow py-8 text-center text-copper-300/40 text-sm font-medium">
-          No holdings available
+          No allocation data available
         </div>
+      }
+
+      @if (hasRetailIndustryDetail()) {
+        <h4
+          class="text-copper-400 text-sm font-bold uppercase tracking-[0.15em] pb-2 border-b border-copper-500/20 shrink-0 mt-2">
+          Retail Tenant Mix (ABR)
+        </h4>
+        <ul
+          class="custom-scroll-copper flex flex-col gap-2 flex-grow overflow-y-auto overflow-x-hidden pr-1 -mr-1 min-h-0 max-h-64">
+          @for (row of retailIndustryWeights(); track row.name + '-' + $index) {
+          <li
+            class="flex justify-between items-center gap-3 py-2 px-3 rounded-xl bg-dark-900/40 border border-copper-500/20 hover:border-copper-500/35 transition-all duration-300">
+            <span class="text-copper-300/80 text-sm font-semibold tracking-wide">{{
+              row.name
+              }}</span>
+            <span class="font-mono font-semibold text-copper-400/70 tracking-wider">{{
+              row.weight
+              }}</span>
+          </li>
+          }
+        </ul>
       }
     </div>
   </div>

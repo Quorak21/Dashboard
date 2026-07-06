@@ -22,12 +22,12 @@ public record AssetDto(
         DividendsBlock dividends,
         FundamentalsBlock fundamentals) {
 
-    public static AssetDto error(String assetId, String dbSymbol) {
+    public static AssetDto error(String assetId, String dbSymbol, String displayName, AssetType type) {
         return new AssetDto(
                 assetId,
                 dbSymbol,
-                null,
-                null,
+                displayName,
+                type,
                 null,
                 null,
                 null,

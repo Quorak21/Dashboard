@@ -169,6 +169,18 @@ class ConfigurableAssetServiceTest {
     }
 
     @Test
+    void getData_returnsDisplayNameWhenCacheIsEmpty() {
+        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.CLOSED);
+        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("INVE-B"))
+                .thenReturn(Collections.emptyList());
+
+        AssetDto result = service.getData("inveb");
+
+        assertEquals("Investor AB", result.displayName());
+        assertNull(result.currentPrice());
+    }
+
+    @Test
     void getData_returnsCacheWithoutProviderCall() {
         stubProviderQuote();
         stubHistorySnapshot(200d, 1_000L);
@@ -526,6 +538,7 @@ class ConfigurableAssetServiceTest {
         assertEquals(1, result.fundamentals().sectorWeights().size());
         assertEquals("Industrials", result.fundamentals().sectorWeights().get(0).sector());
         assertEquals(BigDecimal.valueOf(45.2), result.fundamentals().sectorWeights().get(0).weightPercent());
+        assertTrue(result.fundamentals().retailIndustryWeights().isEmpty());
     }
 
     @Test

@@ -53,7 +53,7 @@ class FmpPriceProviderTest {
 
     private static final AssetDefinition brwm = new AssetDefinition(
             "brwm",
-            "BlackRock World Mining",
+            "World Mining",
             AssetProvider.FMP,
             "BRWM.L",
             "BRWM",
@@ -65,7 +65,7 @@ class FmpPriceProviderTest {
 
     private static final AssetDefinition o = new AssetDefinition(
             "o",
-            "Realty Income",
+            "Realty",
             AssetProvider.FMP,
             "O",
             "O",

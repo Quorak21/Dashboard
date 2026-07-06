@@ -1,9 +1,16 @@
 asset-id: o
-forward-dividend: 3.168
+forward-dividend: 3.31
 forward-dividend-currency: USD
 frequency: monthly
 avg-dividend-growth-10y: 4.3
 history:
-  - { year: 2024, amount: 3.072, currency: USD }
-  - { year: 2023, amount: 2.976, currency: USD }
-  - { year: 2022, amount: 2.808, currency: USD }
+  - { year: 2025, amount: 3.217, currency: USD }
+  - { year: 2024, amount: 3.126, currency: USD }
+  - { year: 2023, amount: 3.051, currency: USD }
+  - { year: 2022, amount: 2.969, currency: USD }
+  - { year: 2021, amount: 2.845, currency: USD }
+  - { year: 2020, amount: 2.801, currency: USD }
+  - { year: 2019, amount: 2.717, currency: USD }
+  - { year: 2018, amount: 2.639, currency: USD }
+  - { year: 2017, amount: 2.537, currency: USD }
+  - { year: 2016, amount: 2.403, currency: USD }

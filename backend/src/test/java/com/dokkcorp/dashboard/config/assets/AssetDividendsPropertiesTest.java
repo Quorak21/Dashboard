@@ -27,26 +27,26 @@ class AssetDividendsPropertiesTest {
         AssetDividendsProperties.DividendsConfig invebConfig = properties.getDividends().get("inveb");
         assertNotNull(invebConfig);
         assertEquals("inveb", invebConfig.getAssetId());
-        assertEquals(0, new BigDecimal("6.00").compareTo(invebConfig.getForwardDividend()));
+        assertEquals(0, new BigDecimal("6.05").compareTo(invebConfig.getForwardDividend()));
         assertEquals("SEK", invebConfig.getForwardDividendCurrency());
-        assertEquals("annual", invebConfig.getFrequency());
+        assertEquals("semi-annual", invebConfig.getFrequency());
         assertEquals(0, new BigDecimal("8.2").compareTo(invebConfig.getAvgDividendGrowth10Y()));
         
         List<AssetDividendsProperties.DividendHistoryEntry> history = invebConfig.getHistory();
         assertNotNull(history);
-        assertEquals(3, history.size());
+        assertEquals(10, history.size());
         
-        assertEquals(2024, history.get(0).getYear());
-        assertEquals(0, new BigDecimal("6.00").compareTo(history.get(0).getAmount()));
+        assertEquals(2025, history.get(0).getYear());
+        assertEquals(0, new BigDecimal("5.60").compareTo(history.get(0).getAmount()));
         assertEquals("SEK", history.get(0).getCurrency());
         
-        assertEquals(2023, history.get(1).getYear());
-        assertEquals(0, new BigDecimal("5.50").compareTo(history.get(1).getAmount()));
+        assertEquals(2024, history.get(1).getYear());
+        assertEquals(0, new BigDecimal("5.20").compareTo(history.get(1).getAmount()));
         assertEquals("SEK", history.get(1).getCurrency());
 
-        assertEquals(2022, history.get(2).getYear());
-        assertEquals(0, new BigDecimal("4.00").compareTo(history.get(2).getAmount()));
-        assertEquals("SEK", history.get(2).getCurrency());
+        assertEquals(2016, history.get(9).getYear());
+        assertEquals(0, new BigDecimal("2.50").compareTo(history.get(9).getAmount()));
+        assertEquals("SEK", history.get(9).getCurrency());
     }
 
     @Test

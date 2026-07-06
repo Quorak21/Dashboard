@@ -32,21 +32,17 @@ describe('AssetPage', () => {
       frequency: 'Annual',
       estimatedYield: 2.4,
       avgDividendGrowth10Y: 8.5,
-      history: [
-        { year: 2024, amount: 5.6, currency: 'SEK' }
-      ]
+      history: [{ year: 2024, amount: 5.6, currency: 'SEK' }],
     },
     fundamentals: {
       updatedAt: '2026-04-15',
       source: 'Q1 2026',
       stale: false,
       metrics: {
-        'trailing-pe': 6.11
+        'trailing-pe': 6.11,
       },
-      topHoldings: [
-        { name: 'ABB', weightPercent: 16.5 }
-      ]
-    }
+      topHoldings: [{ name: 'ABB', weightPercent: 16.5 }],
+    },
   };
 
   beforeAll(() => {
@@ -65,9 +61,9 @@ describe('AssetPage', () => {
       providers: [
         {
           provide: DashboardApiService,
-          useValue: { getAsset: getAssetSpy }
-        }
-      ]
+          useValue: { getAsset: getAssetSpy },
+        },
+      ],
     }).compileComponents();
   });
 
@@ -95,7 +91,7 @@ describe('AssetPage', () => {
     const mockAssetNoCards: AssetDto = {
       ...mockAsset,
       dividends: null,
-      fundamentals: null
+      fundamentals: null,
     };
     getAssetSpy.mockReturnValue(of(mockAssetNoCards));
 
@@ -118,15 +114,11 @@ describe('AssetPage', () => {
         source: 'iShares Factsheet',
         stale: false,
         metrics: {
-          'management-fee': '0.65%'
+          'management-fee': '0.65%',
         },
-        topHoldings: [
-          { name: 'NextEra Energy', weightPercent: 6.1 }
-        ],
-        sectorWeights: [
-          { sector: 'Utilities', weightPercent: 61.2 }
-        ]
-      }
+        topHoldings: [{ name: 'NextEra Energy', weightPercent: 6.1 }],
+        sectorWeights: [{ sector: 'Utilities', weightPercent: 61.2 }],
+      },
     };
     getAssetSpy.mockReturnValue(of(mockEtfAsset));
 
@@ -165,6 +157,25 @@ describe('AssetPage', () => {
 
     expect(fixture.componentInstance.loading()).toBe(false);
     expect(element.querySelector('app-asset-main-card')).toBeTruthy();
+    fixture.destroy();
+  });
+
+  it('returns empty display name when API returns null displayName', async () => {
+    const mockAssetNoName: AssetDto = {
+      ...mockAsset,
+      assetId: 'o',
+      symbol: 'O',
+      displayName: null,
+      type: 'REIT',
+      currency: 'USD',
+    };
+    getAssetSpy.mockReturnValue(of(mockAssetNoName));
+
+    fixture = TestBed.createComponent(AssetPage);
+    fixture.componentRef.setInput('assetId', 'o');
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.assetName()).toBe('');
     fixture.destroy();
   });
 });

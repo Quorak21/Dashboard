@@ -54,6 +54,71 @@ describe('FundamentalsCard', () => {
     expect(element.textContent).toContain('Source: Q1 2026 report');
   });
 
+  it('renders property-type mix when holdings are absent', () => {
+    const mockFundamentals: FundamentalsBlock = {
+      updatedAt: '2026-03-31',
+      source: 'Realty Income Q1 2026',
+      stale: false,
+      metrics: {
+        'portfolio-occupancy': '98.9%',
+      },
+      topHoldings: [],
+      sectorWeights: [
+        { sector: 'Retail', weightPercent: 78.9 },
+        { sector: 'Industrial', weightPercent: 15.5 },
+      ],
+    };
+
+    fixture.componentRef.setInput('fundamentals', mockFundamentals);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.allocationTitle()).toBe('Portfolio Mix (ABR)');
+    expect(fixture.componentInstance.allocationRows()[0]).toEqual({
+      name: 'Retail',
+      weight: '78.90%',
+    });
+
+    const element: HTMLElement = fixture.nativeElement;
+    expect(element.textContent).toContain('Portfolio Mix (ABR)');
+    expect(element.textContent).toContain('Retail');
+    expect(element.textContent).toContain('78.90%');
+  });
+
+  it('renders retail tenant mix when retail industry weights are present', () => {
+    const mockFundamentals: FundamentalsBlock = {
+      updatedAt: '2026-03-31',
+      source: 'Realty Income Q1 2026',
+      stale: false,
+      metrics: {
+        'portfolio-occupancy': '98.9%',
+      },
+      topHoldings: [],
+      sectorWeights: [
+        { sector: 'Retail', weightPercent: 78.9 },
+        { sector: 'Industrial', weightPercent: 15.5 },
+      ],
+      retailIndustryWeights: [
+        { sector: 'Grocery', weightPercent: 11.0 },
+        { sector: 'Convenience Stores', weightPercent: 9.4 },
+      ],
+    };
+
+    fixture.componentRef.setInput('fundamentals', mockFundamentals);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.hasRetailIndustryDetail()).toBe(true);
+    expect(fixture.componentInstance.retailIndustryWeights()[0]).toEqual({
+      name: 'Grocery',
+      weight: '11%',
+    });
+
+    const element: HTMLElement = fixture.nativeElement;
+    expect(element.textContent).toContain('Retail Tenant Mix (ABR)');
+    expect(element.textContent).toContain('Grocery');
+    expect(element.textContent).toContain('11%');
+    expect(element.textContent).toContain('Convenience Stores');
+  });
+
   it('renders fallback messages when live data is unavailable', () => {
     fixture.componentRef.setInput('fundamentals', null);
     fixture.detectChanges();
@@ -67,7 +132,7 @@ describe('FundamentalsCard', () => {
     // DOM Assertions
     const element: HTMLElement = fixture.nativeElement;
     expect(element.textContent).toContain('No metrics available');
-    expect(element.textContent).toContain('No holdings available');
+    expect(element.textContent).toContain('No allocation data available');
     // Footer source should be omitted (since it's empty / '-')
     expect(element.querySelector('p')?.textContent).toBeUndefined();
   });

@@ -63,9 +63,10 @@ class AssetDtoTest {
 
     @Test
     void serializesNullDividendsAndFundamentals() throws Exception {
-        AssetDto dto = AssetDto.error("inveb", "INVE-B");
+        AssetDto dto = AssetDto.error("inveb", "INVE-B", "Investor AB", AssetType.STOCK);
         String json = objectMapper.writeValueAsString(dto);
 
+        assertTrue(json.contains("\"displayName\":\"Investor AB\""));
         assertTrue(json.contains("\"dividends\":null"));
         assertTrue(json.contains("\"fundamentals\":null"));
     }
@@ -97,7 +98,8 @@ class AssetDtoTest {
                 false,
                 Map.of("peRatio", 18.5),
                 List.of(holding),
-                List.of(sector)
+                List.of(sector),
+                List.of()
         );
 
         AssetDto dto = new AssetDto(

@@ -26,6 +26,7 @@ public class AssetFundamentalsProperties {
         private Map<String, Object> metrics = new HashMap<>();
         private List<HoldingProperties> topHoldings = new ArrayList<>();
         private List<SectorWeightProperties> sectorWeights = new ArrayList<>();
+        private List<SectorWeightProperties> retailIndustryWeights = new ArrayList<>();
 
         public String getAssetId() {
             return assetId;
@@ -73,6 +74,14 @@ public class AssetFundamentalsProperties {
 
         public void setSectorWeights(List<SectorWeightProperties> sectorWeights) {
             this.sectorWeights = sectorWeights != null ? sectorWeights : new ArrayList<>();
+        }
+
+        public List<SectorWeightProperties> getRetailIndustryWeights() {
+            return retailIndustryWeights;
+        }
+
+        public void setRetailIndustryWeights(List<SectorWeightProperties> retailIndustryWeights) {
+            this.retailIndustryWeights = retailIndustryWeights != null ? retailIndustryWeights : new ArrayList<>();
         }
     }
 

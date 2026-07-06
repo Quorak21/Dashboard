@@ -2,6 +2,34 @@ import { Component, computed, input } from '@angular/core';
 import { formatNumber } from '../../../core/services/format-number';
 import type { DividendsBlock, DividendHistoryEntry } from '../../../core/models';
 
+const HISTORY_YEARS = 10;
+
+function computeCagrPercent(history: DividendHistoryEntry[]): number | null {
+  const sorted = history
+    .filter(
+      (entry) =>
+        entry &&
+        typeof entry.year === 'number' &&
+        !isNaN(entry.year) &&
+        entry.amount !== null &&
+        entry.amount !== undefined &&
+        !isNaN(entry.amount) &&
+        entry.amount > 0
+    )
+    .sort((a, b) => a.year - b.year)
+    .slice(-HISTORY_YEARS);
+
+  if (sorted.length < 2) {
+    return null;
+  }
+
+  const first = sorted[0].amount as number;
+  const last = sorted[sorted.length - 1].amount as number;
+  const periods = sorted.length - 1;
+
+  return (Math.pow(last / first, 1 / periods) - 1) * 100;
+}
+
 @Component({
   selector: 'app-dividend-card',
   imports: [],
@@ -20,17 +48,17 @@ export class DividendCard {
     const div = this.dividends();
     if (!this.hasData() || !div || !div.history) {
       const currentYear = this.computedCurrentYear();
-      return Array.from({ length: 5 }, (_, i) => ({
-        year: currentYear - 5 + i,
+      return Array.from({ length: HISTORY_YEARS }, (_, i) => ({
+        year: currentYear - i,
         amount: '-',
       }));
     }
     const validEntries = div.history.filter(
       (entry) => entry && typeof entry.year === 'number' && !isNaN(entry.year)
     );
-    const sorted = [...validEntries].sort((a, b) => a.year - b.year);
-    const last5 = sorted.slice(-5);
-    return last5.map((entry: DividendHistoryEntry) => {
+    const sorted = [...validEntries].sort((a, b) => b.year - a.year);
+    const last10 = sorted.slice(0, HISTORY_YEARS);
+    return last10.map((entry: DividendHistoryEntry) => {
       const formattedAmount =
         entry.amount !== null && entry.amount !== undefined && !isNaN(entry.amount)
           ? formatNumber(entry.amount)
@@ -44,10 +72,24 @@ export class DividendCard {
 
   avgGrowth10Y = computed(() => {
     const div = this.dividends();
-    if (!this.hasData() || !div || div.avgDividendGrowth10Y === null || div.avgDividendGrowth10Y === undefined || isNaN(div.avgDividendGrowth10Y)) {
+    if (!this.hasData() || !div) {
       return '-';
     }
-    return `${formatNumber(div.avgDividendGrowth10Y)} %`;
+
+    const fromHistory =
+      div.history && div.history.length > 0 ? computeCagrPercent(div.history) : null;
+    const configured = div.avgDividendGrowth10Y;
+    const growth =
+      fromHistory !== null && !isNaN(fromHistory)
+        ? fromHistory
+        : configured !== null && configured !== undefined && !isNaN(configured)
+          ? configured
+          : null;
+
+    if (growth === null) {
+      return '-';
+    }
+    return `${formatNumber(growth)} %`;
   });
 
   projectionYear = computed(() => {

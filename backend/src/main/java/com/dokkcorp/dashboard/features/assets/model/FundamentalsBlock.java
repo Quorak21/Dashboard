@@ -10,5 +10,6 @@ public record FundamentalsBlock(
         boolean stale,
         Map<String, Object> metrics,
         List<HoldingEntry> topHoldings,
-        List<SectorWeight> sectorWeights) {
+        List<SectorWeight> sectorWeights,
+        List<SectorWeight> retailIndustryWeights) {
 }
