@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.dokkcorp.dashboard.features.crypto.hype.HypeDto;
 import com.dokkcorp.dashboard.features.crypto.hype.HypeService;
+import com.dokkcorp.dashboard.features.crypto.hype.models.HypeSummaryDto;
 import com.dokkcorp.dashboard.features.assets.ConfigurableAssetService;
 import com.dokkcorp.dashboard.features.assets.alerts.QuarterlyReportAlertService;
 import com.dokkcorp.dashboard.features.assets.alerts.StaleAssetAlert;
@@ -52,11 +53,18 @@ class DashboardControllerTest {
 
     @Test
     void testGetLastHypeData() throws Exception {
-        HypeDto mockHype = new HypeDto(null, null, null, null, null, null, null);
+        HypeSummaryDto summary = new HypeSummaryDto("HYPE", 1.25, 5000000.0, 5.42, 1200000.0, 1710000000L);
+        HypeDto mockHype = new HypeDto(summary, null, null, null, null, null, null);
         when(hypeService.getLastHypeData()).thenReturn(mockHype);
 
         mockMvc.perform(get("/api/dashboard/hype"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.summary.symbol").value("HYPE"))
+                .andExpect(jsonPath("$.summary.currentPrice").value(1.25))
+                .andExpect(jsonPath("$.summary.priceChangePercentage24h").value(5.42));
+
+        verify(hypeService, times(1)).getLastHypeData();
+        verifyNoMoreInteractions(hypeService);
     }
 
     @Test
@@ -74,6 +82,7 @@ class DashboardControllerTest {
                 123456789L,
                 PriceSource.FMP,
                 MarketStatus.OPEN,
+                15,
                 List.of(245.0, 250.0),
                 List.of(12345L, 12346L),
                 List.of(248.0, 250.0),
@@ -109,6 +118,7 @@ class DashboardControllerTest {
                 123456789L,
                 PriceSource.FMP,
                 MarketStatus.OPEN,
+                15,
                 List.of(), List.of(), List.of(), List.of(),
                 null, null
         );

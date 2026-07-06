@@ -1,0 +1,1511 @@
+diff --git a/backend/src/main/resources/config/assets-registry.yml b/backend/src/main/resources/config/assets-registry.yml
+new file mode 100644
+index 0000000..279966a
+--- /dev/null
++++ b/backend/src/main/resources/config/assets-registry.yml
+@@ -0,0 +1,73 @@
++app:
++  assets-registry:
++    entries:
++      - id: inveb
++        display-name: Investor AB
++        provider: fmp
++        symbol: INVE-B.ST
++        db-symbol: INVE-B
++        type: STOCK
++        currency: SEK
++        market-hours:
++          zone: Europe/Stockholm
++          open: "09:00"
++          close: "17:35"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 0
++      - id: brwm
++        display-name: BlackRock World Mining
++        provider: fmp
++        symbol: BRWM.L
++        db-symbol: BRWM
++        type: TRUST
++        currency: GBP
++        market-hours:
++          zone: Europe/London
++          open: "08:00"
++          close: "16:35"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 3
++      - id: o
++        display-name: Realty Income
++        provider: fmp
++        symbol: O
++        db-symbol: O
++        type: REIT
++        currency: USD
++        market-hours:
++          zone: America/New_York
++          open: "09:30"
++          close: "16:00"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 0
++      - id: iii
++        display-name: 3i Group
++        provider: fmp
++        symbol: III.L
++        db-symbol: III
++        type: TRUST
++        currency: GBP
++        market-hours:
++          zone: Europe/London
++          open: "08:00"
++          close: "16:35"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 6
++      - id: infr
++        display-name: iShares Global Infrastructure
++        provider: fmp
++        symbol: INFR.L
++        db-symbol: INFR
++        type: ETF
++        currency: USD
++        market-hours:
++          zone: Europe/London
++          open: "08:00"
++          close: "16:35"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 9
+diff --git a/backend/src/test/java/com/dokkcorp/dashboard/features/assets/price/FmpPriceProviderTest.java b/backend/src/test/java/com/dokkcorp/dashboard/features/assets/price/FmpPriceProviderTest.java
+new file mode 100644
+index 0000000..69a2cf6
+--- /dev/null
++++ b/backend/src/test/java/com/dokkcorp/dashboard/features/assets/price/FmpPriceProviderTest.java
+@@ -0,0 +1,345 @@
++package com.dokkcorp.dashboard.features.assets.price;
++
++import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
++import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
++import static com.github.tomakehurst.wiremock.client.WireMock.get;
++import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
++import static org.junit.jupiter.api.Assertions.assertEquals;
++import static org.junit.jupiter.api.Assertions.assertFalse;
++import static org.junit.jupiter.api.Assertions.assertThrows;
++import static org.junit.jupiter.api.Assertions.assertTrue;
++
++import java.nio.charset.StandardCharsets;
++import java.time.Instant;
++import java.time.LocalTime;
++import java.time.ZoneId;
++import java.util.List;
++
++import org.junit.jupiter.api.AfterAll;
++import org.junit.jupiter.api.BeforeAll;
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++import org.springframework.core.io.ClassPathResource;
++import org.springframework.util.StreamUtils;
++import org.springframework.web.client.RestClient;
++
++import com.dokkcorp.dashboard.config.ExternalCallExecutor;
++import com.dokkcorp.dashboard.exception.ExternalProviderException;
++import com.dokkcorp.dashboard.features.assets.model.AssetDefinition;
++import com.dokkcorp.dashboard.features.assets.model.AssetProvider;
++import com.dokkcorp.dashboard.features.assets.model.AssetType;
++import com.dokkcorp.dashboard.features.assets.model.MarketHours;
++import com.dokkcorp.dashboard.features.assets.model.SyncConfig;
++import com.dokkcorp.dashboard.providers.fmp.FMPClient;
++import com.github.tomakehurst.wiremock.WireMockServer;
++import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
++
++class FmpPriceProviderTest {
++
++    private static WireMockServer wireMock;
++    private static FmpPriceProvider provider;
++
++    private static final AssetDefinition inveb = new AssetDefinition(
++            "inveb",
++            "Investor AB",
++            AssetProvider.FMP,
++            "INVE-B.ST",
++            "INVE-B",
++            AssetType.STOCK,
++            "SEK",
++            new MarketHours(ZoneId.of("Europe/Stockholm"), LocalTime.of(9, 0), LocalTime.of(17, 35)),
++            new SyncConfig(15, 0),
++            null);
++
++    private static final AssetDefinition brwm = new AssetDefinition(
++            "brwm",
++            "BlackRock World Mining",
++            AssetProvider.FMP,
++            "BRWM.L",
++            "BRWM",
++            AssetType.TRUST,
++            "GBP",
++            new MarketHours(ZoneId.of("Europe/London"), LocalTime.of(8, 0), LocalTime.of(16, 35)),
++            new SyncConfig(15, 0),
++            null);
++
++    private static final AssetDefinition o = new AssetDefinition(
++            "o",
++            "Realty Income",
++            AssetProvider.FMP,
++            "O",
++            "O",
++            AssetType.REIT,
++            "USD",
++            new MarketHours(ZoneId.of("America/New_York"), LocalTime.of(9, 30), LocalTime.of(16, 0)),
++            new SyncConfig(15, 0),
++            null);
++
++    private static final AssetDefinition iii = new AssetDefinition(
++            "iii",
++            "3i Group",
++            AssetProvider.FMP,
++            "III.L",
++            "III",
++            AssetType.TRUST,
++            "GBP",
++            new MarketHours(ZoneId.of("Europe/London"), LocalTime.of(8, 0), LocalTime.of(16, 35)),
++            new SyncConfig(15, 6),
++            null);
++
++    private static final AssetDefinition infr = new AssetDefinition(
++            "infr",
++            "iShares Global Infrastructure",
++            AssetProvider.FMP,
++            "INFR.L",
++            "INFR",
++            AssetType.ETF,
++            "USD",
++            new MarketHours(ZoneId.of("Europe/London"), LocalTime.of(8, 0), LocalTime.of(16, 35)),
++            new SyncConfig(15, 9),
++            null);
++
++    @BeforeAll
++    static void beforeAll() {
++        wireMock = new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort());
++        wireMock.start();
++
++        ExternalCallExecutor executor = new ExternalCallExecutor(1, 0);
++        FMPClient fmpClient = new FMPClient(
++                RestClient.builder(),
++                executor,
++                "test-key",
++                wireMock.baseUrl());
++        provider = new FmpPriceProvider(fmpClient);
++    }
++
++    @AfterAll
++    static void afterAll() {
++        wireMock.stop();
++    }
++
++    @BeforeEach
++    void setUp() {
++        wireMock.resetAll();
++    }
++
++    @Test
++    void fetch_mapsFmpProfileToPriceQuote() throws Exception {
++        String fixture = StreamUtils.copyToString(
++                new ClassPathResource("fixtures/fmp/profile-inveb.json").getInputStream(),
++                StandardCharsets.UTF_8);
++
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("INVE-B.ST"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody(fixture)));
++
++        Instant before = Instant.now();
++        PriceQuote quote = provider.fetch(inveb);
++        Instant after = Instant.now();
++
++        assertEquals(245.5, quote.price());
++        assertEquals("SEK", quote.currency());
++        assertEquals(1_000_000_000d, quote.marketCap());
++        assertEquals(-1.25, quote.changePercent24h());
++        assertEquals(123_456d, quote.volume());
++        assertFalse(quote.fetchedAt().isBefore(before));
++        assertFalse(quote.fetchedAt().isAfter(after));
++    }
++
++    @Test
++    void fetch_convertsGBpToGbpForLondonStocks() throws Exception {
++
++        String fixture = StreamUtils.copyToString(
++                new ClassPathResource("fixtures/fmp/profile-brwm.json").getInputStream(),
++                StandardCharsets.UTF_8);
++
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("BRWM.L"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody(fixture)));
++
++        PriceQuote quote = provider.fetch(brwm);
++
++        assertEquals(5.50, quote.price()); // 550.0 GBp normalized to 5.50 GBP
++        assertEquals("GBP", quote.currency());
++        assertEquals(1_400_000_000d, quote.marketCap());
++        assertEquals(1.5, quote.changePercent24h());
++        assertEquals(250_000d, quote.volume());
++    }
++
++    @Test
++    void fetch_convertsGBpToGbpFor3iGroup() throws Exception {
++        String fixture = StreamUtils.copyToString(
++                new ClassPathResource("fixtures/fmp/profile-iii.json").getInputStream(),
++                StandardCharsets.UTF_8);
++
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("III.L"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody(fixture)));
++
++        PriceQuote quote = provider.fetch(iii);
++
++        assertEquals(31.80, quote.price()); // 3180.0 GBp normalized to 31.80 GBP
++        assertEquals("GBP", quote.currency());
++        assertEquals(30_000_000_000d, quote.marketCap());
++        assertEquals(0.63, quote.changePercent24h());
++        assertEquals(850_000d, quote.volume());
++    }
++
++    @Test
++    void fetch_retrievesPriceInUsdForInfr() throws Exception {
++        String fixture = StreamUtils.copyToString(
++                new ClassPathResource("fixtures/fmp/profile-infr.json").getInputStream(),
++                StandardCharsets.UTF_8);
++
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("INFR.L"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody(fixture)));
++
++        PriceQuote quote = provider.fetch(infr);
++
++        assertEquals(24.50, quote.price());
++        assertEquals("USD", quote.currency());
++        assertEquals(2_800_000_000d, quote.marketCap());
++        assertEquals(-0.45, quote.changePercent24h());
++        assertEquals(120_000d, quote.volume());
++    }
++
++    @Test
++    void fetch_doesNotConvertGbpToGbpWhenAlreadyInPounds() throws Exception {
++
++        String fixture = "[{\n" +
++                "  \"symbol\": \"BRWM.L\",\n" +
++                "  \"price\": 5.50,\n" +
++                "  \"marketCap\": 1400000000,\n" +
++                "  \"changePercentage\": 1.5,\n" +
++                "  \"volume\": 250000,\n" +
++                "  \"currency\": \"GBP\"\n" +
++                "}]";
++
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("BRWM.L"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody(fixture)));
++
++        PriceQuote quote = provider.fetch(brwm);
++
++        assertEquals(5.50, quote.price()); // 5.50 GBP stays 5.50 GBP
++        assertEquals("GBP", quote.currency());
++    }
++
++    @Test
++    void fetch_retrievesPriceInUsdForNyseStocks() throws Exception {
++
++        String fixture = StreamUtils.copyToString(
++                new ClassPathResource("fixtures/fmp/profile-o.json").getInputStream(),
++                StandardCharsets.UTF_8);
++
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("O"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody(fixture)));
++
++        PriceQuote quote = provider.fetch(o);
++
++        assertEquals(55.0, quote.price());
++        assertEquals("USD", quote.currency());
++        assertEquals(50_000_000_000d, quote.marketCap());
++        assertEquals(-0.85, quote.changePercent24h());
++        assertEquals(3_200_000d, quote.volume());
++    }
++
++
++    @Test
++    void fetch_throwsExternalProviderExceptionOnCurrencyMismatch() {
++        String fixture = "[{\n" +
++                "  \"symbol\": \"INVE-B.ST\",\n" +
++                "  \"price\": 245.5,\n" +
++                "  \"marketCap\": 1000000000,\n" +
++                "  \"changePercentage\": -1.25,\n" +
++                "  \"volume\": 123456,\n" +
++                "  \"currency\": \"USD\"\n" + // Configured is SEK
++                "}]";
++
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("INVE-B.ST"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody(fixture)));
++
++        assertThrows(ExternalProviderException.class, () -> provider.fetch(inveb));
++    }
++
++
++
++    @Test
++    void fetch_propagatesExternalProviderExceptionOnFailure() {
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("INVE-B.ST"))
++                .willReturn(aResponse().withStatus(500)));
++
++        assertThrows(ExternalProviderException.class, () -> provider.fetch(inveb));
++    }
++
++    @Test
++    void fetch_propagatesExternalProviderExceptionOnEmptyResponse() {
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("INVE-B.ST"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody("[]")));
++
++        assertThrows(ExternalProviderException.class, () -> provider.fetch(inveb));
++    }
++
++    @Test
++    void fetch_rejectsNonFmpAsset() {
++        AssetDefinition scrapeAsset = new AssetDefinition(
++                "chdiv",
++                "UBS ETF",
++                AssetProvider.SCRAPE,
++                "CHDIV.SW",
++                "CHDIV",
++                AssetType.ETF,
++                "CHF",
++                new MarketHours(ZoneId.of("Europe/Zurich"), LocalTime.of(9, 0), LocalTime.of(17, 30)),
++                new SyncConfig(10, 0),
++                "yahoo-six-chart");
++
++        IllegalArgumentException error = assertThrows(
++                IllegalArgumentException.class,
++                () -> provider.fetch(scrapeAsset));
++
++        assertEquals("FmpPriceProvider cannot fetch asset with provider: SCRAPE", error.getMessage());
++    }
++
++    @Test
++    void providerId_returnsFmp() {
++        assertEquals("fmp", provider.providerId());
++    }
++}
+diff --git a/backend/src/test/resources/config/assets-registry.yml b/backend/src/test/resources/config/assets-registry.yml
+new file mode 100644
+index 0000000..279966a
+--- /dev/null
++++ b/backend/src/test/resources/config/assets-registry.yml
+@@ -0,0 +1,73 @@
++app:
++  assets-registry:
++    entries:
++      - id: inveb
++        display-name: Investor AB
++        provider: fmp
++        symbol: INVE-B.ST
++        db-symbol: INVE-B
++        type: STOCK
++        currency: SEK
++        market-hours:
++          zone: Europe/Stockholm
++          open: "09:00"
++          close: "17:35"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 0
++      - id: brwm
++        display-name: BlackRock World Mining
++        provider: fmp
++        symbol: BRWM.L
++        db-symbol: BRWM
++        type: TRUST
++        currency: GBP
++        market-hours:
++          zone: Europe/London
++          open: "08:00"
++          close: "16:35"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 3
++      - id: o
++        display-name: Realty Income
++        provider: fmp
++        symbol: O
++        db-symbol: O
++        type: REIT
++        currency: USD
++        market-hours:
++          zone: America/New_York
++          open: "09:30"
++          close: "16:00"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 0
++      - id: iii
++        display-name: 3i Group
++        provider: fmp
++        symbol: III.L
++        db-symbol: III
++        type: TRUST
++        currency: GBP
++        market-hours:
++          zone: Europe/London
++          open: "08:00"
++          close: "16:35"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 6
++      - id: infr
++        display-name: iShares Global Infrastructure
++        provider: fmp
++        symbol: INFR.L
++        db-symbol: INFR
++        type: ETF
++        currency: USD
++        market-hours:
++          zone: Europe/London
++          open: "08:00"
++          close: "16:35"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 9
+diff --git a/backend/src/test/resources/fixtures/fmp/profile-infr.json b/backend/src/test/resources/fixtures/fmp/profile-infr.json
+new file mode 100644
+index 0000000..942b824
+--- /dev/null
++++ b/backend/src/test/resources/fixtures/fmp/profile-infr.json
+@@ -0,0 +1,10 @@
++[
++  {
++    "symbol": "INFR.L",
++    "price": 24.50,
++    "marketCap": 2800000000,
++    "changePercentage": -0.45,
++    "volume": 120000,
++    "currency": "USD"
++  }
++]
+diff --git a/frontend/src/app/app.routes.ts b/frontend/src/app/app.routes.ts
+index 9a4eb7b..7b942a4 100644
+--- a/frontend/src/app/app.routes.ts
++++ b/frontend/src/app/app.routes.ts
+@@ -13,6 +13,23 @@ export const routes: Routes = [
+         path: 'inveb',
+         loadComponent: () => import('./features/stocks/inveb/inveb').then(m => m.Inveb)
+     },
++    {
++        path: 'brwm',
++        loadComponent: () => import('./features/stocks/brwm/brwm').then(m => m.Brwm)
++    },
++    {
++        path: 'o',
++        loadComponent: () => import('./features/stocks/o/o').then(m => m.O)
++    },
++    {
++        path: 'iii',
++        loadComponent: () => import('./features/stocks/iii/iii').then(m => m.Iii)
++    },
++    {
++        path: 'infr',
++        loadComponent: () => import('./features/stocks/infr/infr').then(m => m.Infr)
++    },
++
+     // La route pour la 404, retour au dashboard
+     {
+         path: '**',
+diff --git a/frontend/src/app/features/stocks/infr/infr.html b/frontend/src/app/features/stocks/infr/infr.html
+new file mode 100644
+index 0000000..21aaa18
+--- /dev/null
++++ b/frontend/src/app/features/stocks/infr/infr.html
+@@ -0,0 +1 @@
++<app-asset-page [assetId]="'infr'"></app-asset-page>
+diff --git a/frontend/src/app/features/stocks/infr/infr.spec.ts b/frontend/src/app/features/stocks/infr/infr.spec.ts
+new file mode 100644
+index 0000000..43b7f4e
+--- /dev/null
++++ b/frontend/src/app/features/stocks/infr/infr.spec.ts
+@@ -0,0 +1,78 @@
++import { TestBed } from '@angular/core/testing';
++import { of } from 'rxjs';
++import { vi, type Mock } from 'vitest';
++
++import { Infr } from './infr';
++import { DashboardApiService } from '../../../core/services/dashboard-api.service';
++import type { AssetDto } from '../../../core/models';
++
++describe('Infr', () => {
++  let getAssetSpy: Mock;
++
++  const mockAsset: AssetDto = {
++    assetId: 'infr',
++    symbol: 'INFR',
++    displayName: 'iShares Global Infrastructure',
++    type: 'ETF',
++    currency: 'USD',
++    currentPrice: 24.50,
++    marketCap: 2800,
++    priceChangePercentage24h: -0.45,
++    totalVolume: 120,
++    lastRefresh: Date.UTC(2026, 5, 2, 8, 0, 0),
++    priceSource: 'FMP',
++    marketStatus: 'OPEN',
++    historyPrices: [1, 2],
++    historyDays: [10, 20],
++    livePrices: [3, 4],
++    liveDays: [30, 40],
++    dividends: null,
++    fundamentals: {
++      updatedAt: '2025-05-31',
++      source: 'iShares Factsheet',
++      stale: false,
++      metrics: {
++        'management-fee': '0.65%'
++      },
++      topHoldings: [
++        { name: 'NextEra Energy', weightPercent: 6.1 }
++      ],
++      sectorWeights: [
++        { sector: 'Utilities', weightPercent: 61.2 }
++      ]
++    },
++  };
++
++  beforeAll(() => {
++    (globalThis as any).ResizeObserver = class {
++      observe() {}
++      unobserve() {}
++      disconnect() {}
++    };
++  });
++
++  beforeEach(async () => {
++    getAssetSpy = vi.fn().mockReturnValue(of(mockAsset));
++
++    await TestBed.configureTestingModule({
++      imports: [Infr],
++      providers: [
++        {
++          provide: DashboardApiService,
++          useValue: { getAsset: getAssetSpy },
++        },
++      ],
++    }).compileComponents();
++  });
++
++  it('should compile and render the AssetPage component with assetId infr', async () => {
++    const fixture = TestBed.createComponent(Infr);
++    fixture.detectChanges();
++
++    expect(getAssetSpy).toHaveBeenCalledWith('infr');
++    const element: HTMLElement = fixture.nativeElement;
++    const assetPageEl = element.querySelector('app-asset-page');
++    expect(assetPageEl).toBeTruthy();
++    fixture.destroy();
++  });
++});
+diff --git a/frontend/src/app/features/stocks/infr/infr.ts b/frontend/src/app/features/stocks/infr/infr.ts
+new file mode 100644
+index 0000000..dccefe6
+--- /dev/null
++++ b/frontend/src/app/features/stocks/infr/infr.ts
+@@ -0,0 +1,9 @@
++import { Component } from '@angular/core';
++import { AssetPage } from '../../../shared/components/asset-page/asset-page';
++
++@Component({
++  selector: 'app-infr',
++  imports: [AssetPage],
++  templateUrl: './infr.html',
++})
++export class Infr {}
+diff --git a/frontend/src/app/shared/components/asset-page/asset-page.html b/frontend/src/app/shared/components/asset-page/asset-page.html
+new file mode 100644
+index 0000000..71512ca
+--- /dev/null
++++ b/frontend/src/app/shared/components/asset-page/asset-page.html
+@@ -0,0 +1,91 @@
++<div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col flex-grow gap-8">
++  @if (loading()) {
++    <div class="flex items-center justify-center py-20">
++      <span class="text-copper-400 text-lg font-medium animate-pulse">Chargement des données...</span>
++    </div>
++  } @else if (!data()) {
++    <div class="flex items-center justify-center py-20">
++      <span class="text-red-400 text-lg font-medium">Impossible de charger les données de l'actif.</span>
++    </div>
++  } @else {
++    <!-- Price freshness badge + main card -->
++    <div class="flex flex-col gap-4">
++      <div class="flex justify-start">
++        <app-price-freshness-badge
++          [marketStatus]="marketStatus()"
++          [priceSource]="priceSource()"
++          [lastRefresh]="lastRefresh()"
++        ></app-price-freshness-badge>
++      </div>
++
++      <div class="flex flex-wrap gap-8 justify-center">
++        <app-asset-main-card
++          [asset]="assetName()"
++          [symbol]="symbol()"
++          [actualPrice]="currentPrice()"
++          [change24h]="priceChangePercentage24h()"
++          [volume24h]="totalVolume()"
++          [marketCap]="marketCap()"
++          [lastRefresh]="lastRefresh()"
++          [currencySymbol]="currency()"
++          tag="stock"
++          [marketClosed]="isMarketClosed()"
++        ></app-asset-main-card>
++      </div>
++    </div>
++
++    <!-- Charts Section -->
++    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 w-full">
++      <!-- Chart annuelle -->
++      <div class="flex flex-col lg:col-span-3">
++        <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
++          <span class="w-2 h-2 rounded-sm bg-copper-500 animate-pulse"></span>
++          Annual Performance
++        </h3>
++        <app-price-chart
++          [prices]="historyPrices()"
++          [labels]="historyDays()"
++          [currency]="currency()"
++        ></app-price-chart>
++      </div>
++      <!-- Daily Chart -->
++      <div class="flex flex-col lg:col-span-2">
++        <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
++          <span class="w-2 h-2 rounded-sm bg-copper-500 animate-pulse"></span>
++          Daily Live
++        </h3>
++        <app-daily-chart
++          [prices]="livePrices()"
++          [labels]="liveDays()"
++          [currency]="currency()"
++        ></app-daily-chart>
++      </div>
++    </div>
++
++    <!-- Dividend & Fundamentals -->
++    @if (dividends() || fundamentals()) {
++      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full items-stretch">
++        @if (dividends()) {
++          <app-dividend-card
++            [dividends]="dividends()"
++            [currency]="currency()"
++          ></app-dividend-card>
++        }
++        @if (fundamentals()) {
++          @if (isEtf()) {
++            <app-etf-metrics-card
++              [fundamentals]="fundamentals()"
++            ></app-etf-metrics-card>
++            <app-etf-sector-chart
++              [sectorWeights]="sectorWeights()"
++            ></app-etf-sector-chart>
++          } @else {
++            <app-fundamentals-card
++              [fundamentals]="fundamentals()"
++            ></app-fundamentals-card>
++          }
++        }
++      </div>
++    }
++  }
++</div>
+diff --git a/frontend/src/app/shared/components/asset-page/asset-page.spec.ts b/frontend/src/app/shared/components/asset-page/asset-page.spec.ts
+new file mode 100644
+index 0000000..4ed64e5
+--- /dev/null
++++ b/frontend/src/app/shared/components/asset-page/asset-page.spec.ts
+@@ -0,0 +1,170 @@
++import { TestBed, ComponentFixture } from '@angular/core/testing';
++import { of } from 'rxjs';
++import { vi, type Mock } from 'vitest';
++import { AssetPage } from './asset-page';
++import { DashboardApiService } from '../../../core/services/dashboard-api.service';
++import type { AssetDto } from '../../../core/models';
++
++describe('AssetPage', () => {
++  let getAssetSpy: Mock;
++  let fixture: ComponentFixture<AssetPage>;
++
++  const mockAsset: AssetDto = {
++    assetId: 'inveb',
++    symbol: 'INVE-B',
++    displayName: 'Investor AB',
++    type: 'STOCK',
++    currency: 'SEK',
++    currentPrice: 250,
++    marketCap: 750000000,
++    priceChangePercentage24h: 1.5,
++    totalVolume: 5000000,
++    lastRefresh: Date.now(),
++    priceSource: 'FMP',
++    marketStatus: 'OPEN',
++    historyPrices: [100, 110, 120],
++    historyDays: [2021, 2022, 2023],
++    livePrices: [248, 249, 250],
++    liveDays: [1, 2, 3],
++    dividends: {
++      forwardDividend: 6.0,
++      forwardDividendCurrency: 'SEK',
++      frequency: 'Annual',
++      estimatedYield: 2.4,
++      avgDividendGrowth10Y: 8.5,
++      history: [
++        { year: 2024, amount: 5.6, currency: 'SEK' }
++      ]
++    },
++    fundamentals: {
++      updatedAt: '2026-04-15',
++      source: 'Q1 2026',
++      stale: false,
++      metrics: {
++        'trailing-pe': 6.11
++      },
++      topHoldings: [
++        { name: 'ABB', weightPercent: 16.5 }
++      ]
++    }
++  };
++
++  beforeAll(() => {
++    (globalThis as any).ResizeObserver = class {
++      observe() {}
++      unobserve() {}
++      disconnect() {}
++    };
++  });
++
++  beforeEach(async () => {
++    getAssetSpy = vi.fn().mockReturnValue(of(mockAsset));
++
++    await TestBed.configureTestingModule({
++      imports: [AssetPage],
++      providers: [
++        {
++          provide: DashboardApiService,
++          useValue: { getAsset: getAssetSpy }
++        }
++      ]
++    }).compileComponents();
++  });
++
++  it('loads and renders the asset data properly', async () => {
++    fixture = TestBed.createComponent(AssetPage);
++    fixture.componentRef.setInput('assetId', 'inveb');
++    fixture.detectChanges();
++
++    const component = fixture.componentInstance;
++    expect(getAssetSpy).toHaveBeenCalledWith('inveb');
++    expect(component.data()).not.toBeNull();
++    expect(component.assetName()).toBe('Investor AB');
++
++    const element: HTMLElement = fixture.nativeElement;
++    expect(element.querySelector('app-asset-main-card')).toBeTruthy();
++    expect(element.querySelector('app-price-chart')).toBeTruthy();
++    expect(element.querySelector('app-daily-chart')).toBeTruthy();
++    expect(element.querySelector('app-dividend-card')).toBeTruthy();
++    expect(element.querySelector('app-fundamentals-card')).toBeTruthy();
++    expect(element.querySelector('app-price-freshness-badge')).toBeTruthy();
++    fixture.destroy();
++  }, 15000);
++
++  it('hides dividend and fundamentals card if data is missing', async () => {
++    const mockAssetNoCards: AssetDto = {
++      ...mockAsset,
++      dividends: null,
++      fundamentals: null
++    };
++    getAssetSpy.mockReturnValue(of(mockAssetNoCards));
++
++    fixture = TestBed.createComponent(AssetPage);
++    fixture.componentRef.setInput('assetId', 'inveb');
++    fixture.detectChanges();
++
++    const element: HTMLElement = fixture.nativeElement;
++    expect(element.querySelector('app-dividend-card')).toBeNull();
++    expect(element.querySelector('app-fundamentals-card')).toBeNull();
++    fixture.destroy();
++  });
++
++  it('renders ETF specific cards instead of fundamentals card if type is ETF', async () => {
++    const mockEtfAsset: AssetDto = {
++      ...mockAsset,
++      type: 'ETF',
++      fundamentals: {
++        updatedAt: '2025-05-31',
++        source: 'iShares Factsheet',
++        stale: false,
++        metrics: {
++          'management-fee': '0.65%'
++        },
++        topHoldings: [
++          { name: 'NextEra Energy', weightPercent: 6.1 }
++        ],
++        sectorWeights: [
++          { sector: 'Utilities', weightPercent: 61.2 }
++        ]
++      }
++    };
++    getAssetSpy.mockReturnValue(of(mockEtfAsset));
++
++    fixture = TestBed.createComponent(AssetPage);
++    fixture.componentRef.setInput('assetId', 'infr');
++    fixture.detectChanges();
++
++    const component = fixture.componentInstance;
++    expect(component.isEtf()).toBe(true);
++
++    const element: HTMLElement = fixture.nativeElement;
++    expect(element.querySelector('app-etf-metrics-card')).toBeTruthy();
++    expect(element.querySelector('app-etf-sector-chart')).toBeTruthy();
++    expect(element.querySelector('app-fundamentals-card')).toBeNull();
++    fixture.destroy();
++  });
++
++  it('shows loading indicator while data is being fetched', async () => {
++    const { Subject } = await import('rxjs');
++    const dataSubject = new Subject<AssetDto | null>();
++    getAssetSpy.mockReturnValue(dataSubject.asObservable());
++
++    fixture = TestBed.createComponent(AssetPage);
++    fixture.componentRef.setInput('assetId', 'inveb');
++    fixture.detectChanges();
++
++    // Data not yet emitted — loading should be true
++    const element: HTMLElement = fixture.nativeElement;
++    expect(fixture.componentInstance.loading()).toBe(true);
++    expect(element.querySelector('app-asset-main-card')).toBeNull();
++
++    // Emit data — loading should clear
++    dataSubject.next(mockAsset);
++    dataSubject.complete();
++    fixture.detectChanges();
++
++    expect(fixture.componentInstance.loading()).toBe(false);
++    expect(element.querySelector('app-asset-main-card')).toBeTruthy();
++    fixture.destroy();
++  });
++});
+diff --git a/frontend/src/app/shared/components/asset-page/asset-page.ts b/frontend/src/app/shared/components/asset-page/asset-page.ts
+new file mode 100644
+index 0000000..98fddef
+--- /dev/null
++++ b/frontend/src/app/shared/components/asset-page/asset-page.ts
+@@ -0,0 +1,95 @@
++import { Component, inject, computed, DestroyRef, signal, input } from '@angular/core';
++import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
++import { DashboardApiService } from '../../../core/services/dashboard-api.service';
++import type { AssetDto } from '../../../core/models';
++import { AssetMainCard } from '../asset-main-card/asset-main-card';
++import { PriceChart } from '../price-chart/price-chart';
++import { DailyChart } from '../daily-chart/daily-chart';
++import { DividendCard } from '../dividend-card/dividend-card';
++import { FundamentalsCard } from '../fundamentals-card/fundamentals-card';
++import { EtfMetricsCard } from '../etf-metrics-card/etf-metrics-card';
++import { EtfSectorChart } from '../etf-sector-chart/etf-sector-chart';
++import { PriceFreshnessBadge } from '../price-freshness-badge/price-freshness-badge';
++import { Subject, switchMap, tap, takeUntil } from 'rxjs';
++
++@Component({
++  selector: 'app-asset-page',
++  imports: [
++    AssetMainCard,
++    PriceChart,
++    DailyChart,
++    DividendCard,
++    FundamentalsCard,
++    EtfMetricsCard,
++    EtfSectorChart,
++    PriceFreshnessBadge,
++  ],
++  templateUrl: './asset-page.html',
++})
++export class AssetPage {
++  assetId = input.required<string>();
++
++  data = signal<AssetDto | null>(null);
++  loading = signal<boolean>(true);
++
++  private api = inject(DashboardApiService);
++  private destroyRef = inject(DestroyRef);
++  private destroy$ = new Subject<void>();
++
++  assetName = computed(() => this.data()?.displayName ?? '');
++  symbol = computed(() => this.data()?.symbol ?? '');
++  currentPrice = computed(() => this.data()?.currentPrice ?? null);
++  currency = computed(() => this.data()?.currency ?? 'SEK');
++  priceChangePercentage24h = computed(() => this.data()?.priceChangePercentage24h ?? null);
++  totalVolume = computed(() => this.data()?.totalVolume ?? null);
++  marketCap = computed(() => this.data()?.marketCap ?? null);
++  lastRefresh = computed(() => this.data()?.lastRefresh ?? null);
++  priceSource = computed(() => this.data()?.priceSource ?? null);
++  marketStatus = computed(() => this.data()?.marketStatus ?? null);
++
++  historyPrices = computed(() => this.data()?.historyPrices ?? []);
++  historyDays = computed(() => this.data()?.historyDays ?? []);
++  livePrices = computed(() => this.data()?.livePrices ?? []);
++  liveDays = computed(() => this.data()?.liveDays ?? []);
++
++  dividends = computed(() => this.data()?.dividends ?? null);
++  fundamentals = computed(() => this.data()?.fundamentals ?? null);
++  isEtf = computed(() => this.data()?.type === 'ETF');
++  sectorWeights = computed(() => this.data()?.fundamentals?.sectorWeights ?? []);
++
++  hasLiveData = computed(() => this.currentPrice() !== null);
++  isMarketClosed = computed(() => this.marketStatus() === 'CLOSED');
++
++  constructor() {
++    toObservable(this.assetId)
++      .pipe(
++        tap(() => this.loading.set(true)),
++        switchMap((id) => this.api.getAsset(id)),
++        takeUntilDestroyed(this.destroyRef)
++      )
++      .subscribe((dto) => {
++        this.data.set(dto);
++        this.loading.set(false);
++      });
++
++    const intervalID = setInterval(() => this.refresh(), 180000);
++    this.destroyRef.onDestroy(() => {
++      clearInterval(intervalID);
++      this.destroy$.next();
++      this.destroy$.complete();
++    });
++  }
++
++  refresh() {
++    const id = this.assetId();
++    if (!id) return;
++    this.api
++      .getAsset(id)
++      .pipe(takeUntil(this.destroy$))
++      .subscribe((dto) => {
++        if (dto) {
++          this.data.set(dto);
++        }
++      });
++  }
++}
+diff --git a/frontend/src/app/shared/components/etf-metrics-card/etf-metrics-card.css b/frontend/src/app/shared/components/etf-metrics-card/etf-metrics-card.css
+new file mode 100644
+index 0000000..ba83986
+--- /dev/null
++++ b/frontend/src/app/shared/components/etf-metrics-card/etf-metrics-card.css
+@@ -0,0 +1 @@
++/* ETF Metrics Card Styles */
+diff --git a/frontend/src/app/shared/components/etf-metrics-card/etf-metrics-card.html b/frontend/src/app/shared/components/etf-metrics-card/etf-metrics-card.html
+new file mode 100644
+index 0000000..a1b92a6
+--- /dev/null
++++ b/frontend/src/app/shared/components/etf-metrics-card/etf-metrics-card.html
+@@ -0,0 +1,98 @@
++<div
++  class="relative w-full h-full bg-dark-800/40 border border-copper-500/20 rounded-2xl p-6 shadow-xl shadow-black/50 overflow-hidden group hover:border-copper-500/40 hover:bg-dark-800/60 transition-all duration-500 flex flex-col gap-5 min-h-full">
++  <div
++    class="absolute -top-16 -left-16 w-32 h-32 bg-copper-500/5 rounded-full blur-[40px] pointer-events-none group-hover:bg-copper-500/15 transition-all duration-700">
++  </div>
++
++  <h3
++    class="text-copper-300 text-xs font-black uppercase tracking-[0.2em] pb-3 border-b border-copper-500/20 drop-shadow-sm flex items-center relative z-10 shrink-0">
++    <span class="w-1.5 h-1.5 bg-copper-500 mr-2 rounded-sm shadow-[0_0_8px] shadow-copper-500/60"></span>
++    ETF Metrics
++  </h3>
++
++  <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-6 flex-grow">
++    <!-- Key Metrics (TER, AUM, NAV Premium) -->
++    <div class="flex flex-col gap-1 sm:pr-6 sm:border-r border-copper-500/20 min-h-0">
++      <h4
++        class="text-copper-400 text-sm font-bold uppercase tracking-[0.15em] pb-2 border-b border-copper-500/20 shrink-0">
++        Key Metrics
++      </h4>
++      @if (hasData()) {
++        <!-- TER (Management Fee) -->
++        <div
++          class="flex justify-between items-center gap-3 py-1.5 px-2 -mx-2 rounded-lg hover:bg-white/[0.03] transition-colors duration-300 group/item">
++          <span
++            class="text-copper-300/60 text-sm font-medium tracking-wide group-hover/item:text-copper-300 transition-colors leading-snug">
++            Management Fee (TER)
++          </span>
++          <span class="font-mono font-semibold text-copper-600/80 tracking-wider shrink-0">
++            {{ ter() }}
++          </span>
++        </div>
++
++        <!-- AUM (Total Assets) -->
++        <div
++          class="flex justify-between items-center gap-3 py-1.5 px-2 -mx-2 rounded-lg hover:bg-white/[0.03] transition-colors duration-300 group/item">
++          <span
++            class="text-copper-300/60 text-sm font-medium tracking-wide group-hover/item:text-copper-300 transition-colors leading-snug">
++            Total Assets (AUM)
++          </span>
++          <span class="font-mono font-semibold text-copper-600/80 tracking-wider shrink-0">
++            {{ aum() }}
++          </span>
++        </div>
++
++        <!-- NAV Premium/Discount -->
++        <div
++          class="flex justify-between items-center gap-3 py-1.5 px-2 -mx-2 rounded-lg hover:bg-white/[0.03] transition-colors duration-300 group/item">
++          <span
++            class="text-copper-300/60 text-sm font-medium tracking-wide group-hover/item:text-copper-300 transition-colors leading-snug">
++            NAV Discount / Premium
++          </span>
++          <span class="font-mono font-semibold text-copper-600/80 tracking-wider shrink-0">
++            {{ navPremium() }}
++          </span>
++        </div>
++      } @else {
++        <div class="flex items-center justify-center flex-grow py-8 text-center text-copper-300/40 text-sm font-medium">
++          No metrics available
++        </div>
++      }
++    </div>
++
++    <!-- Top Holdings -->
++    <div class="flex flex-col gap-3 sm:pl-6">
++      <h4
++        class="text-copper-400 text-sm font-bold uppercase tracking-[0.15em] pb-2 border-b border-copper-500/20 shrink-0">
++        Top Holdings
++      </h4>
++      @if (hasData() && topHoldings().length > 0) {
++        <ul
++          class="custom-scroll-copper flex flex-col gap-2 flex-grow overflow-y-auto overflow-x-hidden pr-1 -mr-1 min-h-0 max-h-64 sm:max-h-none sm:aspect-square">
++          @for (holding of topHoldings(); track holding.name + '-' + $index) {
++          <li
++            class="flex justify-between items-center gap-3 py-2 px-3 rounded-xl bg-dark-900/40 border border-copper-500/20 hover:border-copper-500/35 transition-all duration-300">
++            <span class="text-copper-300/80 text-sm font-semibold tracking-wide">{{
++              holding.name
++              }}</span>
++            <span class="font-mono font-semibold text-copper-400/70 tracking-wider">{{
++              holding.weight
++              }}</span>
++          </li>
++          }
++        </ul>
++      } @else {
++        <div class="flex items-center justify-center flex-grow py-8 text-center text-copper-300/40 text-sm font-medium">
++          No holdings available
++        </div>
++      }
++    </div>
++  </div>
++
++  @if (sourceLabel() && sourceLabel() !== '-' && sourceLabel() !== '') {
++  <p
++    class="relative z-10 text-copper-300/35 text-[10px] font-medium tracking-wide uppercase text-center pt-2 border-t border-copper-500/10 shrink-0">
++    {{ sourceLabel() }}
++  </p>
++  }
++</div>
+diff --git a/frontend/src/app/shared/components/etf-metrics-card/etf-metrics-card.spec.ts b/frontend/src/app/shared/components/etf-metrics-card/etf-metrics-card.spec.ts
+new file mode 100644
+index 0000000..b1d15a2
+--- /dev/null
++++ b/frontend/src/app/shared/components/etf-metrics-card/etf-metrics-card.spec.ts
+@@ -0,0 +1,74 @@
++import { ComponentFixture, TestBed } from '@angular/core/testing';
++import { EtfMetricsCard } from './etf-metrics-card';
++import type { FundamentalsBlock } from '../../../core/models';
++
++describe('EtfMetricsCard', () => {
++  let fixture: ComponentFixture<EtfMetricsCard>;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [EtfMetricsCard],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(EtfMetricsCard);
++    await fixture.whenStable();
++    fixture.detectChanges();
++  });
++
++  it('renders detailed data when fundamentals block is populated', () => {
++    const mockFundamentals: FundamentalsBlock = {
++      updatedAt: '2025-05-31',
++      source: 'Source: iShares ETF Factsheet',
++      stale: false,
++      metrics: {
++        'management-fee': '0.65%',
++        'total-assets': '$2.8bn',
++        'nav-discount-premium': '0.02%',
++      },
++      topHoldings: [
++        { name: 'NextEra Energy', weightPercent: 6.1 },
++        { name: 'Southern Company', weightPercent: 3.9 },
++      ],
++      sectorWeights: [],
++    };
++
++    fixture.componentRef.setInput('fundamentals', mockFundamentals);
++    fixture.detectChanges();
++
++    const component = fixture.componentInstance;
++    expect(component.hasData()).toBe(true);
++    expect(component.sourceLabel()).toBe('Source: iShares ETF Factsheet');
++    expect(component.ter()).toBe('0.65%');
++    expect(component.aum()).toBe('$2.8bn');
++    expect(component.navPremium()).toBe('0.02%');
++    expect(component.topHoldings().length).toBe(2);
++    expect(component.topHoldings()[0]).toEqual({ name: 'NextEra Energy', weight: '6.10%' });
++
++    // DOM Assertions
++    const element: HTMLElement = fixture.nativeElement;
++    expect(element.querySelector('h3')?.textContent).toContain('ETF Metrics');
++    expect(element.textContent).toContain('Management Fee (TER)');
++    expect(element.textContent).toContain('0.65%');
++    expect(element.textContent).toContain('NextEra Energy');
++    expect(element.textContent).toContain('6.10%');
++    expect(element.textContent).toContain('Source: iShares ETF Factsheet');
++  });
++
++  it('renders fallback messages when data is unavailable', () => {
++    fixture.componentRef.setInput('fundamentals', null);
++    fixture.detectChanges();
++
++    const component = fixture.componentInstance;
++    expect(component.hasData()).toBe(false);
++    expect(component.ter()).toBe('-');
++    expect(component.aum()).toBe('-');
++    expect(component.navPremium()).toBe('-');
++    expect(component.topHoldings().length).toBe(0);
++
++    // DOM Assertions
++    const element: HTMLElement = fixture.nativeElement;
++    expect(element.textContent).toContain('No metrics available');
++    expect(element.textContent).toContain('No holdings available');
++    expect(element.querySelector('p')?.textContent).toBeUndefined();
++  });
++});
+diff --git a/frontend/src/app/shared/components/etf-metrics-card/etf-metrics-card.ts b/frontend/src/app/shared/components/etf-metrics-card/etf-metrics-card.ts
+new file mode 100644
+index 0000000..265935f
+--- /dev/null
++++ b/frontend/src/app/shared/components/etf-metrics-card/etf-metrics-card.ts
+@@ -0,0 +1,57 @@
++import { Component, computed, input } from '@angular/core';
++import { formatNumber } from '../../../core/services/format-number';
++import type { FundamentalsBlock, HoldingEntry } from '../../../core/models';
++
++@Component({
++  selector: 'app-etf-metrics-card',
++  imports: [],
++  templateUrl: './etf-metrics-card.html',
++  styleUrl: './etf-metrics-card.css',
++})
++export class EtfMetricsCard {
++  fundamentals = input<FundamentalsBlock | null>(null);
++
++  hasData = computed(() => this.fundamentals() !== null);
++
++  ter = computed(() => {
++    const fund = this.fundamentals();
++    if (!fund || !fund.metrics) return '-';
++    return String(fund.metrics['management-fee'] ?? '-');
++  });
++
++  aum = computed(() => {
++    const fund = this.fundamentals();
++    if (!fund || !fund.metrics) return '-';
++    return String(fund.metrics['total-assets'] ?? '-');
++  });
++
++  navPremium = computed(() => {
++    const fund = this.fundamentals();
++    if (!fund || !fund.metrics) return '-';
++    return String(fund.metrics['nav-discount-premium'] ?? '-');
++  });
++
++  topHoldings = computed(() => {
++    const fund = this.fundamentals();
++    if (!this.hasData() || !fund || !fund.topHoldings) {
++      return [];
++    }
++    return fund.topHoldings.map((h: HoldingEntry) => {
++      const weightStr = h.weightPercent != null && !isNaN(h.weightPercent)
++        ? `${formatNumber(h.weightPercent)}%`
++        : '-';
++      return {
++        name: h.name,
++        weight: weightStr,
++      };
++    });
++  });
++
++  sourceLabel = computed(() => {
++    const fund = this.fundamentals();
++    if (!this.hasData() || !fund || !fund.source) {
++      return '-';
++    }
++    return fund.source;
++  });
++}
+diff --git a/frontend/src/app/shared/components/etf-sector-chart/etf-sector-chart.css b/frontend/src/app/shared/components/etf-sector-chart/etf-sector-chart.css
+new file mode 100644
+index 0000000..2cfb91c
+--- /dev/null
++++ b/frontend/src/app/shared/components/etf-sector-chart/etf-sector-chart.css
+@@ -0,0 +1,5 @@
++canvas {
++  display: block;
++  width: 100%;
++  height: 100%;
++}
+diff --git a/frontend/src/app/shared/components/etf-sector-chart/etf-sector-chart.html b/frontend/src/app/shared/components/etf-sector-chart/etf-sector-chart.html
+new file mode 100644
+index 0000000..f8864e7
+--- /dev/null
++++ b/frontend/src/app/shared/components/etf-sector-chart/etf-sector-chart.html
+@@ -0,0 +1,21 @@
++<div
++  class="relative w-full h-full bg-dark-800/40 border border-copper-500/20 rounded-2xl p-6 shadow-xl shadow-black/50 overflow-hidden group hover:border-copper-500/40 hover:bg-dark-800/60 transition-all duration-500 flex flex-col gap-5 min-h-full">
++  <div
++    class="absolute -top-16 -left-16 w-32 h-32 bg-copper-500/5 rounded-full blur-[40px] pointer-events-none group-hover:bg-copper-500/15 transition-all duration-700">
++  </div>
++
++  <h3
++    class="text-copper-300 text-xs font-black uppercase tracking-[0.2em] pb-3 border-b border-copper-500/20 drop-shadow-sm flex items-center relative z-10 shrink-0">
++    <span class="w-1.5 h-1.5 bg-copper-500 mr-2 rounded-sm shadow-[0_0_8px] shadow-copper-500/60"></span>
++    Sector Exposure
++  </h3>
++
++  <div class="relative z-10 flex-grow w-full h-[220px] min-h-0">
++    <canvas #chartCanvas [class.invisible]="!hasData()">
++      <p class="sr-only">Donut chart showing ETF sector weights allocation.</p>
++    </canvas>
++    @if (!hasData()) {
++      <app-chart-empty-state />
++    }
++  </div>
++</div>
+diff --git a/frontend/src/app/shared/components/etf-sector-chart/etf-sector-chart.spec.ts b/frontend/src/app/shared/components/etf-sector-chart/etf-sector-chart.spec.ts
+new file mode 100644
+index 0000000..1c822fb
+--- /dev/null
++++ b/frontend/src/app/shared/components/etf-sector-chart/etf-sector-chart.spec.ts
+@@ -0,0 +1,55 @@
++import { ComponentFixture, TestBed } from '@angular/core/testing';
++import { EtfSectorChart } from './etf-sector-chart';
++import type { SectorWeight } from '../../../core/models';
++
++describe('EtfSectorChart', () => {
++  let fixture: ComponentFixture<EtfSectorChart>;
++
++  beforeAll(() => {
++    (globalThis as any).ResizeObserver = class {
++      observe() {}
++      unobserve() {}
++      disconnect() {}
++    };
++  });
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [EtfSectorChart],
++    }).compileComponents();
++
++    fixture = TestBed.createComponent(EtfSectorChart);
++    await fixture.whenStable();
++    fixture.detectChanges();
++  });
++
++  it('renders sector weights when data is populated', () => {
++    const mockSectorWeights: SectorWeight[] = [
++      { sector: 'Utilities', weightPercent: 61.2 },
++      { sector: 'Energy', weightPercent: 16.4 },
++    ];
++
++    fixture.componentRef.setInput('sectorWeights', mockSectorWeights);
++    fixture.detectChanges();
++
++    const component = fixture.componentInstance;
++    expect(component.hasData()).toBe(true);
++
++    // DOM Assertions
++    const element: HTMLElement = fixture.nativeElement;
++    expect(element.querySelector('h3')?.textContent).toContain('Sector Exposure');
++    expect(element.querySelector('canvas')).toBeTruthy();
++  });
++
++  it('renders empty state when data is empty', () => {
++    fixture.componentRef.setInput('sectorWeights', []);
++    fixture.detectChanges();
++
++    const component = fixture.componentInstance;
++    expect(component.hasData()).toBe(false);
++
++    // DOM Assertions
++    const element: HTMLElement = fixture.nativeElement;
++    expect(element.querySelector('app-chart-empty-state')).toBeTruthy();
++  });
++});
+diff --git a/frontend/src/app/shared/components/etf-sector-chart/etf-sector-chart.ts b/frontend/src/app/shared/components/etf-sector-chart/etf-sector-chart.ts
+new file mode 100644
+index 0000000..9d924e0
+--- /dev/null
++++ b/frontend/src/app/shared/components/etf-sector-chart/etf-sector-chart.ts
+@@ -0,0 +1,119 @@
++import { Component, ElementRef, viewChild, input, effect, inject, DestroyRef, computed } from '@angular/core';
++import { Chart, registerables } from 'chart.js';
++import { ChartEmptyState } from '../chart-empty-state/chart-empty-state';
++import type { SectorWeight } from '../../../core/models';
++
++Chart.register(...registerables);
++
++@Component({
++  selector: 'app-etf-sector-chart',
++  imports: [ChartEmptyState],
++  templateUrl: './etf-sector-chart.html',
++  styleUrl: './etf-sector-chart.css',
++})
++export class EtfSectorChart {
++  chartCanvas = viewChild<ElementRef<HTMLCanvasElement>>('chartCanvas');
++  sectorWeights = input<SectorWeight[]>([]);
++
++  hasData = computed(() => this.sectorWeights().length > 0);
++
++  private chart: Chart | undefined;
++
++  private readonly destroyRef = inject(DestroyRef);
++
++  constructor() {
++    this.destroyRef.onDestroy(() => {
++      this.chart?.destroy();
++    });
++
++    effect(() => {
++      const canvas = this.chartCanvas();
++      if (!canvas || !this.hasData()) {
++        this.chart?.destroy();
++        this.chart = undefined;
++        return;
++      }
++
++      if (!this.chart) {
++        this.createChart();
++      } else {
++        this.updateChart();
++      }
++    });
++  }
++
++  private updateChart() {
++    if (!this.chart) return;
++    const data = this.sectorWeights();
++    this.chart.data.labels = data.map(sw => sw.sector);
++    this.chart.data.datasets[0].data = data.map(sw => sw.weightPercent);
++    this.chart.update('none');
++  }
++
++  private createChart() {
++    const canvas = this.chartCanvas()?.nativeElement;
++    if (!canvas) return;
++    const ctx = canvas.getContext('2d');
++    if (!ctx) return;
++
++    const data = this.sectorWeights();
++
++    // Harmonious dark copper theme color palette
++    const colors = [
++      '#b87333', // Primary copper
++      '#d4a373', // Light copper
++      '#a3704c', // Medium dark copper
++      '#8c531d', // Dark copper
++      '#e5c158', // Light gold-copper
++      '#5c3a21', // Espresso copper
++      '#f2d49b', // Sandy copper
++    ];
++
++    this.chart = new Chart(ctx, {
++      type: 'doughnut',
++      data: {
++        labels: data.map(sw => sw.sector),
++        datasets: [{
++          data: data.map(sw => sw.weightPercent),
++          backgroundColor: colors.slice(0, data.length),
++          borderColor: '#111111',
++          borderWidth: 2,
++          hoverOffset: 4,
++        }]
++      },
++      options: {
++        responsive: true,
++        maintainAspectRatio: false,
++        plugins: {
++          legend: {
++            position: 'right',
++            labels: {
++              color: 'rgba(255, 255, 255, 0.7)',
++              font: {
++                size: 11,
++                weight: 'normal',
++              },
++              padding: 15,
++              usePointStyle: true,
++              pointStyle: 'circle',
++            }
++          },
++          tooltip: {
++            backgroundColor: '#1a1a1a',
++            titleColor: '#e5a075',
++            borderColor: 'rgba(184, 115, 51, 0.3)',
++            borderWidth: 1,
++            padding: { top: 8, bottom: 8, left: 16, right: 16 },
++            titleFont: { size: 13, weight: 'bold' },
++            bodyFont: { size: 13 },
++            displayColors: false,
++            callbacks: {
++              label: (ctx) => ` ${ctx.parsed}%`
++            }
++          }
++        },
++        cutout: '65%',
++      }
++    });
++  }
++}

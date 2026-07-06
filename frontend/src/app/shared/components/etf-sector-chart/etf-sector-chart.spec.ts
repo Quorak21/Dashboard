@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { vi } from 'vitest';
 import { EtfSectorChart } from './etf-sector-chart';
 import type { SectorWeight } from '../../../core/models';
 
@@ -6,11 +7,11 @@ describe('EtfSectorChart', () => {
   let fixture: ComponentFixture<EtfSectorChart>;
 
   beforeAll(() => {
-    (globalThis as any).ResizeObserver = class {
+    vi.stubGlobal('ResizeObserver', class {
       observe() {}
       unobserve() {}
       disconnect() {}
-    };
+    });
   });
 
   beforeEach(async () => {

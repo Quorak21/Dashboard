@@ -8,7 +8,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -50,6 +54,7 @@ public class ConfigurableAssetService {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigurableAssetService.class);
     private static final long HISTORY_REFRESH_MS = 3_600_000L;
+    private static final long GET_SYNC_TIMEOUT_MS = 10_000L;
 
     private final AssetRegistry assetRegistry;
     private final PriceProviderRegistry priceProviderRegistry;
@@ -113,15 +118,31 @@ public class ConfigurableAssetService {
 
     public AssetDto getData(String assetId) {
         AssetDefinition asset = resolveAsset(assetId);
-        refreshHistory(asset);
         AssetDto cached = cacheFor(assetId).get();
         if (cached == null) {
-            return assembleDto(
-                    asset,
-                    AssetDto.error(assetId, asset.dbSymbol(), asset.displayName(), asset.type()),
-                    null,
-                    marketHoursGuard.status(asset));
+            logger.info("Cache miss for asset {}, warming up via syncPrice", assetId);
+            try {
+                return CompletableFuture.supplyAsync(() -> syncPrice(assetId))
+                        .get(GET_SYNC_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                logger.warn(
+                        "Sync timed out for asset {} after {}ms, returning partial response",
+                        assetId,
+                        GET_SYNC_TIMEOUT_MS);
+                return assembleDto(
+                        asset,
+                        AssetDto.error(assetId, asset.dbSymbol(), asset.displayName(), asset.type()),
+                        PriceSource.CACHE,
+                        marketHoursGuard.status(asset));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return fallbackFromCache(asset);
+            } catch (ExecutionException e) {
+                logger.error("Sync failed for asset {}", assetId, e.getCause());
+                return fallbackFromCache(asset);
+            }
         }
+        refreshHistory(asset);
         return assembleDto(asset, cached, cached.priceSource(), marketHoursGuard.status(asset));
     }
 
@@ -131,68 +152,135 @@ public class ConfigurableAssetService {
         synchronized (lock) {
             try {
                 refreshHistory(asset);
-                if (asset.provider() == null) {
-                    logger.warn("Asset {} has no provider configured", assetId);
-                    return fallbackFromCache(asset);
-                }
-                PriceProvider provider = priceProviderRegistry.requireById(asset.provider().providerId());
-                PriceQuote quote = provider.fetch(asset);
+            } catch (Exception e) {
+                logger.error("Failed to refresh history for asset {}", assetId, e);
+                return fallbackFromCache(asset);
+            }
 
-                if (quote == null || quote.fetchedAt() == null) {
-                    if (asset.provider() == AssetProvider.SCRAPE) {
-                        providerCallMetrics.incrementScrape();
-                        providerCallMetrics.recordScrapeFailure();
-                    }
-                    return fallbackFromCache(asset);
-                }
-
-                if (marketHoursGuard.isOpen(asset)) {
-                    try {
-                        persistDailyPoint(asset, quote);
-                    } catch (Exception e) {
-                        logger.error("Failed to persist daily price point for asset {}", assetId, e);
-                    }
-                }
-
-                LiveSeries live = buildLiveSeries(asset);
-                HistoryState history = historyState(assetId);
-                MarketStatus marketStatus = marketHoursGuard.status(asset);
-
-                AssetDto dto = new AssetDto(
-                        asset.id(),
-                        asset.dbSymbol(),
-                        asset.displayName(),
-                        asset.type(),
-                        quote.currency(),
-                        quote.price(),
-                        quote.marketCap(),
-                        quote.changePercent24h(),
-                        quote.volume(),
-                        quote.fetchedAt().toEpochMilli(),
-                        priceSourceFor(asset, false),
-                        marketStatus,
-                        history.historyPrices,
-                        history.historyDays,
-                        live.prices(),
-                        live.days(),
-                        buildDividendsBlock(asset.id(), quote.price()),
-                        buildFundamentalsBlock(asset.id()));
-
-                cacheFor(assetId).set(dto);
-                if (asset.provider() == AssetProvider.FMP) {
-                    providerCallMetrics.incrementFmp();
-                } else if (asset.provider() == AssetProvider.SCRAPE) {
-                    providerCallMetrics.incrementScrape();
-                }
-                return dto;
+            SyncFetchResult fetchResult;
+            try {
+                fetchResult = fetchPriceQuote(asset, assetId);
             } catch (Exception e) {
                 logger.error("Price provider failed for asset {}", assetId, e);
+                fetchResult = SyncFetchResult.failure();
+            }
+
+            return applySyncResult(asset, assetId, fetchResult);
+        }
+    }
+
+    private SyncFetchResult fetchPriceQuote(AssetDefinition asset, String assetId) {
+        try {
+            if (asset.provider() == null) {
+                logger.warn("Asset {} has no provider configured", assetId);
+                return SyncFetchResult.noProvider();
+            }
+            PriceProvider provider = priceProviderRegistry.requireById(asset.provider().providerId());
+            PriceQuote quote = provider.fetch(asset);
+
+            if (quote == null || quote.fetchedAt() == null) {
                 if (asset.provider() == AssetProvider.SCRAPE) {
                     providerCallMetrics.incrementScrape();
                     providerCallMetrics.recordScrapeFailure();
                 }
-                return fallbackFromCache(asset);
+                return SyncFetchResult.missingQuote();
             }
+            return SyncFetchResult.success(quote);
+        } catch (Exception e) {
+            logger.error("Price provider failed for asset {}", assetId, e);
+            if (asset.provider() == AssetProvider.SCRAPE) {
+                providerCallMetrics.incrementScrape();
+                providerCallMetrics.recordScrapeFailure();
+            }
+            return SyncFetchResult.failure();
+        }
+    }
+
+    private AssetDto applySyncResult(AssetDefinition asset, String assetId, SyncFetchResult fetchResult) {
+        if (!fetchResult.hasQuote()) {
+            return fallbackFromCache(asset);
+        }
+
+        PriceQuote quote = fetchResult.quote();
+        long quoteMillis = quote.fetchedAt().toEpochMilli();
+        AssetDto existing = cacheFor(assetId).get();
+        if (existing != null
+                && existing.lastRefresh() != null
+                && quoteMillis <= existing.lastRefresh()) {
+            logger.debug(
+                    "Ignoring stale quote for asset {} (quote={}, cached={})",
+                    assetId,
+                    quoteMillis,
+                    existing.lastRefresh());
+            return assembleDto(asset, existing, existing.priceSource(), marketHoursGuard.status(asset));
+        }
+
+        try {
+            if (marketHoursGuard.isOpen(asset)) {
+                try {
+                    persistDailyPoint(asset, quote);
+                } catch (Exception e) {
+                    logger.error("Failed to persist daily price point for asset {}", assetId, e);
+                }
+            }
+
+            LiveSeries live = buildLiveSeries(asset);
+            HistoryState history = historyState(assetId);
+            MarketStatus marketStatus = marketHoursGuard.status(asset);
+
+            AssetDto dto = new AssetDto(
+                    asset.id(),
+                    asset.dbSymbol(),
+                    asset.displayName(),
+                    asset.type(),
+                    quote.currency(),
+                    quote.price(),
+                    quote.marketCap(),
+                    quote.changePercent24h(),
+                    quote.volume(),
+                    quote.fetchedAt().toEpochMilli(),
+                    priceSourceFor(asset, false),
+                    marketStatus,
+                    syncIntervalMinutesFor(asset),
+                    history.historyPrices,
+                    history.historyDays,
+                    live.prices(),
+                    live.days(),
+                    buildDividendsBlock(asset.id(), quote.price()),
+                    buildFundamentalsBlock(asset.id()));
+
+            cacheFor(assetId).set(dto);
+            if (asset.provider() == AssetProvider.FMP) {
+                providerCallMetrics.incrementFmp();
+            } else if (asset.provider() == AssetProvider.SCRAPE) {
+                providerCallMetrics.incrementScrape();
+            }
+            return dto;
+        } catch (Exception e) {
+            logger.error("Failed to apply sync result for asset {}", assetId, e);
+            return fallbackFromCache(asset);
+        }
+    }
+
+    private record SyncFetchResult(PriceQuote quote, boolean attempted) {
+        static SyncFetchResult success(PriceQuote quote) {
+            return new SyncFetchResult(quote, true);
+        }
+
+        static SyncFetchResult noProvider() {
+            return new SyncFetchResult(null, false);
+        }
+
+        static SyncFetchResult missingQuote() {
+            return new SyncFetchResult(null, true);
+        }
+
+        static SyncFetchResult failure() {
+            return new SyncFetchResult(null, true);
+        }
+
+        boolean hasQuote() {
+            return quote != null && quote.fetchedAt() != null;
         }
     }
 
@@ -230,7 +318,7 @@ public class ConfigurableAssetService {
         List<Double> livePrices = priceFields.livePrices() != null ? priceFields.livePrices() : List.of();
         List<Long> liveDays = priceFields.liveDays() != null ? priceFields.liveDays() : List.of();
         DividendsBlock dividends = buildDividendsBlock(asset.id(), priceFields.currentPrice());
-        FundamentalsBlock fundamentals = priceFields.fundamentals();
+        FundamentalsBlock fundamentals = buildFundamentalsBlock(asset.id());
         HistoryState history = historyState(asset.id());
         
         return new AssetDto(
@@ -246,6 +334,7 @@ public class ConfigurableAssetService {
                 priceFields.lastRefresh(),
                 priceSource,
                 marketStatus,
+                syncIntervalMinutesFor(asset),
                 history.historyPrices,
                 history.historyDays,
                 livePrices,
@@ -420,6 +509,13 @@ public class ConfigurableAssetService {
 
     private HistoryState historyState(String assetId) {
         return historyStateByAssetId.computeIfAbsent(assetId, id -> new HistoryState());
+    }
+
+    private Integer syncIntervalMinutesFor(AssetDefinition asset) {
+        if (asset.sync() == null) {
+            return null;
+        }
+        return asset.sync().intervalMinutes();
     }
 
     private PriceSource priceSourceFor(AssetDefinition asset, boolean fromCache) {

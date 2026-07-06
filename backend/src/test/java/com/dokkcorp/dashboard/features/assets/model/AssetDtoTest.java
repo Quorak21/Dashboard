@@ -30,6 +30,7 @@ class AssetDtoTest {
                 1748858400000L,
                 PriceSource.FMP,
                 MarketStatus.OPEN,
+                15,
                 List.of(200.0),
                 List.of(1000L),
                 List.of(),
@@ -53,6 +54,7 @@ class AssetDtoTest {
         assertTrue(json.contains("\"lastRefresh\":1748858400000"));
         assertTrue(json.contains("\"priceSource\":\"FMP\""));
         assertTrue(json.contains("\"marketStatus\":\"OPEN\""));
+        assertTrue(json.contains("\"syncIntervalMinutes\":15"));
         assertTrue(json.contains("\"historyPrices\":[200.0]"));
         assertTrue(json.contains("\"historyDays\":[1000]"));
         assertTrue(json.contains("\"livePrices\":[]"));
@@ -115,6 +117,7 @@ class AssetDtoTest {
                 1748858400000L,
                 PriceSource.FMP,
                 MarketStatus.OPEN,
+                15,
                 List.of(),
                 List.of(),
                 List.of(),

@@ -11,6 +11,7 @@ import { EtfMetricsCard } from '../etf-metrics-card/etf-metrics-card';
 import { EtfSectorChart } from '../etf-sector-chart/etf-sector-chart';
 import { PriceFreshnessBadge } from '../price-freshness-badge/price-freshness-badge';
 import { Subject, switchMap, tap, takeUntil, of, catchError } from 'rxjs';
+import { ASSET_PAGE_LABELS } from './asset-page.labels';
 
 @Component({
   selector: 'app-asset-page',
@@ -29,6 +30,8 @@ import { Subject, switchMap, tap, takeUntil, of, catchError } from 'rxjs';
 export class AssetPage {
   assetId = input.required<string>();
 
+  readonly labels = ASSET_PAGE_LABELS;
+
   data = signal<AssetDto | null>(null);
   loading = signal<boolean>(true);
 
@@ -46,6 +49,7 @@ export class AssetPage {
   lastRefresh = computed(() => this.data()?.lastRefresh ?? null);
   priceSource = computed(() => this.data()?.priceSource ?? null);
   marketStatus = computed(() => this.data()?.marketStatus ?? null);
+  syncIntervalMinutes = computed(() => this.data()?.syncIntervalMinutes ?? null);
 
   historyPrices = computed(() => this.data()?.historyPrices ?? []);
   historyDays = computed(() => this.data()?.historyDays ?? []);

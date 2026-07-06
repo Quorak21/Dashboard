@@ -1,11 +1,11 @@
 <div class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col flex-grow gap-8">
   @if (loading()) {
     <div class="flex items-center justify-center py-20">
-      <span class="text-copper-400 text-lg font-medium animate-pulse">Chargement des données...</span>
+      <span class="text-copper-400 text-lg font-medium animate-pulse">{{ labels.loading }}</span>
     </div>
   } @else if (!data()) {
     <div class="flex items-center justify-center py-20">
-      <span class="text-red-400 text-lg font-medium">Impossible de charger les données de l'actif.</span>
+      <span class="text-red-400 text-lg font-medium">{{ labels.loadError }}</span>
     </div>
   } @else {
     <!-- Price freshness badge + main card -->
@@ -15,6 +15,7 @@
           [marketStatus]="marketStatus()"
           [priceSource]="priceSource()"
           [lastRefresh]="lastRefresh()"
+          [syncIntervalMinutes]="syncIntervalMinutes()"
         ></app-price-freshness-badge>
       </div>
 
@@ -41,7 +42,7 @@
       <div class="flex flex-col lg:col-span-3">
         <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
           <span class="w-2 h-2 rounded-sm bg-copper-500 animate-pulse"></span>
-          Annual Performance
+          {{ labels.annualPerformance }}
         </h3>
         <app-price-chart
           [prices]="historyPrices()"
@@ -53,7 +54,7 @@
       <div class="flex flex-col lg:col-span-2">
         <h3 class="text-copper-400 text-lg font-medium mb-4 flex items-center gap-2">
           <span class="w-2 h-2 rounded-sm bg-copper-500 animate-pulse"></span>
-          Daily Live
+          {{ labels.dailyLive }}
         </h3>
         <app-daily-chart
           [prices]="livePrices()"

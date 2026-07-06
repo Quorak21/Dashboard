@@ -1,5 +1,7 @@
 app:
   assets-registry:
+    # sync.interval-minutes / offset-minutes: FMP fetch schedule (UTC minute slots).
+    # Prices refresh 24/7; AssetDaily DB writes still respect market-hours per asset.
     entries:
       - id: inveb
         display-name: Investor AB

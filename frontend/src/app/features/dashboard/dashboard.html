@@ -42,7 +42,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 @for (asset of registeredAssets(); track asset.id) {
                 <app-asset-dashboard-card [asset]="asset.id" [title]="asset.displayName" [price]="assets()[asset.id]?.currentPrice ?? null"
-                    [change]="assets()[asset.id]?.priceChangePercentage24h ?? null" [currencySymbol]="getCurrencySymbol(asset.currency)"></app-asset-dashboard-card>
+                    [change]="assets()[asset.id]?.priceChangePercentage24h ?? null" [currencySymbol]="getCurrencySymbol(asset.currency)"
+                    [marketStatus]="assets()[asset.id]?.marketStatus ?? null"></app-asset-dashboard-card>
                 }
             </div>
         </section>

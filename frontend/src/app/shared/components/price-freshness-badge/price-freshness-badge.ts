@@ -2,6 +2,9 @@ import { Component, computed, input } from '@angular/core';
 import type { PriceSource, MarketStatus } from '../../../core/models';
 import { formatTime } from '../../../core/services/format-dates';
 
+/** Fallback when registry sync interval is unknown (2 × 15 min). */
+const DEFAULT_STALE_THRESHOLD_MS = 30 * 60 * 1000;
+
 @Component({
   selector: 'app-price-freshness-badge',
   imports: [],
@@ -11,9 +14,16 @@ export class PriceFreshnessBadge {
   marketStatus = input<MarketStatus | null>(null);
   priceSource = input<PriceSource | null>(null);
   lastRefresh = input<number | null>(null);
+  /** Registry sync.interval-minutes; stale when age exceeds 2× this value (ADR-14). */
+  syncIntervalMinutes = input<number | null>(null);
 
-  // default threshold: 30 minutes
-  staleThresholdMs = input<number>(30 * 60 * 1000);
+  private staleThresholdMs = computed(() => {
+    const interval = this.syncIntervalMinutes();
+    if (interval != null && interval > 0) {
+      return interval * 2 * 60 * 1000;
+    }
+    return DEFAULT_STALE_THRESHOLD_MS;
+  });
 
   freshness = computed(() => {
     const status = this.marketStatus();
@@ -31,7 +41,7 @@ export class PriceFreshnessBadge {
     }
 
     const isStaleSource = source === 'CACHE';
-    const isStaleTime = refresh === null || (Date.now() - refresh > threshold);
+    const isStaleTime = refresh === null || Date.now() - refresh > threshold;
 
     if (isStaleSource || isStaleTime) {
       return {

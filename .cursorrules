@@ -1,12 +1,19 @@
-# Dashboard — Règles Cursor (Orchestration)
+# Dashboard — Règles Cursor
 
-Les règles et agents du projet sont définis dans `.cursor/rules/` :
+Règles agents : `.cursor/rules/agent.mdc` — définition subagent : `.cursor/agents/agent.md`
 
-- `odin.mdc` (@odin) — Toujours actif. Grand Chef, planification, architecture et suivi dette technique.
-- `alex.mdc` (@alex) — Actif sur `frontend/**/*`. Logique Angular 21 et validation TypeScript.
-- `steve.mdc` (@steve) — Actif sur `backend/**/*`. Base de données et logique Spring Boot 4.
-- `picasso.mdc` (@picasso) — Actif sur les fichiers front-end. Design UI, HTML/CSS et intégration Tailwind.
+## Cap produit
 
-Suivi de la dette technique : géré exclusivement par `@odin` dans `code_review.md` (backlog actif) et `journal.md` (historique résolu).
+**Dashboard personnel** multi-actifs (crypto HYPE, actions, ETF) : overview + pages détail, registry YAML, APIs externes (CoinGecko, FMP, Hyperliquid). Front Vercel, back Docker VPS.
 
-Ne pas dupliquer de règles ici.
+Suivi projet : **`backlog.md`** (tâches en cours + FF), **`journal.md`** (terminé).
+
+## Stack
+
+**Angular 21** + **Tailwind 3** + **Chart.js** (front) · **Spring Boot 4** + **PostgreSQL 16** (back).
+
+## Conventions dev
+
+- **Simplicité** : code lisible, diff minimal, pas d'over-engineering.
+- **Règles complètes** : `.agents/AGENTS.md`
+- **Tests** : `ng test` (frontend), `mvn test` (backend).

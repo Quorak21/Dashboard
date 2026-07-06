@@ -1,0 +1,1319 @@
+﻿diff --git a/backend/src/main/resources/config/fundamentals/inveb.yml b/backend/src/main/resources/config/fundamentals/inveb.yml
+new file mode 100644
+index 0000000..22acee3
+--- /dev/null
++++ b/backend/src/main/resources/config/fundamentals/inveb.yml
+@@ -0,0 +1,22 @@
++asset-id: inveb
++updated-at: "2026-04-15"
++source: "Source: Q1 2026 report"
++metrics:
++  trailing-pe: 6.11
++  debt-leverage: "1.2%"
++  management-cost: "0.09%"
++  five-y-nav-cagr: "14.5%"
++  five-y-total-return: "112%"
++  dry-powder: "~18.2B SEK"
++  cash-inflow: "~11.5B SEK"
++top-holdings:
++  - { name: "ABB", weight-percent: 16.5 }
++  - { name: "Atlas Copco", weight-percent: 15.0 }
++  - { name: "SEB", weight-percent: 11.5 }
++  - { name: "AstraZeneca", weight-percent: 8.0 }
++  - { name: "M├╢lnlycke", weight-percent: 7.5 }
++  - { name: "Epiroc", weight-percent: 5.5 }
++  - { name: "EQT AB", weight-percent: 5.0 }
++  - { name: "Ericsson", weight-percent: 4.0 }
++  - { name: "Nasdaq", weight-percent: 3.5 }
++  - { name: "Saab", weight-percent: 3.0 }
+diff --git a/backend/src/main/resources/config/fundamentals/brwm.yml b/backend/src/main/resources/config/fundamentals/brwm.yml
+new file mode 100644
+index 0000000..99cc949
+--- /dev/null
++++ b/backend/src/main/resources/config/fundamentals/brwm.yml
+@@ -0,0 +1,8 @@
++asset-id: brwm
++updated-at: "2026-03-15"
++source: "Rapport semestriel H2 2025"
++metrics:
++  nav-per-share: 612.0
++  discount-to-nav: -8.5
++  trailing-pe: 12.4
++top-holdings: []
+diff --git a/backend/src/main/java/com/dokkcorp/dashboard/config/assets/AssetFundamentalsProperties.java b/backend/src/main/java/com/dokkcorp/dashboard/config/assets/AssetFundamentalsProperties.java
+new file mode 100644
+index 0000000..12249fb
+--- /dev/null
++++ b/backend/src/main/java/com/dokkcorp/dashboard/config/assets/AssetFundamentalsProperties.java
+@@ -0,0 +1,120 @@
++package com.dokkcorp.dashboard.config.assets;
++
++import java.math.BigDecimal;
++import java.time.LocalDate;
++import java.util.ArrayList;
++import java.util.HashMap;
++import java.util.List;
++import java.util.Map;
++
++public class AssetFundamentalsProperties {
++
++    private Map<String, FundamentalsConfig> fundamentals = new HashMap<>();
++
++    public Map<String, FundamentalsConfig> getFundamentals() {
++        return fundamentals;
++    }
++
++    public void setFundamentals(Map<String, FundamentalsConfig> fundamentals) {
++        this.fundamentals = fundamentals != null ? fundamentals : new HashMap<>();
++    }
++
++    public static class FundamentalsConfig {
++        private String assetId;
++        private LocalDate updatedAt;
++        private String source;
++        private Map<String, Object> metrics = new HashMap<>();
++        private List<HoldingProperties> topHoldings = new ArrayList<>();
++        private List<SectorWeightProperties> sectorWeights = new ArrayList<>();
++
++        public String getAssetId() {
++            return assetId;
++        }
++
++        public void setAssetId(String assetId) {
++            this.assetId = assetId;
++        }
++
++        public LocalDate getUpdatedAt() {
++            return updatedAt;
++        }
++
++        public void setUpdatedAt(LocalDate updatedAt) {
++            this.updatedAt = updatedAt;
++        }
++
++        public String getSource() {
++            return source;
++        }
++
++        public void setSource(String source) {
++            this.source = source;
++        }
++
++        public Map<String, Object> getMetrics() {
++            return metrics;
++        }
++
++        public void setMetrics(Map<String, Object> metrics) {
++            this.metrics = metrics != null ? metrics : new HashMap<>();
++        }
++
++        public List<HoldingProperties> getTopHoldings() {
++            return topHoldings;
++        }
++
++        public void setTopHoldings(List<HoldingProperties> topHoldings) {
++            this.topHoldings = topHoldings != null ? topHoldings : new ArrayList<>();
++        }
++
++        public List<SectorWeightProperties> getSectorWeights() {
++            return sectorWeights;
++        }
++
++        public void setSectorWeights(List<SectorWeightProperties> sectorWeights) {
++            this.sectorWeights = sectorWeights != null ? sectorWeights : new ArrayList<>();
++        }
++    }
++
++    public static class HoldingProperties {
++        private String name;
++        private BigDecimal weightPercent;
++
++        public String getName() {
++            return name;
++        }
++
++        public void setName(String name) {
++            this.name = name;
++        }
++
++        public BigDecimal getWeightPercent() {
++            return weightPercent;
++        }
++
++        public void setWeightPercent(BigDecimal weightPercent) {
++            this.weightPercent = weightPercent;
++        }
++    }
++
++    public static class SectorWeightProperties {
++        private String sector;
++        private BigDecimal weightPercent;
++
++        public String getSector() {
++            return sector;
++        }
++
++        public void setSector(String sector) {
++            this.sector = sector;
++        }
++
++        public BigDecimal getWeightPercent() {
++            return weightPercent;
++        }
++
++        public void setWeightPercent(BigDecimal weightPercent) {
++            this.weightPercent = weightPercent;
++        }
++    }
++}
+diff --git a/backend/src/main/java/com/dokkcorp/dashboard/config/assets/AssetFundamentalsConfiguration.java b/backend/src/main/java/com/dokkcorp/dashboard/config/assets/AssetFundamentalsConfiguration.java
+new file mode 100644
+index 0000000..2eaf615
+--- /dev/null
++++ b/backend/src/main/java/com/dokkcorp/dashboard/config/assets/AssetFundamentalsConfiguration.java
+@@ -0,0 +1,72 @@
++package com.dokkcorp.dashboard.config.assets;
++
++import java.io.IOException;
++import java.util.Locale;
++import java.util.Map;
++import java.util.Properties;
++
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
++import org.springframework.boot.context.properties.bind.Bindable;
++import org.springframework.boot.context.properties.bind.Binder;
++import org.springframework.boot.context.properties.source.MapConfigurationPropertySource;
++import org.springframework.context.annotation.Bean;
++import org.springframework.context.annotation.Configuration;
++import org.springframework.core.io.Resource;
++import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
++import org.springframework.core.io.support.ResourcePatternResolver;
++
++@Configuration
++public class AssetFundamentalsConfiguration {
++
++    private static final Logger logger = LoggerFactory.getLogger(AssetFundamentalsConfiguration.class);
++
++    @Bean
++    public AssetFundamentalsProperties assetFundamentalsProperties() throws IOException {
++        AssetFundamentalsProperties properties = new AssetFundamentalsProperties();
++        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
++
++        Resource[] resources;
++        try {
++            resources = resolver.getResources("classpath*:config/fundamentals/*.yml");
++            if (resources == null) {
++                logger.warn("Scanned fundamentals config: resources array is null");
++                return properties;
++            }
++            logger.info("Scanned fundamentals config: found {} files", resources.length);
++        } catch (IOException e) {
++            logger.error("Failed to scan fundamentals configurations", e);
++            return properties;
++        }
++
++        for (Resource resource : resources) {
++            if (resource == null || !resource.exists()) {
++                continue;
++            }
++            try {
++                YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
++                factory.setResources(resource);
++                Properties props = factory.getObject();
++                if (props != null) {
++                    MapConfigurationPropertySource source = new MapConfigurationPropertySource((Map) props);
++                    Binder binder = new Binder(source);
++                    AssetFundamentalsProperties.FundamentalsConfig config = binder.bind("", Bindable.of(AssetFundamentalsProperties.FundamentalsConfig.class)).orElse(null);
++                    if (config != null) {
++                        if (config.getAssetId() == null || config.getUpdatedAt() == null ||
++                            config.getSource() == null || config.getMetrics() == null) {
++                            logger.warn("Skipped fundamentals config in resource {}: missing mandatory fields (assetId, updatedAt, source, metrics)", resource.getFilename());
++                        } else {
++                            String key = config.getAssetId().toLowerCase(Locale.ROOT);
++                            properties.getFundamentals().put(key, config);
++                            logger.info("Loaded fundamentals config for asset: {} from {}", key, resource.getFilename());
++                        }
++                    }
++                }
++            } catch (Exception e) {
++                logger.error("Failed to load fundamentals config from resource: {}", resource.getFilename(), e);
++            }
++        }
++        return properties;
++    }
++}
+diff --git a/backend/src/main/java/com/dokkcorp/dashboard/features/assets/ConfigurableAssetService.java b/backend/src/main/java/com/dokkcorp/dashboard/features/assets/ConfigurableAssetService.java
+new file mode 100644
+index 0000000..0e08f18
+--- /dev/null
++++ b/backend/src/main/java/com/dokkcorp/dashboard/features/assets/ConfigurableAssetService.java
+@@ -0,0 +1,414 @@
++package com.dokkcorp.dashboard.features.assets;
++
++import java.time.Instant;
++import java.time.LocalDate;
++import java.time.ZoneId;
++import java.time.temporal.ChronoUnit;
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.List;
++import java.util.Set;
++import java.util.concurrent.ConcurrentHashMap;
++import java.util.concurrent.atomic.AtomicReference;
++import java.util.stream.Collectors;
++
++import org.slf4j.Logger;
++import org.slf4j.LoggerFactory;
++import org.springframework.stereotype.Service;
++
++import jakarta.annotation.PostConstruct;
++
++import com.dokkcorp.dashboard.features.assets.model.AssetDefinition;
++import com.dokkcorp.dashboard.features.assets.model.AssetDto;
++import com.dokkcorp.dashboard.features.assets.model.AssetProvider;
++import com.dokkcorp.dashboard.features.assets.model.MarketStatus;
++import com.dokkcorp.dashboard.features.assets.model.PriceSource;
++import com.dokkcorp.dashboard.features.assets.price.PriceProvider;
++import com.dokkcorp.dashboard.features.assets.price.PriceProviderRegistry;
++import com.dokkcorp.dashboard.features.assets.price.PriceQuote;
++import com.dokkcorp.dashboard.exception.AssetNotFoundException;
++import com.dokkcorp.dashboard.model.entity.AssetDaily;
++import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
++import com.dokkcorp.dashboard.repository.AssetDailyRepository;
++import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
++import java.util.Locale;
++import com.dokkcorp.dashboard.config.assets.AssetDividendsProperties;
++import com.dokkcorp.dashboard.config.assets.AssetFundamentalsProperties;
++import com.dokkcorp.dashboard.features.assets.model.DividendsBlock;
++import com.dokkcorp.dashboard.features.assets.model.DividendHistoryEntry;
++import com.dokkcorp.dashboard.features.assets.model.FundamentalsBlock;
++import com.dokkcorp.dashboard.features.assets.model.HoldingEntry;
++import com.dokkcorp.dashboard.features.assets.model.SectorWeight;
++
++@Service
++public class ConfigurableAssetService {
++
++    private static final Logger logger = LoggerFactory.getLogger(ConfigurableAssetService.class);
++    private static final long HISTORY_REFRESH_MS = 3_600_000L;
++
++    private final AssetRegistry assetRegistry;
++    private final PriceProviderRegistry priceProviderRegistry;
++    private final AssetSnapshotRepository assetSnapshotRepository;
++    private final AssetDailyRepository assetDailyRepository;
++    private final MarketHoursGuard marketHoursGuard;
++    private final ProviderCallMetrics providerCallMetrics;
++    private final AssetDividendsProperties assetDividendsProperties;
++    private final AssetFundamentalsProperties assetFundamentalsProperties;
++
++    private final ConcurrentHashMap<String, AtomicReference<AssetDto>> cacheByAssetId = new ConcurrentHashMap<>();
++    private final ConcurrentHashMap<String, Object> syncLocks = new ConcurrentHashMap<>();
++    private final ConcurrentHashMap<String, HistoryState> historyStateByAssetId = new ConcurrentHashMap<>();
++
++    public ConfigurableAssetService(
++            AssetRegistry assetRegistry,
++            PriceProviderRegistry priceProviderRegistry,
++            AssetSnapshotRepository assetSnapshotRepository,
++            AssetDailyRepository assetDailyRepository,
++            MarketHoursGuard marketHoursGuard,
++            ProviderCallMetrics providerCallMetrics,
++            AssetDividendsProperties assetDividendsProperties,
++            AssetFundamentalsProperties assetFundamentalsProperties) {
++        this.assetRegistry = assetRegistry;
++        this.priceProviderRegistry = priceProviderRegistry;
++        this.assetSnapshotRepository = assetSnapshotRepository;
++        this.assetDailyRepository = assetDailyRepository;
++        this.marketHoursGuard = marketHoursGuard;
++        this.providerCallMetrics = providerCallMetrics;
++        this.assetDividendsProperties = assetDividendsProperties;
++        this.assetFundamentalsProperties = assetFundamentalsProperties;
++    }
++
++    @PostConstruct
++    void initializeCachesFromRegistry() {
++        synchronizeCachesWithRegistry();
++    }
++
++    /**
++     * Keeps in-memory maps aligned with the current registry.
++     * Call again after a future registry reload.
++     */
++    void synchronizeCachesWithRegistry() {
++        Set<String> registeredIds = assetRegistry.all().stream()
++                .map(AssetDefinition::id)
++                .collect(Collectors.toUnmodifiableSet());
++
++        cacheByAssetId.keySet().removeIf(id -> !registeredIds.contains(id));
++        syncLocks.keySet().removeIf(id -> !registeredIds.contains(id));
++        historyStateByAssetId.keySet().removeIf(id -> !registeredIds.contains(id));
++
++        for (String assetId : registeredIds) {
++            cacheByAssetId.computeIfAbsent(assetId, id -> new AtomicReference<>());
++            syncLocks.computeIfAbsent(assetId, id -> new Object());
++            historyStateByAssetId.computeIfAbsent(assetId, id -> new HistoryState());
++        }
++    }
++
++    public AssetDto getData(String assetId) {
++        AssetDefinition asset = resolveAsset(assetId);
++        refreshHistory(asset);
++        AssetDto cached = cacheFor(assetId).get();
++        if (cached == null) {
++            return AssetDto.error(assetId, asset.dbSymbol());
++        }
++        return assembleDto(asset, cached, cached.priceSource(), marketHoursGuard.status(asset));
++    }
++
++    public AssetDto syncPrice(String assetId) {
++        AssetDefinition asset = resolveAsset(assetId);
++        Object lock = syncLocks.computeIfAbsent(assetId, id -> new Object());
++        synchronized (lock) {
++            refreshHistory(asset);
++            try {
++                if (asset.provider() == null) {
++                    logger.warn("Asset {} has no provider configured", assetId);
++                    return fallbackFromCache(asset);
++                }
++                PriceProvider provider = priceProviderRegistry.requireById(asset.provider().providerId());
++                PriceQuote quote = provider.fetch(asset);
++
++                if (quote == null || quote.fetchedAt() == null) {
++                    if (asset.provider() == AssetProvider.SCRAPE) {
++                        providerCallMetrics.incrementScrape();
++                        providerCallMetrics.recordScrapeFailure();
++                    }
++                    return fallbackFromCache(asset);
++                }
++
++                if (marketHoursGuard.isOpen(asset)) {
++                    try {
++                        persistDailyPoint(asset, quote);
++                    } catch (Exception e) {
++                        logger.error("Failed to persist daily price point for asset {}", assetId, e);
++                    }
++                }
++
++                LiveSeries live = buildLiveSeries(asset);
++                HistoryState history = historyState(assetId);
++                MarketStatus marketStatus = marketHoursGuard.status(asset);
++
++                AssetDto dto = new AssetDto(
++                        asset.id(),
++                        asset.dbSymbol(),
++                        asset.displayName(),
++                        asset.type(),
++                        quote.currency(),
++                        quote.price(),
++                        quote.marketCap(),
++                        quote.changePercent24h(),
++                        quote.volume(),
++                        quote.fetchedAt().toEpochMilli(),
++                        priceSourceFor(asset, false),
++                        marketStatus,
++                        history.historyPrices,
++                        history.historyDays,
++                        live.prices(),
++                        live.days(),
++                        buildDividendsBlock(asset.id()),
++                        buildFundamentalsBlock(asset.id()));
++
++                cacheFor(assetId).set(dto);
++                if (asset.provider() == AssetProvider.FMP) {
++                    providerCallMetrics.incrementFmp();
++                } else if (asset.provider() == AssetProvider.SCRAPE) {
++                    providerCallMetrics.incrementScrape();
++                }
++                return dto;
++            } catch (Exception e) {
++                logger.error("Price provider failed for asset {}", assetId, e);
++                if (asset.provider() == AssetProvider.SCRAPE) {
++                    providerCallMetrics.incrementScrape();
++                    providerCallMetrics.recordScrapeFailure();
++                }
++                return fallbackFromCache(asset);
++            }
++        }
++    }
++
++    private AssetDto fallbackFromCache(AssetDefinition asset) {
++        String assetId = asset.id();
++        AssetDto stale = cacheFor(assetId).get();
++        if (stale != null) {
++            long ageMinutes = computeStaleAgeMinutes(stale);
++            logger.warn("Stale price for {}, source=cache, age={}m", assetId, ageMinutes);
++            AssetDto cached = assembleDto(asset, stale, PriceSource.CACHE, marketHoursGuard.status(asset));
++            cacheFor(assetId).set(cached);
++            return cached;
++        }
++        return AssetDto.error(assetId, asset.dbSymbol());
++    }
++
++    private long computeStaleAgeMinutes(AssetDto cached) {
++        if (cached.lastRefresh() == null) {
++            return 0;
++        }
++        return ChronoUnit.MINUTES.between(
++                Instant.ofEpochMilli(cached.lastRefresh()),
++                Instant.now());
++    }
++
++    private AssetDto assembleDto(
++            AssetDefinition asset,
++            AssetDto priceFields,
++            PriceSource priceSource,
++            MarketStatus marketStatus) {
++        List<Double> livePrices = priceFields.livePrices() != null ? priceFields.livePrices() : List.of();
++        List<Long> liveDays = priceFields.liveDays() != null ? priceFields.liveDays() : List.of();
++        DividendsBlock dividends = priceFields.dividends();
++        FundamentalsBlock fundamentals = priceFields.fundamentals();
++        HistoryState history = historyState(asset.id());
++        
++        return new AssetDto(
++                asset.id(),
++                asset.dbSymbol(),
++                asset.displayName(),
++                asset.type(),
++                priceFields.currency(),
++                priceFields.currentPrice(),
++                priceFields.marketCap(),
++                priceFields.priceChangePercentage24h(),
++                priceFields.totalVolume(),
++                priceFields.lastRefresh(),
++                priceSource,
++                marketStatus,
++                history.historyPrices,
++                history.historyDays,
++                livePrices,
++                liveDays,
++                dividends,
++                fundamentals);
++    }
++
++    private void persistDailyPoint(AssetDefinition asset, PriceQuote quote) {
++        AssetDaily point = new AssetDaily();
++        point.setSymbol(asset.dbSymbol());
++        point.setCurrentPrice(quote.price());
++        point.setMarketCap(quote.marketCap());
++        point.setPriceChangePercentage24h(quote.changePercent24h());
++        point.setTotalVolume(quote.volume());
++        point.setLastRefresh(quote.fetchedAt());
++        assetDailyRepository.save(point);
++    }
++
++    private LiveSeries buildLiveSeries(AssetDefinition asset) {
++        if (asset.marketHours() == null || asset.marketHours().zone() == null) {
++            return new LiveSeries(List.of(), List.of());
++        }
++        ZoneId zone = asset.marketHours().zone();
++        List<AssetDaily> dailyPoints = assetDailyRepository
++                .findTop144BySymbolOrderByLastRefreshDesc(asset.dbSymbol());
++        List<AssetDaily> chronological = new ArrayList<>(dailyPoints);
++        Collections.reverse(chronological);
++
++        List<Double> livePrices = new ArrayList<>();
++        List<Long> liveDays = new ArrayList<>();
++
++        if (!chronological.isEmpty()) {
++            AssetDaily latestPoint = null;
++            for (int i = chronological.size() - 1; i >= 0; i--) {
++                if (chronological.get(i).getLastRefresh() != null) {
++                    latestPoint = chronological.get(i);
++                    break;
++                }
++            }
++            if (latestPoint == null) {
++                return new LiveSeries(List.of(), List.of());
++            }
++            LocalDate latestLocalDate = latestPoint.getLastRefresh()
++                    .atZone(zone)
++                    .toLocalDate();
++
++            for (AssetDaily point : chronological) {
++                if (point.getLastRefresh() == null) {
++                    continue;
++                }
++                LocalDate pointLocalDate = point.getLastRefresh()
++                        .atZone(zone)
++                        .toLocalDate();
++                if (pointLocalDate.equals(latestLocalDate)) {
++                    livePrices.add(point.getCurrentPrice());
++                    liveDays.add(point.getLastRefresh().toEpochMilli());
++                }
++            }
++        }
++
++        return new LiveSeries(livePrices, liveDays);
++    }
++
++    private void refreshHistory(AssetDefinition asset) {
++        String assetId = asset.id();
++        HistoryState state = historyState(assetId);
++        synchronized (state) {
++            if (System.currentTimeMillis() - state.lastHistoryRefresh < HISTORY_REFRESH_MS
++                    && !state.historyPrices.isEmpty()) {
++                return;
++            }
++
++            List<AssetSnapshot> snapshots = assetSnapshotRepository
++                    .findTop365BySymbolOrderByDayDesc(asset.dbSymbol());
++            if (snapshots == null) {
++                return;
++            }
++
++            List<Double> prices = new ArrayList<>();
++            List<Long> days = new ArrayList<>();
++            for (int i = snapshots.size() - 1; i >= 0; i--) {
++                AssetSnapshot snap = snapshots.get(i);
++                if (snap == null || snap.getDay() == null || snap.getPrice() == null) {
++                    continue;
++                }
++                prices.add(snap.getPrice());
++                days.add(snap.getDay().toEpochMilli());
++            }
++
++            state.historyPrices = List.copyOf(prices);
++            state.historyDays = List.copyOf(days);
++            state.lastHistoryRefresh = System.currentTimeMillis();
++        }
++    }
++
++    private DividendsBlock buildDividendsBlock(String assetId) {
++        if (assetId == null) {
++            return null;
++        }
++        AssetDividendsProperties.DividendsConfig config = assetDividendsProperties.getDividends()
++                .get(assetId.toLowerCase(Locale.ROOT));
++        if (config == null) {
++            return null;
++        }
++        
++        List<DividendHistoryEntry> historyList = config.getHistory() == null ? List.of() : config.getHistory().stream()
++                .filter(entry -> entry != null)
++                .map(entry -> new DividendHistoryEntry(entry.getYear(), entry.getAmount(), entry.getCurrency()))
++                .collect(Collectors.toList());
++
++        return new DividendsBlock(
++                config.getForwardDividend(),
++                config.getForwardDividendCurrency(),
++                config.getFrequency(),
++                null, // estimatedYield (Story 3.3)
++                config.getAvgDividendGrowth10Y(),
++                historyList
++        );
++    }
++
++    private FundamentalsBlock buildFundamentalsBlock(String assetId) {
++        if (assetId == null) {
++            return null;
++        }
++        AssetFundamentalsProperties.FundamentalsConfig config = assetFundamentalsProperties.getFundamentals()
++                .get(assetId.toLowerCase(Locale.ROOT));
++        if (config == null) {
++            return null;
++        }
++
++        List<HoldingEntry> holdingsList = config.getTopHoldings() == null ? List.of() : config.getTopHoldings().stream()
++                .filter(entry -> entry != null)
++                .map(entry -> new HoldingEntry(entry.getName(), entry.getWeightPercent()))
++                .collect(Collectors.toList());
++
++        List<SectorWeight> sectorsList = config.getSectorWeights() == null ? List.of() : config.getSectorWeights().stream()
++                .filter(entry -> entry != null)
++                .map(entry -> new SectorWeight(entry.getSector(), entry.getWeightPercent()))
++                .collect(Collectors.toList());
++
++        return new FundamentalsBlock(
++                config.getUpdatedAt(),
++                config.getSource(),
++                false, // stale (Story 3.4)
++                config.getMetrics(),
++                holdingsList,
++                sectorsList
++        );
++    }
++
++    private AssetDefinition resolveAsset(String assetId) {
++        return assetRegistry.findById(assetId)
++                .orElseThrow(() -> new AssetNotFoundException(assetId));
++    }
++
++    private AtomicReference<AssetDto> cacheFor(String assetId) {
++        return cacheByAssetId.computeIfAbsent(assetId, id -> new AtomicReference<>());
++    }
++
++    private HistoryState historyState(String assetId) {
++        return historyStateByAssetId.computeIfAbsent(assetId, id -> new HistoryState());
++    }
++
++    private PriceSource priceSourceFor(AssetDefinition asset, boolean fromCache) {
++        if (fromCache) return PriceSource.CACHE;
++        if (asset.provider() == null) return PriceSource.CACHE;
++        return switch (asset.provider()) {
++            case FMP -> PriceSource.FMP;
++            case SCRAPE -> PriceSource.SCRAPE;
++        };
++    }
++
++    private static final class HistoryState {
++        volatile List<Double> historyPrices = List.of();
++        volatile List<Long> historyDays = List.of();
++        volatile long lastHistoryRefresh = 0;
++    }
++
++    private record LiveSeries(List<Double> prices, List<Long> days) {
++    }
++}
+diff --git a/backend/src/test/java/com/dokkcorp/dashboard/config/assets/AssetFundamentalsPropertiesTest.java b/backend/src/test/java/com/dokkcorp/dashboard/config/assets/AssetFundamentalsPropertiesTest.java
+new file mode 100644
+index 0000000..5042228
+--- /dev/null
++++ b/backend/src/test/java/com/dokkcorp/dashboard/config/assets/AssetFundamentalsPropertiesTest.java
+@@ -0,0 +1,114 @@
++package com.dokkcorp.dashboard.config.assets;
++
++import static org.junit.jupiter.api.Assertions.assertEquals;
++import static org.junit.jupiter.api.Assertions.assertNotNull;
++import static org.junit.jupiter.api.Assertions.assertNull;
++import static org.junit.jupiter.api.Assertions.assertTrue;
++
++import java.io.IOException;
++import java.math.BigDecimal;
++import java.time.LocalDate;
++import java.util.List;
++
++import org.junit.jupiter.api.Test;
++
++class AssetFundamentalsPropertiesTest {
++
++    @Test
++    void testFundamentalsConfigLoading() throws IOException {
++        AssetFundamentalsConfiguration configuration = new AssetFundamentalsConfiguration();
++        AssetFundamentalsProperties properties = configuration.assetFundamentalsProperties();
++
++        assertNotNull(properties);
++        assertNotNull(properties.getFundamentals());
++
++        // inveb should be loaded because inveb.yml is in resources/config/fundamentals/
++        assertTrue(properties.getFundamentals().containsKey("inveb"));
++
++        AssetFundamentalsProperties.FundamentalsConfig invebConfig = properties.getFundamentals().get("inveb");
++        assertNotNull(invebConfig);
++        assertEquals("inveb", invebConfig.getAssetId());
++        assertEquals(LocalDate.of(2026, 4, 15), invebConfig.getUpdatedAt());
++        assertEquals("Source: Q1 2026 report", invebConfig.getSource());
++        assertNotNull(invebConfig.getMetrics());
++        assertEquals(6.11, invebConfig.getMetrics().get("trailing-pe"));
++        assertEquals("1.2%", invebConfig.getMetrics().get("debt-leverage"));
++
++        List<AssetFundamentalsProperties.HoldingProperties> topHoldings = invebConfig.getTopHoldings();
++        assertNotNull(topHoldings);
++        assertEquals(10, topHoldings.size());
++        assertEquals("ABB", topHoldings.get(0).getName());
++        assertEquals(0, new BigDecimal("16.5").compareTo(topHoldings.get(0).getWeightPercent()));
++
++        // brwm should be loaded
++        assertTrue(properties.getFundamentals().containsKey("brwm"));
++        AssetFundamentalsProperties.FundamentalsConfig brwmConfig = properties.getFundamentals().get("brwm");
++        assertNotNull(brwmConfig);
++        assertEquals("brwm", brwmConfig.getAssetId());
++        assertEquals(LocalDate.of(2026, 3, 15), brwmConfig.getUpdatedAt());
++        assertEquals("Rapport semestriel H2 2025", brwmConfig.getSource());
++        assertEquals(612.0, brwmConfig.getMetrics().get("nav-per-share"));
++        assertEquals(-8.5, brwmConfig.getMetrics().get("discount-to-nav"));
++        assertTrue(brwmConfig.getTopHoldings().isEmpty());
++    }
++
++    @Test
++    void testMissingOptionalDataBinding() {
++        String yaml = "asset-id: test-asset\n"
++                    + "updated-at: \"2026-06-24\"\n"
++                    + "source: \"Test Source\"\n"
++                    + "metrics:\n"
++                    + "  nav-per-share: 100.0\n"; // missing top-holdings and sector-weights
++
++        org.springframework.core.io.ByteArrayResource resource = new org.springframework.core.io.ByteArrayResource(yaml.getBytes(java.nio.charset.StandardCharsets.UTF_8)) {
++            @Override
++            public String getFilename() {
++                return "test-asset.yml";
++            }
++        };
++
++        org.springframework.beans.factory.config.YamlPropertiesFactoryBean factory = new org.springframework.beans.factory.config.YamlPropertiesFactoryBean();
++        factory.setResources(resource);
++        java.util.Properties props = factory.getObject();
++        assertNotNull(props);
++
++        org.springframework.boot.context.properties.bind.Binder binder = new org.springframework.boot.context.properties.bind.Binder(
++                new org.springframework.boot.context.properties.source.MapConfigurationPropertySource((java.util.Map) props));
++        AssetFundamentalsProperties.FundamentalsConfig config = binder.bind("", org.springframework.boot.context.properties.bind.Bindable.of(AssetFundamentalsProperties.FundamentalsConfig.class)).orElse(null);
++
++        assertNotNull(config);
++        assertEquals("test-asset", config.getAssetId());
++        assertEquals(LocalDate.of(2026, 6, 24), config.getUpdatedAt());
++        assertEquals("Test Source", config.getSource());
++        assertEquals(100.0, config.getMetrics().get("nav-per-share"));
++        assertTrue(config.getTopHoldings().isEmpty());
++        assertTrue(config.getSectorWeights().isEmpty());
++    }
++
++    @Test
++    void testMissingMandatoryFieldsBinding() {
++        String yaml = "asset-id: test-asset\n"
++                    + "source: \"Test Source\"\n"; // missing updatedAt and metrics
++
++        org.springframework.core.io.ByteArrayResource resource = new org.springframework.core.io.ByteArrayResource(yaml.getBytes(java.nio.charset.StandardCharsets.UTF_8)) {
++            @Override
++            public String getFilename() {
++                return "test-invalid.yml";
++            }
++        };
++
++        org.springframework.beans.factory.config.YamlPropertiesFactoryBean factory = new org.springframework.beans.factory.config.YamlPropertiesFactoryBean();
++        factory.setResources(resource);
++        java.util.Properties props = factory.getObject();
++        assertNotNull(props);
++
++        org.springframework.boot.context.properties.bind.Binder binder = new org.springframework.boot.context.properties.bind.Binder(
++                new org.springframework.boot.context.properties.source.MapConfigurationPropertySource((java.util.Map) props));
++        AssetFundamentalsProperties.FundamentalsConfig config = binder.bind("", org.springframework.boot.context.properties.bind.Bindable.of(AssetFundamentalsProperties.FundamentalsConfig.class)).orElse(null);
++
++        assertNotNull(config);
++        assertEquals("test-asset", config.getAssetId());
++        assertNull(config.getUpdatedAt());
++        assertTrue(config.getMetrics().isEmpty());
++    }
++}
+diff --git a/backend/src/test/java/com/dokkcorp/dashboard/features/assets/ConfigurableAssetServiceTest.java b/backend/src/test/java/com/dokkcorp/dashboard/features/assets/ConfigurableAssetServiceTest.java
+new file mode 100644
+index 0000000..f68fcdd
+--- /dev/null
++++ b/backend/src/test/java/com/dokkcorp/dashboard/features/assets/ConfigurableAssetServiceTest.java
+@@ -0,0 +1,527 @@
++package com.dokkcorp.dashboard.features.assets;
++
++import static org.junit.jupiter.api.Assertions.assertEquals;
++import static org.junit.jupiter.api.Assertions.assertFalse;
++import static org.junit.jupiter.api.Assertions.assertNotNull;
++import static org.junit.jupiter.api.Assertions.assertNull;
++import static org.junit.jupiter.api.Assertions.assertTrue;
++import java.math.BigDecimal;
++import static org.mockito.ArgumentMatchers.any;
++import static org.mockito.Mockito.mock;
++import static org.mockito.Mockito.never;
++import static org.mockito.Mockito.times;
++import static org.mockito.Mockito.verify;
++import static org.mockito.Mockito.when;
++
++import java.lang.reflect.Field;
++import java.time.Instant;
++import java.time.LocalDate;
++import java.time.LocalTime;
++import java.time.ZoneId;
++import java.util.Collections;
++import java.util.List;
++import java.util.Optional;
++import java.util.Set;
++import java.util.concurrent.ConcurrentHashMap;
++
++import org.junit.jupiter.api.AfterEach;
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++
++import ch.qos.logback.classic.Level;
++import ch.qos.logback.classic.Logger;
++import ch.qos.logback.classic.spi.ILoggingEvent;
++import ch.qos.logback.core.read.ListAppender;
++import org.slf4j.LoggerFactory;
++
++import com.dokkcorp.dashboard.features.assets.model.AssetDefinition;
++import com.dokkcorp.dashboard.features.assets.model.AssetDto;
++import com.dokkcorp.dashboard.features.assets.model.AssetProvider;
++import com.dokkcorp.dashboard.features.assets.model.AssetType;
++import com.dokkcorp.dashboard.features.assets.model.MarketHours;
++import com.dokkcorp.dashboard.features.assets.model.MarketStatus;
++import com.dokkcorp.dashboard.features.assets.model.PriceSource;
++import com.dokkcorp.dashboard.features.assets.model.SyncConfig;
++import com.dokkcorp.dashboard.features.assets.price.PriceProvider;
++import com.dokkcorp.dashboard.features.assets.price.PriceProviderRegistry;
++import com.dokkcorp.dashboard.features.assets.price.PriceQuote;
++import com.dokkcorp.dashboard.model.entity.AssetDaily;
++import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
++import com.dokkcorp.dashboard.repository.AssetDailyRepository;
++import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
++import com.dokkcorp.dashboard.config.assets.AssetDividendsProperties;
++import com.dokkcorp.dashboard.config.assets.AssetFundamentalsProperties;
++import com.dokkcorp.dashboard.features.assets.model.FundamentalsBlock;
++
++class ConfigurableAssetServiceTest {
++
++    private static final ZoneId STOCKHOLM = ZoneId.of("Europe/Stockholm");
++
++    private final AssetRegistry assetRegistry = mock(AssetRegistry.class);
++    private final PriceProviderRegistry priceProviderRegistry = mock(PriceProviderRegistry.class);
++    private final AssetSnapshotRepository assetSnapshotRepository = mock(AssetSnapshotRepository.class);
++    private final AssetDailyRepository assetDailyRepository = mock(AssetDailyRepository.class);
++    private final MarketHoursGuard marketHoursGuard = mock(MarketHoursGuard.class);
++    private final ProviderCallMetrics providerCallMetrics = mock(ProviderCallMetrics.class);
++    private final PriceProvider priceProvider = mock(PriceProvider.class);
++    private final AssetDividendsProperties assetDividendsProperties = new AssetDividendsProperties();
++    private final AssetFundamentalsProperties assetFundamentalsProperties = new AssetFundamentalsProperties();
++
++    private AssetDefinition inveb;
++    private AssetDefinition hypeScrape;
++    private ConfigurableAssetService service;
++    private ListAppender<ILoggingEvent> logAppender;
++    private Logger serviceLogger;
++
++    @BeforeEach
++    void setUp() {
++        serviceLogger = (Logger) LoggerFactory.getLogger(ConfigurableAssetService.class);
++        logAppender = new ListAppender<>();
++        logAppender.start();
++        serviceLogger.addAppender(logAppender);
++
++        inveb = new AssetDefinition(
++                "inveb",
++                "Investor AB",
++                AssetProvider.FMP,
++                "INVE-B.ST",
++                "INVE-B",
++                AssetType.STOCK,
++                "SEK",
++                new MarketHours(STOCKHOLM, LocalTime.of(9, 0), LocalTime.of(17, 35)),
++                new SyncConfig(15, 0),
++                null);
++
++        hypeScrape = new AssetDefinition(
++                "hype",
++                "Hyperliquid",
++                AssetProvider.SCRAPE,
++                "HYPE",
++                "HYPE",
++                AssetType.TRUST,
++                "USD",
++                null,
++                new SyncConfig(10, 0),
++                null);
++
++        when(assetRegistry.findById("inveb")).thenReturn(Optional.of(inveb));
++        when(assetRegistry.findById("hype")).thenReturn(Optional.of(hypeScrape));
++        when(assetRegistry.all()).thenReturn(List.of(inveb));
++        when(priceProviderRegistry.requireById("fmp")).thenReturn(priceProvider);
++        when(priceProviderRegistry.requireById("scrape")).thenReturn(priceProvider);
++
++        service = new ConfigurableAssetService(
++                assetRegistry,
++                priceProviderRegistry,
++                assetSnapshotRepository,
++                assetDailyRepository,
++                marketHoursGuard,
++                providerCallMetrics,
++                assetDividendsProperties,
++                assetFundamentalsProperties);
++        service.synchronizeCachesWithRegistry();
++    }
++
++    @AfterEach
++    void tearDown() {
++        serviceLogger.detachAppender(logAppender);
++    }
++
++    @Test
++    void syncPrice_persistsDailyAndUpdatesCache_whenMarketOpen() {
++        stubProviderQuote();
++        stubHistorySnapshot(200d, 1_000L);
++        when(marketHoursGuard.isOpen(inveb)).thenReturn(true);
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.OPEN);
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B"))
++                .thenReturn(Collections.emptyList());
++
++        AssetDto result = service.syncPrice("inveb");
++
++        assertEquals("inveb", result.assetId());
++        assertEquals("INVE-B", result.symbol());
++        assertEquals(245.5, result.currentPrice());
++        assertEquals(1_000_000_000d, result.marketCap());
++        assertEquals(-1.25, result.priceChangePercentage24h());
++        assertEquals(123_456d, result.totalVolume());
++        assertEquals(PriceSource.FMP, result.priceSource());
++        assertEquals(MarketStatus.OPEN, result.marketStatus());
++        assertNull(result.dividends());
++        verify(assetDailyRepository).save(any(AssetDaily.class));
++        verify(providerCallMetrics).incrementFmp();
++    }
++
++    @Test
++    void syncPrice_skipsDailyWrite_whenMarketClosed() {
++        stubProviderQuote();
++        stubHistorySnapshot(200d, 1_000L);
++        when(marketHoursGuard.isOpen(inveb)).thenReturn(false);
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.CLOSED);
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B"))
++                .thenReturn(Collections.emptyList());
++
++        service.syncPrice("inveb");
++
++        verify(assetDailyRepository, never()).save(any(AssetDaily.class));
++    }
++
++    @Test
++    void getData_returnsCacheWithoutProviderCall() {
++        stubProviderQuote();
++        stubHistorySnapshot(200d, 1_000L);
++        when(marketHoursGuard.isOpen(inveb)).thenReturn(true);
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.OPEN);
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B"))
++                .thenReturn(Collections.emptyList());
++
++        service.syncPrice("inveb");
++        AssetDto cached = service.getData("inveb");
++
++        assertEquals("INVE-B", cached.symbol());
++        assertEquals(245.5, cached.currentPrice());
++        assertEquals(-1.25, cached.priceChangePercentage24h());
++        assertEquals(List.of(200d), cached.historyPrices());
++        assertEquals(List.of(1_000L), cached.historyDays());
++        verify(priceProvider, times(1)).fetch(inveb);
++    }
++
++    @Test
++    void getData_returnsStaleCacheAfterProviderFailure() {
++        stubProviderQuote();
++        stubHistorySnapshot(200d, 1_000L);
++        when(marketHoursGuard.isOpen(inveb)).thenReturn(true);
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.OPEN);
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B"))
++                .thenReturn(Collections.emptyList());
++
++        service.syncPrice("inveb");
++        when(priceProvider.fetch(inveb)).thenThrow(new RuntimeException("down"));
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.CLOSED);
++
++        service.syncPrice("inveb");
++        AssetDto result = service.getData("inveb");
++
++        assertEquals(245.5, result.currentPrice());
++        assertEquals(PriceSource.CACHE, result.priceSource());
++        assertEquals(MarketStatus.CLOSED, result.marketStatus());
++        verify(priceProvider, times(2)).fetch(inveb);
++    }
++
++    @Test
++    void syncPrice_returnsStaleCacheOnProviderFailure() {
++        stubProviderQuote();
++        stubHistorySnapshot(200d, 1_000L);
++        when(marketHoursGuard.isOpen(inveb)).thenReturn(true);
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.OPEN);
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B"))
++                .thenReturn(Collections.emptyList());
++
++        AssetDto first = service.syncPrice("inveb");
++        when(priceProvider.fetch(inveb)).thenThrow(new RuntimeException("down"));
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.CLOSED);
++
++        AssetDto second = service.syncPrice("inveb");
++
++        assertEquals(first.currentPrice(), second.currentPrice());
++        assertEquals(PriceSource.CACHE, second.priceSource());
++        assertEquals(List.of(200d), second.historyPrices());
++        verify(providerCallMetrics, times(1)).incrementFmp();
++    }
++
++    @Test
++    void syncPrice_logsStaleCacheWarningOnProviderFailure() {
++        stubProviderQuote();
++        stubHistorySnapshot(200d, 1_000L);
++        when(marketHoursGuard.isOpen(inveb)).thenReturn(true);
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.OPEN);
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B"))
++                .thenReturn(Collections.emptyList());
++
++        service.syncPrice("inveb");
++        when(priceProvider.fetch(inveb)).thenThrow(new RuntimeException("down"));
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.CLOSED);
++
++        service.syncPrice("inveb");
++
++        assertTrue(logAppender.list.stream()
++                .filter(event -> event.getLevel() == Level.WARN)
++                .map(ILoggingEvent::getFormattedMessage)
++                .anyMatch(m -> m.contains("Stale price for inveb") && m.contains("source=cache")));
++    }
++
++    @Test
++    void syncPrice_incrementsScrapeMetricsOnSuccessfulScrape() {
++        when(priceProvider.fetch(hypeScrape)).thenReturn(new PriceQuote(
++                42d, "USD", null, null, null, Instant.parse("2026-06-02T10:00:00Z")));
++        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE"))
++                .thenReturn(Collections.emptyList());
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE"))
++                .thenReturn(Collections.emptyList());
++        when(marketHoursGuard.isOpen(hypeScrape)).thenReturn(true);
++        when(marketHoursGuard.status(hypeScrape)).thenReturn(MarketStatus.OPEN);
++
++        service.syncPrice("hype");
++
++        verify(providerCallMetrics).incrementScrape();
++        verify(providerCallMetrics, never()).recordScrapeFailure();
++    }
++
++    @Test
++    void syncPrice_recordsScrapeFailureOnException() {
++        when(priceProvider.fetch(hypeScrape)).thenThrow(new RuntimeException("scrape down"));
++        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE"))
++                .thenReturn(Collections.emptyList());
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE"))
++                .thenReturn(Collections.emptyList());
++
++        service.syncPrice("hype");
++
++        verify(providerCallMetrics).incrementScrape();
++        verify(providerCallMetrics).recordScrapeFailure();
++    }
++
++    @Test
++    void syncPrice_recordsScrapeFailureOnNullQuote() {
++        when(priceProvider.fetch(hypeScrape)).thenReturn(null);
++        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("HYPE"))
++                .thenReturn(Collections.emptyList());
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("HYPE"))
++                .thenReturn(Collections.emptyList());
++
++        service.syncPrice("hype");
++
++        verify(providerCallMetrics).incrementScrape();
++        verify(providerCallMetrics).recordScrapeFailure();
++    }
++
++    @Test
++    void syncPrice_returnsErrorWhenNoCacheAndProviderFails() {
++        when(priceProvider.fetch(inveb)).thenThrow(new RuntimeException("down"));
++        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("INVE-B"))
++                .thenReturn(Collections.emptyList());
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B"))
++                .thenReturn(Collections.emptyList());
++
++        AssetDto result = service.syncPrice("inveb");
++
++        assertEquals("inveb", result.assetId());
++        assertEquals("INVE-B", result.symbol());
++        assertNull(result.currentPrice());
++        verify(assetDailyRepository, never()).save(any(AssetDaily.class));
++    }
++
++    @Test
++    void getData_groupsLivePricesByLatestTradingDay() {
++        stubProviderQuote();
++        stubHistorySnapshot(200d, 1_000L);
++        when(marketHoursGuard.isOpen(inveb)).thenReturn(true);
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.OPEN);
++
++        Instant previousDay = LocalDate.of(2026, 6, 1).atTime(14, 0).atZone(STOCKHOLM).toInstant();
++        Instant sameDayMorning = LocalDate.of(2026, 6, 2).atTime(10, 0).atZone(STOCKHOLM).toInstant();
++        Instant sameDayAfternoon = LocalDate.of(2026, 6, 2).atTime(15, 0).atZone(STOCKHOLM).toInstant();
++
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B"))
++                .thenReturn(List.of(
++                        dailyPoint(sameDayAfternoon, 246d),
++                        dailyPoint(sameDayMorning, 245d),
++                        dailyPoint(previousDay, 240d)));
++
++        AssetDto result = service.syncPrice("inveb");
++
++        assertEquals(List.of(245d, 246d), result.livePrices());
++        assertEquals(List.of(sameDayMorning.toEpochMilli(), sameDayAfternoon.toEpochMilli()), result.liveDays());
++    }
++
++    @Test
++    void synchronizeCachesWithRegistry_initializesOnlyRegisteredAssetKeys() {
++        assertEquals(Set.of("inveb"), cacheKeys(service));
++        assertEquals(Set.of("inveb"), syncLockKeys(service));
++        assertEquals(Set.of("inveb"), historyStateKeys(service));
++    }
++
++    @Test
++    void synchronizeCachesWithRegistry_evictsOrphanedEntries() throws Exception {
++        AssetDefinition removed = new AssetDefinition(
++                "removed",
++                "Removed Asset",
++                AssetProvider.FMP,
++                "REM.ST",
++                "REM",
++                AssetType.STOCK,
++                "SEK",
++                new MarketHours(STOCKHOLM, LocalTime.of(9, 0), LocalTime.of(17, 35)),
++                new SyncConfig(15, 0),
++                null);
++
++        when(assetRegistry.all()).thenReturn(List.of(inveb, removed));
++        when(assetRegistry.findById("removed")).thenReturn(Optional.of(removed));
++        service.synchronizeCachesWithRegistry();
++
++        stubProviderQuote();
++        stubHistorySnapshot(200d, 1_000L);
++        when(marketHoursGuard.isOpen(inveb)).thenReturn(true);
++        when(marketHoursGuard.isOpen(removed)).thenReturn(true);
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.OPEN);
++        when(marketHoursGuard.status(removed)).thenReturn(MarketStatus.OPEN);
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B"))
++                .thenReturn(Collections.emptyList());
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("REM"))
++                .thenReturn(Collections.emptyList());
++        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("REM"))
++                .thenReturn(Collections.emptyList());
++
++        service.syncPrice("inveb");
++        service.syncPrice("removed");
++
++        assertTrue(cacheKeys(service).contains("removed"));
++
++        when(assetRegistry.all()).thenReturn(List.of(inveb));
++        service.synchronizeCachesWithRegistry();
++
++        assertEquals(Set.of("inveb"), cacheKeys(service));
++        assertEquals(Set.of("inveb"), syncLockKeys(service));
++        assertEquals(Set.of("inveb"), historyStateKeys(service));
++    }
++
++    @SuppressWarnings("unchecked")
++    private Set<String> cacheKeys(ConfigurableAssetService target) {
++        return mapKeys(target, "cacheByAssetId");
++    }
++
++    @SuppressWarnings("unchecked")
++    private Set<String> syncLockKeys(ConfigurableAssetService target) {
++        return mapKeys(target, "syncLocks");
++    }
++
++    @SuppressWarnings("unchecked")
++    private Set<String> historyStateKeys(ConfigurableAssetService target) {
++        return mapKeys(target, "historyStateByAssetId");
++    }
++
++    @SuppressWarnings("unchecked")
++    private Set<String> mapKeys(ConfigurableAssetService target, String fieldName) {
++        try {
++            Field field = ConfigurableAssetService.class.getDeclaredField(fieldName);
++            field.setAccessible(true);
++            ConcurrentHashMap<String, ?> map = (ConcurrentHashMap<String, ?>) field.get(target);
++            return Set.copyOf(map.keySet());
++        } catch (ReflectiveOperationException e) {
++            throw new AssertionError(e);
++        }
++    }
++
++    private void stubProviderQuote() {
++        when(priceProvider.fetch(inveb)).thenReturn(new PriceQuote(
++                245.5,
++                "SEK",
++                1_000_000_000d,
++                -1.25d,
++                123_456d,
++                Instant.parse("2026-06-02T10:00:00Z")));
++    }
++
++    private void stubHistorySnapshot(double price, long dayMillis) {
++        AssetSnapshot snapshot = new AssetSnapshot();
++        snapshot.setPrice(price);
++        snapshot.setDay(Instant.ofEpochMilli(dayMillis));
++        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("INVE-B"))
++                .thenReturn(List.of(snapshot));
++    }
++
++    private AssetDaily dailyPoint(Instant lastRefresh, double price) {
++        AssetDaily daily = new AssetDaily();
++        daily.setSymbol("INVE-B");
++        daily.setCurrentPrice(price);
++        daily.setLastRefresh(lastRefresh);
++        return daily;
++    }
++
++    @Test
++    void syncPrice_populatesDividendsBlock_whenConfigPresent() {
++        stubProviderQuote();
++        stubHistorySnapshot(200d, 1_000L);
++        when(marketHoursGuard.isOpen(inveb)).thenReturn(true);
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.OPEN);
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B"))
++                .thenReturn(Collections.emptyList());
++
++        // Setup dividend config
++        AssetDividendsProperties.DividendsConfig config = new AssetDividendsProperties.DividendsConfig();
++        config.setAssetId("inveb");
++        config.setForwardDividend(java.math.BigDecimal.valueOf(6.0));
++        config.setForwardDividendCurrency("SEK");
++        config.setFrequency("annual");
++        config.setAvgDividendGrowth10Y(java.math.BigDecimal.valueOf(8.2));
++        
++        AssetDividendsProperties.DividendHistoryEntry historyEntry = new AssetDividendsProperties.DividendHistoryEntry();
++        historyEntry.setYear(2024);
++        historyEntry.setAmount(java.math.BigDecimal.valueOf(6.0));
++        historyEntry.setCurrency("SEK");
++        config.setHistory(List.of(historyEntry));
++
++        assetDividendsProperties.getDividends().put("inveb", config);
++
++        AssetDto result = service.syncPrice("inveb");
++
++        assertEquals("inveb", result.assetId());
++        org.junit.jupiter.api.Assertions.assertNotNull(result.dividends());
++        assertEquals(java.math.BigDecimal.valueOf(6.0), result.dividends().forwardDividend());
++        assertEquals("SEK", result.dividends().forwardDividendCurrency());
++        assertEquals("annual", result.dividends().frequency());
++        assertEquals(java.math.BigDecimal.valueOf(8.2), result.dividends().avgDividendGrowth10Y());
++        assertEquals(1, result.dividends().history().size());
++        assertEquals(2024, result.dividends().history().get(0).year());
++        assertEquals(java.math.BigDecimal.valueOf(6.0), result.dividends().history().get(0).amount());
++        assertEquals("SEK", result.dividends().history().get(0).currency());
++        assertNull(result.dividends().estimatedYield()); // Estimated yield must be null for now
++    }
++
++    @Test
++    void syncPrice_populatesFundamentalsBlock_whenConfigPresent() {
++        stubProviderQuote();
++        stubHistorySnapshot(200d, 1_000L);
++        when(marketHoursGuard.isOpen(inveb)).thenReturn(true);
++        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.OPEN);
++        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B"))
++                .thenReturn(Collections.emptyList());
++
++        // Setup fundamentals config
++        AssetFundamentalsProperties.FundamentalsConfig config = new AssetFundamentalsProperties.FundamentalsConfig();
++        config.setAssetId("inveb");
++        config.setUpdatedAt(LocalDate.of(2026, 4, 15));
++        config.setSource("Source: Q1 2026 report");
++        config.getMetrics().put("trailing-pe", 6.11);
++        config.getMetrics().put("debt-leverage", "1.2%");
++
++        AssetFundamentalsProperties.HoldingProperties holding = new AssetFundamentalsProperties.HoldingProperties();
++        holding.setName("ABB");
++        holding.setWeightPercent(BigDecimal.valueOf(16.5));
++        config.setTopHoldings(List.of(holding));
++
++        AssetFundamentalsProperties.SectorWeightProperties sector = new AssetFundamentalsProperties.SectorWeightProperties();
++        sector.setSector("Industrials");
++        sector.setWeightPercent(BigDecimal.valueOf(45.2));
++        config.setSectorWeights(List.of(sector));
++
++        assetFundamentalsProperties.getFundamentals().put("inveb", config);
++
++        AssetDto result = service.syncPrice("inveb");
++
++        assertEquals("inveb", result.assetId());
++        assertNotNull(result.fundamentals());
++        assertEquals(LocalDate.of(2026, 4, 15), result.fundamentals().updatedAt());
++        assertEquals("Source: Q1 2026 report", result.fundamentals().source());
++        assertEquals(6.11, result.fundamentals().metrics().get("trailing-pe"));
++        assertEquals("1.2%", result.fundamentals().metrics().get("debt-leverage"));
++        assertFalse(result.fundamentals().stale());
++
++        assertEquals(1, result.fundamentals().topHoldings().size());
++        assertEquals("ABB", result.fundamentals().topHoldings().get(0).name());
++        assertEquals(BigDecimal.valueOf(16.5), result.fundamentals().topHoldings().get(0).weightPercent());
++
++        assertEquals(1, result.fundamentals().sectorWeights().size());
++        assertEquals("Industrials", result.fundamentals().sectorWeights().get(0).sector());
++        assertEquals(BigDecimal.valueOf(45.2), result.fundamentals().sectorWeights().get(0).weightPercent());
++    }
++}

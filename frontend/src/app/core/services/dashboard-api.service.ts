@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type { HypeDto, AssetDto, QuarterlyAlertsResponse, RegisteredAssetDto } from '../models';
-import { ToastService } from './toastService';
+import { ToastService } from './toast.service';
 
 @Injectable({ providedIn: 'root' })
 export class DashboardApiService {

@@ -5,14 +5,13 @@ metrics:
   trailing-pe: 43.5
   forward-pe: 38.2
   net-debt-ebitda: "5.2x"
-  affo-payout-ratio: "75.2%"
+  affo-payout-ratio: "71.7%"
   portfolio-occupancy: "98.9%"
+  same-store-rent-growth: "0.8%"
+  avg-lease-term: "8.7 yrs"
+  rent-recapture: "103.4%"
 sector-weights:
-  - { sector: "Retail", weight-percent: 78.9 }
   - { sector: "Industrial", weight-percent: 15.5 }
-  - { sector: "Gaming", weight-percent: 3.2 }
-  - { sector: "Other (Office, Agriculture, Data Centers…)", weight-percent: 2.4 }
-retail-industry-weights:
   - { sector: "Grocery", weight-percent: 11.0 }
   - { sector: "Convenience Stores", weight-percent: 9.4 }
   - { sector: "Home Improvement", weight-percent: 6.4 }
@@ -23,10 +22,5 @@ retail-industry-weights:
   - { sector: "Health & Fitness", weight-percent: 4.2 }
   - { sector: "Restaurants — Casual Dining", weight-percent: 3.8 }
   - { sector: "General Merchandise", weight-percent: 3.7 }
+  - { sector: "Gaming", weight-percent: 3.2 }
   - { sector: "Home Furnishings", weight-percent: 3.0 }
-  - { sector: "Apparel Stores", weight-percent: 2.5 }
-  - { sector: "Sporting Goods", weight-percent: 2.5 }
-  - { sector: "Wholesale Clubs", weight-percent: 2.1 }
-  - { sector: "Motor Vehicle Dealerships", weight-percent: 1.9 }
-  - { sector: "Entertainment", weight-percent: 1.9 }
-  - { sector: "Theaters", weight-percent: 1.8 }

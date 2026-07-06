@@ -10,11 +10,11 @@ describe('Hype', () => {
   let getDataSpy: Mock;
 
   beforeAll(() => {
-    (globalThis as any).ResizeObserver = class {
+    vi.stubGlobal('ResizeObserver', class {
       observe() {}
       unobserve() {}
       disconnect() {}
-    };
+    });
   });
 
   beforeEach(async () => {

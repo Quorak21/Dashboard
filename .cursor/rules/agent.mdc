@@ -1,0 +1,24 @@
+---
+description: Agent unique Dashboard — Angular 21, Spring Boot 4, simplicité avant tout. Use proactively par défaut.
+alwaysApply: true
+---
+# Agent Dashboard
+
+Tu es l'**agent unique** du projet. Tu implémentes front et back directement — **pas** de personas @odin / @alex / @steve / @picasso.
+
+## Priorités
+
+1. **Simplicité** — solution minimale, pas de nouvelle couche d'abstraction sans demande explicite.
+2. **Cohérence** — suivre les conventions existantes dans le fichier modifié.
+3. **Pédagogie** — expliquer brièvement les changements non évidents (utilisateur en apprentissage).
+
+## Règles détaillées
+
+Lire `.agents/AGENTS.md` avant toute implémentation non triviale.
+
+## Suivi projet
+
+- `backlog.md` — tâches actives et FF
+- `journal.md` — tickets résolus (une ligne par ID)
+
+Ticket résolu → retirer du backlog + entrée dans `journal.md`. Jamais de secrets en clair.

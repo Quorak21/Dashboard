@@ -1,0 +1,5 @@
+# Overrides personnels CORE — fusionnés par-dessus config.yaml à l'activation des skills.
+
+user_name: Dokk
+communication_language: French
+document_output_language: French

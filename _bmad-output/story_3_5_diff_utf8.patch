@@ -1,0 +1,366 @@
+﻿diff --git a/backend/src/main/resources/config/dividends/brwm.yml b/backend/src/main/resources/config/dividends/brwm.yml
+new file mode 100644
+index 0000000..766add6
+--- /dev/null
++++ b/backend/src/main/resources/config/dividends/brwm.yml
+@@ -0,0 +1,8 @@
++asset-id: brwm
++forward-dividend: 0.185
++forward-dividend-currency: GBP
++frequency: semi-annual
++history:
++  - { year: 2024, amount: 0.185, currency: GBP }
++  - { year: 2023, amount: 0.130, currency: GBP }
++  - { year: 2022, amount: 0.380, currency: GBP }
+diff --git a/backend/src/main/resources/config/dividends/chdiv.yml b/backend/src/main/resources/config/dividends/chdiv.yml
+new file mode 100644
+index 0000000..bb8b4fd
+--- /dev/null
++++ b/backend/src/main/resources/config/dividends/chdiv.yml
+@@ -0,0 +1,8 @@
++asset-id: chdiv
++forward-dividend: 1.85
++forward-dividend-currency: CHF
++frequency: annual
++history:
++  - { year: 2024, amount: 1.78, currency: CHF }
++  - { year: 2023, amount: 1.65, currency: CHF }
++  - { year: 2022, amount: 1.52, currency: CHF }
+diff --git a/backend/src/main/resources/config/dividends/iii.yml b/backend/src/main/resources/config/dividends/iii.yml
+new file mode 100644
+index 0000000..e8e9237
+--- /dev/null
++++ b/backend/src/main/resources/config/dividends/iii.yml
+@@ -0,0 +1,9 @@
++asset-id: iii
++forward-dividend: 0.58
++forward-dividend-currency: GBP
++frequency: semi-annual
++avg-dividend-growth-10y: 12.5
++history:
++  - { year: 2024, amount: 0.54, currency: GBP }
++  - { year: 2023, amount: 0.46, currency: GBP }
++  - { year: 2022, amount: 0.38, currency: GBP }
+diff --git a/backend/src/main/resources/config/dividends/infr.yml b/backend/src/main/resources/config/dividends/infr.yml
+new file mode 100644
+index 0000000..184177e
+--- /dev/null
++++ b/backend/src/main/resources/config/dividends/infr.yml
+@@ -0,0 +1,8 @@
++asset-id: infr
++forward-dividend: 0.68
++forward-dividend-currency: GBP
++frequency: semi-annual
++history:
++  - { year: 2024, amount: 0.65, currency: GBP }
++  - { year: 2023, amount: 0.61, currency: GBP }
++  - { year: 2022, amount: 0.55, currency: GBP }
+diff --git a/backend/src/main/resources/config/dividends/o.yml b/backend/src/main/resources/config/dividends/o.yml
+new file mode 100644
+index 0000000..a5ecdc1
+--- /dev/null
++++ b/backend/src/main/resources/config/dividends/o.yml
+@@ -0,0 +1,9 @@
++asset-id: o
++forward-dividend: 3.168
++forward-dividend-currency: USD
++frequency: monthly
++avg-dividend-growth-10y: 4.3
++history:
++  - { year: 2024, amount: 3.072, currency: USD }
++  - { year: 2023, amount: 2.976, currency: USD }
++  - { year: 2022, amount: 2.808, currency: USD }
+diff --git a/backend/src/main/resources/config/dividends/qqqe.yml b/backend/src/main/resources/config/dividends/qqqe.yml
+new file mode 100644
+index 0000000..b8f6160
+--- /dev/null
++++ b/backend/src/main/resources/config/dividends/qqqe.yml
+@@ -0,0 +1,8 @@
++asset-id: qqqe
++forward-dividend: 0.28
++forward-dividend-currency: USD
++frequency: annual
++history:
++  - { year: 2024, amount: 0.25, currency: USD }
++  - { year: 2023, amount: 0.21, currency: USD }
++  - { year: 2022, amount: 0.18, currency: USD }
+diff --git a/backend/src/main/resources/config/fundamentals/brwm.yml b/backend/src/main/resources/config/fundamentals/brwm.yml
+new file mode 100644
+index 0000000..ee26d66
+--- /dev/null
++++ b/backend/src/main/resources/config/fundamentals/brwm.yml
+@@ -0,0 +1,19 @@
++asset-id: brwm
++updated-at: "2025-02-28"
++source: "BlackRock World Mining Trust Annual Report 2024"
++metrics:
++  nav-discount-premium: "-13.5%"
++  total-assets: "┬ú1.4bn"
++  management-fee: "0.70%"
++top-holdings:
++  - { name: "Glencore", weight-percent: 17.2 }
++  - { name: "BHP Group", weight-percent: 15.8 }
++  - { name: "Rio Tinto", weight-percent: 12.4 }
++  - { name: "Vale", weight-percent: 8.9 }
++  - { name: "Freeport-McMoRan", weight-percent: 7.1 }
++sector-weights:
++  - { sector: "Diversified Metals & Mining", weight-percent: 48.3 }
++  - { sector: "Copper", weight-percent: 22.1 }
++  - { sector: "Gold", weight-percent: 15.4 }
++  - { sector: "Iron Ore", weight-percent: 8.7 }
++  - { sector: "Other", weight-percent: 5.5 }
+diff --git a/backend/src/main/resources/config/fundamentals/chdiv.yml b/backend/src/main/resources/config/fundamentals/chdiv.yml
+new file mode 100644
+index 0000000..706719d
+--- /dev/null
++++ b/backend/src/main/resources/config/fundamentals/chdiv.yml
+@@ -0,0 +1,19 @@
++asset-id: chdiv
++updated-at: "2025-04-30"
++source: "iShares Swiss Dividend ETF (CHDIV) factsheet April 2025"
++metrics:
++  nav-discount-premium: "0.01%"
++  total-assets: "CHF 1.2bn"
++  management-fee: "0.15%"
++top-holdings:
++  - { name: "Nestl├⌐", weight-percent: 14.8 }
++  - { name: "Novartis", weight-percent: 12.3 }
++  - { name: "Roche", weight-percent: 10.7 }
++  - { name: "Zurich Insurance", weight-percent: 7.4 }
++  - { name: "Swiss Re", weight-percent: 5.9 }
++sector-weights:
++  - { sector: "Consumer Staples", weight-percent: 22.1 }
++  - { sector: "Healthcare", weight-percent: 20.8 }
++  - { sector: "Financials", weight-percent: 19.3 }
++  - { sector: "Industrials", weight-percent: 14.6 }
++  - { sector: "Materials", weight-percent: 8.9 }
+diff --git a/backend/src/main/resources/config/fundamentals/iii.yml b/backend/src/main/resources/config/fundamentals/iii.yml
+new file mode 100644
+index 0000000..e5f7824
+--- /dev/null
++++ b/backend/src/main/resources/config/fundamentals/iii.yml
+@@ -0,0 +1,8 @@
++asset-id: iii
++updated-at: "2025-05-14"
++source: "3i Group Annual Report 2025 (FY ending March 2025)"
++metrics:
++  trailing-pe: 18.2
++  forward-pe: 16.8
++  debt-leverage: "8%"
++  dividend-payout-ratio: "22%"
+diff --git a/backend/src/main/resources/config/fundamentals/infr.yml b/backend/src/main/resources/config/fundamentals/infr.yml
+new file mode 100644
+index 0000000..d27895e
+--- /dev/null
++++ b/backend/src/main/resources/config/fundamentals/infr.yml
+@@ -0,0 +1,19 @@
++asset-id: infr
++updated-at: "2025-05-31"
++source: "iShares Global Infrastructure ETF (INFR) factsheet May 2025"
++metrics:
++  nav-discount-premium: "0.02%"
++  total-assets: "$2.8bn"
++  management-fee: "0.65%"
++top-holdings:
++  - { name: "NextEra Energy", weight-percent: 6.1 }
++  - { name: "Southern Company", weight-percent: 3.9 }
++  - { name: "Duke Energy", weight-percent: 3.7 }
++  - { name: "American Tower", weight-percent: 3.4 }
++  - { name: "Transurban Group", weight-percent: 3.1 }
++sector-weights:
++  - { sector: "Utilities", weight-percent: 61.2 }
++  - { sector: "Energy", weight-percent: 16.4 }
++  - { sector: "Industrials", weight-percent: 13.8 }
++  - { sector: "Real Estate", weight-percent: 5.3 }
++  - { sector: "Communication Services", weight-percent: 3.3 }
+diff --git a/backend/src/main/resources/config/fundamentals/o.yml b/backend/src/main/resources/config/fundamentals/o.yml
+new file mode 100644
+index 0000000..267fc1e
+--- /dev/null
++++ b/backend/src/main/resources/config/fundamentals/o.yml
+@@ -0,0 +1,8 @@
++asset-id: o
++updated-at: "2025-05-06"
++source: "Realty Income Q1 2025 Supplemental Operating Data"
++metrics:
++  trailing-pe: 43.5
++  forward-pe: 38.2
++  debt-leverage: "35.8%"
++  dividend-payout-ratio: "76%"
+diff --git a/backend/src/main/resources/config/fundamentals/qqqe.yml b/backend/src/main/resources/config/fundamentals/qqqe.yml
+new file mode 100644
+index 0000000..36288ae
+--- /dev/null
++++ b/backend/src/main/resources/config/fundamentals/qqqe.yml
+@@ -0,0 +1,20 @@
++asset-id: qqqe
++updated-at: "2025-05-31"
++source: "Invesco NASDAQ 100 Equal Weight ETF (QQQE) factsheet May 2025"
++metrics:
++  nav-discount-premium: "0.01%"
++  total-assets: "$1.5bn"
++  management-fee: "0.25%"
++top-holdings:
++  - { name: "Super Micro Computer", weight-percent: 1.3 }
++  - { name: "MicroStrategy", weight-percent: 1.2 }
++  - { name: "Palantir Technologies", weight-percent: 1.2 }
++  - { name: "Netflix", weight-percent: 1.1 }
++  - { name: "Meta Platforms", weight-percent: 1.1 }
++sector-weights:
++  - { sector: "Technology", weight-percent: 45.8 }
++  - { sector: "Consumer Discretionary", weight-percent: 18.3 }
++  - { sector: "Communication Services", weight-percent: 14.2 }
++  - { sector: "Healthcare", weight-percent: 7.9 }
++  - { sector: "Industrials", weight-percent: 5.6 }
++  - { sector: "Other", weight-percent: 8.2 }
+diff --git a/backend/src/test/java/com/dokkcorp/dashboard/config/assets/AssetFundamentalsPropertiesTest.java b/backend/src/test/java/com/dokkcorp/dashboard/config/assets/AssetFundamentalsPropertiesTest.java
+new file mode 100644
+index 0000000..a1d74c7
+--- /dev/null
++++ b/backend/src/test/java/com/dokkcorp/dashboard/config/assets/AssetFundamentalsPropertiesTest.java
+@@ -0,0 +1,145 @@
++package com.dokkcorp.dashboard.config.assets;
++
++import static org.junit.jupiter.api.Assertions.assertEquals;
++import static org.junit.jupiter.api.Assertions.assertFalse;
++import static org.junit.jupiter.api.Assertions.assertNotNull;
++import static org.junit.jupiter.api.Assertions.assertNull;
++import static org.junit.jupiter.api.Assertions.assertTrue;
++
++import java.io.IOException;
++import java.math.BigDecimal;
++import java.time.LocalDate;
++import java.util.List;
++
++import org.junit.jupiter.api.Test;
++
++class AssetFundamentalsPropertiesTest {
++
++    @Test
++    void testFundamentalsConfigLoading() throws IOException {
++        AssetFundamentalsConfiguration configuration = new AssetFundamentalsConfiguration();
++        AssetFundamentalsProperties properties = configuration.assetFundamentalsProperties();
++
++        assertNotNull(properties);
++        assertNotNull(properties.getFundamentals());
++
++        // inveb should be loaded because inveb.yml is in resources/config/fundamentals/
++        assertTrue(properties.getFundamentals().containsKey("inveb"));
++
++        AssetFundamentalsProperties.FundamentalsConfig invebConfig = properties.getFundamentals().get("inveb");
++        assertNotNull(invebConfig);
++        assertEquals("inveb", invebConfig.getAssetId());
++        assertEquals(LocalDate.of(2026, 4, 15), invebConfig.getUpdatedAt());
++        assertEquals("Source: Q1 2026 report", invebConfig.getSource());
++        assertNotNull(invebConfig.getMetrics());
++        assertEquals(6.11, invebConfig.getMetrics().get("trailing-pe"));
++        assertEquals("1.2%", invebConfig.getMetrics().get("debt-leverage"));
++
++        List<AssetFundamentalsProperties.HoldingProperties> topHoldings = invebConfig.getTopHoldings();
++        assertNotNull(topHoldings);
++        assertEquals(10, topHoldings.size());
++        assertEquals("ABB", topHoldings.get(0).getName());
++        assertEquals(0, new BigDecimal("16.5").compareTo(topHoldings.get(0).getWeightPercent()));
++
++        // brwm should be loaded
++        assertTrue(properties.getFundamentals().containsKey("brwm"));
++        AssetFundamentalsProperties.FundamentalsConfig brwmConfig = properties.getFundamentals().get("brwm");
++        assertNotNull(brwmConfig);
++        assertEquals("brwm", brwmConfig.getAssetId());
++        assertEquals(LocalDate.of(2025, 2, 28), brwmConfig.getUpdatedAt());
++        assertEquals("BlackRock World Mining Trust Annual Report 2024", brwmConfig.getSource());
++        assertEquals("-13.5%", brwmConfig.getMetrics().get("nav-discount-premium"));
++        assertEquals("┬ú1.4bn", brwmConfig.getMetrics().get("total-assets"));
++        assertEquals("0.70%", brwmConfig.getMetrics().get("management-fee"));
++        assertFalse(brwmConfig.getTopHoldings().isEmpty());
++        assertEquals(5, brwmConfig.getTopHoldings().size());
++        assertEquals("Glencore", brwmConfig.getTopHoldings().get(0).getName());
++        assertEquals(0, new BigDecimal("17.2").compareTo(brwmConfig.getTopHoldings().get(0).getWeightPercent()));
++    }
++
++    @Test
++    void testMissingOptionalDataBinding() {
++        String yaml = "asset-id: test-asset\n"
++                    + "updated-at: \"2026-06-24\"\n"
++                    + "source: \"Test Source\"\n"
++                    + "metrics:\n"
++                    + "  nav-per-share: 100.0\n"; // missing top-holdings and sector-weights
++
++        org.springframework.core.io.ByteArrayResource resource = new org.springframework.core.io.ByteArrayResource(yaml.getBytes(java.nio.charset.StandardCharsets.UTF_8)) {
++            @Override
++            public String getFilename() {
++                return "test-asset.yml";
++            }
++        };
++
++        org.springframework.beans.factory.config.YamlPropertiesFactoryBean factory = new org.springframework.beans.factory.config.YamlPropertiesFactoryBean();
++        factory.setResources(resource);
++        java.util.Properties props = factory.getObject();
++        assertNotNull(props);
++
++        org.springframework.boot.context.properties.bind.Binder binder = new org.springframework.boot.context.properties.bind.Binder(
++                new org.springframework.boot.context.properties.source.MapConfigurationPropertySource((java.util.Map) props));
++        AssetFundamentalsProperties.FundamentalsConfig config = binder.bind("", org.springframework.boot.context.properties.bind.Bindable.of(AssetFundamentalsProperties.FundamentalsConfig.class)).orElse(null);
++
++        assertNotNull(config);
++        assertEquals("test-asset", config.getAssetId());
++        assertEquals(LocalDate.of(2026, 6, 24), config.getUpdatedAt());
++        assertEquals("Test Source", config.getSource());
++        assertEquals(100.0, config.getMetrics().get("nav-per-share"));
++        assertTrue(config.getTopHoldings().isEmpty());
++        assertTrue(config.getSectorWeights().isEmpty());
++        assertTrue(AssetFundamentalsConfiguration.isValid(config));
++    }
++
++    @Test
++    void testMissingMandatoryFieldsBinding() {
++        String yaml = "asset-id: test-asset\n"
++                    + "source: \"Test Source\"\n"; // missing updatedAt and metrics
++
++        org.springframework.core.io.ByteArrayResource resource = new org.springframework.core.io.ByteArrayResource(yaml.getBytes(java.nio.charset.StandardCharsets.UTF_8)) {
++            @Override
++            public String getFilename() {
++                return "test-invalid.yml";
++            }
++        };
++
++        org.springframework.beans.factory.config.YamlPropertiesFactoryBean factory = new org.springframework.beans.factory.config.YamlPropertiesFactoryBean();
++        factory.setResources(resource);
++        java.util.Properties props = factory.getObject();
++        assertNotNull(props);
++
++        org.springframework.boot.context.properties.bind.Binder binder = new org.springframework.boot.context.properties.bind.Binder(
++                new org.springframework.boot.context.properties.source.MapConfigurationPropertySource((java.util.Map) props));
++        AssetFundamentalsProperties.FundamentalsConfig config = binder.bind("", org.springframework.boot.context.properties.bind.Bindable.of(AssetFundamentalsProperties.FundamentalsConfig.class)).orElse(null);
++
++        assertNotNull(config);
++        assertEquals("test-asset", config.getAssetId());
++        assertNull(config.getUpdatedAt());
++        assertTrue(config.getMetrics().isEmpty());
++        assertFalse(AssetFundamentalsConfiguration.isValid(config));
++    }
++
++    @Test
++    void testIsValidValidationLogic() {
++        AssetFundamentalsProperties.FundamentalsConfig config = new AssetFundamentalsProperties.FundamentalsConfig();
++        // Null config
++        assertFalse(AssetFundamentalsConfiguration.isValid(null));
++
++        // Missing all fields
++        assertFalse(AssetFundamentalsConfiguration.isValid(config));
++
++        // Populate fields except metrics
++        config.setAssetId("test");
++        config.setUpdatedAt(LocalDate.now());
++        config.setSource("Source");
++        assertFalse(AssetFundamentalsConfiguration.isValid(config));
++
++        // Metrics empty
++        config.setMetrics(new java.util.HashMap<>());
++        assertFalse(AssetFundamentalsConfiguration.isValid(config));
++
++        // Metrics populated -> Valid
++        config.getMetrics().put("key", "value");
++        assertTrue(AssetFundamentalsConfiguration.isValid(config));
++    }
++}

@@ -1,0 +1,70 @@
+﻿{
+    "date":  "2026-06-17",
+    "assets":  [
+                   {
+                       "id":  "chdiv",
+                       "symbol":  "CHDIV.SW",
+                       "isin":  "CH1244681594",
+                       "ubs_nl":  {
+                                      "fundgateOnly":  true,
+                                      "length":  92230,
+                                      "ask":  null,
+                                      "ok":  false,
+                                      "http":  200,
+                                      "bid":  null,
+                                      "note":  "fundgate shell sans prix",
+                                      "nav":  null
+                                  },
+                       "yahoo":  {
+                                     "currency":  "CHF",
+                                     "exchange":  "Swiss",
+                                     "ok":  true,
+                                     "note":  "Yahoo chart API (SIX via EBS)",
+                                     "symbol":  "CHDIV.SW",
+                                     "price":  13.868
+                                 }
+                   },
+                   {
+                       "id":  "qqqe",
+                       "symbol":  "QQQE.SW",
+                       "isin":  "IE0003RQ9F90",
+                       "ubs_nl":  {
+                                      "fundgateOnly":  true,
+                                      "length":  92230,
+                                      "ask":  null,
+                                      "ok":  false,
+                                      "http":  200,
+                                      "bid":  null,
+                                      "note":  "fundgate shell sans prix",
+                                      "nav":  null
+                                  },
+                       "yahoo":  {
+                                     "currency":  "USD",
+                                     "exchange":  "Swiss",
+                                     "ok":  true,
+                                     "note":  "Yahoo chart API (SIX via EBS)",
+                                     "symbol":  "QQQE.SW",
+                                     "price":  34.995
+                                 },
+                       "deutsche_boerse":  {
+                                               "price":  30.125,
+                                               "ok":  true,
+                                               "http":  200,
+                                               "note":  "Frankfurt/Xetra listing (BCFN.DE), pas SIX USD",
+                                               "currency":  "EUR"
+                                           }
+                   }
+               ],
+    "stability":  [
+                      {
+                          "id":  "chdiv",
+                          "runs":  "13,868, 13,868, 13,868",
+                          "stable":  true
+                      },
+                      {
+                          "id":  "qqqe",
+                          "runs":  "34,995, 34,995, 34,995",
+                          "stable":  true
+                      }
+                  ]
+}

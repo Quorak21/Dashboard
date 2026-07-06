@@ -1,8 +1,12 @@
 package com.dokkcorp.dashboard.jobs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,16 +17,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.scheduling.TaskScheduler;
 
 import com.dokkcorp.dashboard.features.assets.AssetRegistry;
 import com.dokkcorp.dashboard.features.assets.ConfigurableAssetService;
-import com.dokkcorp.dashboard.features.assets.MarketHoursGuard;
 import com.dokkcorp.dashboard.features.assets.ProviderCallMetrics;
 import com.dokkcorp.dashboard.features.assets.model.AssetDefinition;
 import com.dokkcorp.dashboard.features.assets.model.AssetProvider;
 import com.dokkcorp.dashboard.features.assets.model.AssetType;
+import com.dokkcorp.dashboard.features.assets.model.SyncConfig;
 import com.dokkcorp.dashboard.features.crypto.hype.HypeDto;
 import com.dokkcorp.dashboard.features.crypto.hype.HypeService;
 import com.dokkcorp.dashboard.features.crypto.hype.models.HypeBlockchainDto;
@@ -44,17 +50,27 @@ class AssetSyncJobTest {
     private final HypeService hypeService = mock(HypeService.class);
     private final ConfigurableAssetService configurableAssetService = mock(ConfigurableAssetService.class);
     private final AssetRegistry assetRegistry = mock(AssetRegistry.class);
-    private final MarketHoursGuard marketHoursGuard = mock(MarketHoursGuard.class);
     private final ProviderCallMetrics providerCallMetrics = mock(ProviderCallMetrics.class);
-    private final AssetSyncJob job = new AssetSyncJob(
-            assetSnapshotRepository,
-            assetDailyRepository,
-            hypeService,
-            configurableAssetService,
-            assetRegistry,
-            marketHoursGuard,
-            providerCallMetrics
-    );
+    private final TaskScheduler taskScheduler = mock(TaskScheduler.class);
+    private AssetSyncJob job;
+
+    @BeforeEach
+    void setUpTaskScheduler() {
+        doAnswer(invocation -> {
+            Runnable task = invocation.getArgument(0);
+            task.run();
+            return null;
+        }).when(taskScheduler).schedule(any(Runnable.class), any(Instant.class));
+        job = new AssetSyncJob(
+                assetSnapshotRepository,
+                assetDailyRepository,
+                hypeService,
+                configurableAssetService,
+                assetRegistry,
+                providerCallMetrics,
+                taskScheduler
+        );
+    }
 
     @Test
     void sendDailySnapshotToDb_savesHypeAndInvebSnapshots() {
@@ -64,10 +80,11 @@ class AssetSyncJobTest {
         hypeDaily.setBurnedHype("10");
         hypeDaily.setCirculatingSupply("100");
         AssetDaily invebDaily = new AssetDaily();
+        invebDaily.setSymbol("INVE-B");
         invebDaily.setCurrentPrice(250d);
         invebDaily.setLastRefresh(Instant.ofEpochMilli(1712222222L));
         when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(Optional.of(hypeDaily));
-        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("INVE-B")).thenReturn(Optional.of(invebDaily));
+        when(assetDailyRepository.findLatestBySymbols(anyList())).thenReturn(List.of(invebDaily));
         when(hypeService.getData()).thenReturn(buildHypeDto());
         when(assetRegistry.all()).thenReturn(List.of(invebDefinition()));
 
@@ -92,10 +109,11 @@ class AssetSyncJobTest {
         hypeDaily.setBurnedHype("10");
         hypeDaily.setCirculatingSupply("100");
         AssetDaily invebDaily = new AssetDaily();
+        invebDaily.setSymbol("INVE-B");
         invebDaily.setCurrentPrice(250d);
         invebDaily.setLastRefresh(Instant.ofEpochMilli(1712222222L));
         when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(Optional.of(hypeDaily));
-        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("INVE-B")).thenReturn(Optional.of(invebDaily));
+        when(assetDailyRepository.findLatestBySymbols(anyList())).thenReturn(List.of(invebDaily));
         when(hypeService.getData()).thenReturn(buildHypeDto());
         when(assetRegistry.all()).thenReturn(List.of(invebDefinition()));
 
@@ -124,7 +142,7 @@ class AssetSyncJobTest {
         invebDaily.setCurrentPrice(null);
         invebDaily.setLastRefresh(Instant.ofEpochMilli(1712222222L));
         when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(Optional.of(hypeDaily));
-        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("INVE-B")).thenReturn(Optional.of(invebDaily));
+        when(assetDailyRepository.findLatestBySymbols(anyList())).thenReturn(List.of(invebDaily));
         when(hypeService.getData()).thenReturn(buildHypeDto());
         when(assetRegistry.all()).thenReturn(List.of(invebDefinition()));
 
@@ -141,11 +159,12 @@ class AssetSyncJobTest {
         hypeDaily.setBurnedHype("10");
         hypeDaily.setCirculatingSupply("100");
         AssetDaily invebDaily = new AssetDaily();
+        invebDaily.setSymbol("INVE-B");
         invebDaily.setCurrentPrice(250d);
         invebDaily.setLastRefresh(Instant.ofEpochMilli(1712222222L));
 
         when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(Optional.of(hypeDaily));
-        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("INVE-B")).thenReturn(Optional.of(invebDaily));
+        when(assetDailyRepository.findLatestBySymbols(anyList())).thenReturn(List.of(invebDaily));
         when(hypeService.getData()).thenReturn(buildHypeDto());
         when(assetRegistry.all()).thenReturn(List.of(invebDefinition()));
 
@@ -164,11 +183,12 @@ class AssetSyncJobTest {
         hypeDaily.setBurnedHype("10");
         hypeDaily.setCirculatingSupply("100");
         AssetDaily invebDaily = new AssetDaily();
+        invebDaily.setSymbol("INVE-B");
         invebDaily.setCurrentPrice(250d);
         invebDaily.setLastRefresh(null);
 
         when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("HYPE")).thenReturn(Optional.of(hypeDaily));
-        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("INVE-B")).thenReturn(Optional.of(invebDaily));
+        when(assetDailyRepository.findLatestBySymbols(anyList())).thenReturn(List.of(invebDaily));
         when(hypeService.getData()).thenReturn(buildHypeDto());
         when(assetRegistry.all()).thenReturn(List.of(invebDefinition()));
 
@@ -184,17 +204,16 @@ class AssetSyncJobTest {
                 "brwm", "World Mining", AssetProvider.FMP,
                 "BRWM.L", "BRWM", AssetType.TRUST, "GBP", null, null, null);
         AssetDaily invebDaily = new AssetDaily();
+        invebDaily.setSymbol("INVE-B");
         invebDaily.setCurrentPrice(250d);
         invebDaily.setLastRefresh(Instant.ofEpochMilli(1712222222L));
         AssetDaily brwmDaily = new AssetDaily();
+        brwmDaily.setSymbol("BRWM");
         brwmDaily.setCurrentPrice(500d);
         brwmDaily.setLastRefresh(Instant.ofEpochMilli(1713333333L));
 
         when(assetRegistry.all()).thenReturn(List.of(inveb, brwm));
-        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("INVE-B"))
-                .thenReturn(Optional.of(invebDaily));
-        when(assetDailyRepository.findFirstBySymbolOrderByLastRefreshDesc("BRWM"))
-                .thenReturn(Optional.of(brwmDaily));
+        when(assetDailyRepository.findLatestBySymbols(anyList())).thenReturn(List.of(invebDaily, brwmDaily));
         when(assetSnapshotRepository.save(any(AssetSnapshot.class)))
                 .thenThrow(new RuntimeException("DB failure"))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -226,18 +245,16 @@ class AssetSyncJobTest {
     }
 
     @Test
-    void syncFmpAssets_syncsOpenMarketsAndSkipsClosedMarkets() {
+    void syncFmpAssets_syncsAllFmpAssetsRegardlessOfMarketHours() {
         AssetDefinition openAsset = new AssetDefinition("inveb", null, null, null, null, null, null, null, null, null);
-        AssetDefinition closedAsset = new AssetDefinition("brwm", null, null, null, null, null, null, null, null, null);
+        AssetDefinition closedAsset = new AssetDefinition("o", null, null, null, null, null, null, null, null, null);
 
         when(assetRegistry.byProvider(AssetProvider.FMP)).thenReturn(List.of(openAsset, closedAsset));
-        when(marketHoursGuard.isOpen(openAsset)).thenReturn(true);
-        when(marketHoursGuard.isOpen(closedAsset)).thenReturn(false);
 
         job.syncFmpAssets();
 
         verify(configurableAssetService, times(1)).syncPrice("inveb");
-        verify(configurableAssetService, times(0)).syncPrice("brwm");
+        verify(configurableAssetService, times(1)).syncPrice("o");
         verify(providerCallMetrics, times(1)).logMetrics();
     }
 
@@ -247,8 +264,6 @@ class AssetSyncJobTest {
         AssetDefinition asset2 = new AssetDefinition("brwm", null, null, null, null, null, null, null, null, null);
 
         when(assetRegistry.byProvider(AssetProvider.FMP)).thenReturn(List.of(asset1, asset2));
-        when(marketHoursGuard.isOpen(asset1)).thenReturn(true);
-        when(marketHoursGuard.isOpen(asset2)).thenReturn(true);
 
         when(configurableAssetService.syncPrice("inveb")).thenThrow(new RuntimeException("API failure"));
 
@@ -278,12 +293,47 @@ class AssetSyncJobTest {
         list.add(openAsset);
 
         when(assetRegistry.byProvider(AssetProvider.FMP)).thenReturn(list);
-        when(marketHoursGuard.isOpen(openAsset)).thenReturn(true);
 
         job.syncFmpAssets();
 
         verify(configurableAssetService, times(1)).syncPrice("inveb");
         verify(providerCallMetrics, times(1)).logMetrics();
+    }
+
+    @Test
+    void isDueForSync_respectsIntervalAndOffset() {
+        SyncConfig brwmSync = new SyncConfig(15, 3);
+
+        assertTrue(AssetSyncJob.isDueForSync(3, brwmSync));
+        assertTrue(AssetSyncJob.isDueForSync(18, brwmSync));
+        assertFalse(AssetSyncJob.isDueForSync(0, brwmSync));
+        assertFalse(AssetSyncJob.isDueForSync(15, brwmSync));
+        assertTrue(AssetSyncJob.isDueForSync(0, new SyncConfig(15, 0)));
+        assertTrue(AssetSyncJob.isDueForSync(42, null));
+        assertFalse(AssetSyncJob.isDueForSync(0, new SyncConfig(0, 0)));
+    }
+
+    @Test
+    void preferLatestDaily_prefersNonNullPriceAndHigherId() {
+        AssetDaily withPrice = new AssetDaily();
+        withPrice.setId(2L);
+        withPrice.setSymbol("INVE-B");
+        withPrice.setCurrentPrice(250d);
+
+        AssetDaily withoutPrice = new AssetDaily();
+        withoutPrice.setId(3L);
+        withoutPrice.setSymbol("INVE-B");
+        withoutPrice.setCurrentPrice(null);
+
+        assertEquals(withPrice, AssetSyncJob.preferLatestDaily(withoutPrice, withPrice));
+        assertEquals(withPrice, AssetSyncJob.preferLatestDaily(withPrice, withoutPrice));
+
+        AssetDaily older = new AssetDaily();
+        older.setId(1L);
+        older.setSymbol("INVE-B");
+        older.setCurrentPrice(200d);
+
+        assertEquals(withPrice, AssetSyncJob.preferLatestDaily(older, withPrice));
     }
 
     private static AssetDefinition invebDefinition() {

@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { vi } from 'vitest';
 import { DashboardApiService } from './dashboard-api.service';
-import { ToastService } from './toastService';
+import { ToastService } from './toast.service';
 import { environment } from '../../../environments/environment';
 import type { AssetDto, QuarterlyAlertsResponse } from '../models';
 

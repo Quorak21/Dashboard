@@ -1,0 +1,761 @@
+﻿diff --git a/backend/src/main/resources/config/assets-registry.yml b/backend/src/main/resources/config/assets-registry.yml
+new file mode 100644
+index 0000000..89fbc24
+--- /dev/null
++++ b/backend/src/main/resources/config/assets-registry.yml
+@@ -0,0 +1,47 @@
++app:
++  assets-registry:
++    entries:
++      - id: inveb
++        display-name: Investor AB
++        provider: fmp
++        symbol: INVE-B.ST
++        db-symbol: INVE-B
++        type: STOCK
++        currency: SEK
++        market-hours:
++          zone: Europe/Stockholm
++          open: "09:00"
++          close: "17:35"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 0
++      - id: brwm
++        display-name: BlackRock World Mining
++        provider: fmp
++        symbol: BRWM.L
++        db-symbol: BRWM
++        type: TRUST
++        currency: GBP
++        market-hours:
++          zone: Europe/London
++          open: "08:00"
++          close: "16:35"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 3
++      - id: o
++        display-name: Realty Income
++        provider: fmp
++        symbol: O
++        db-symbol: O
++        type: REIT
++        currency: USD
++        market-hours:
++          zone: America/New_York
++          open: "09:30"
++          close: "16:00"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 0
++
++
+diff --git a/backend/src/main/resources/config/dividends/o.yml b/backend/src/main/resources/config/dividends/o.yml
+new file mode 100644
+index 0000000..a5ecdc1
+--- /dev/null
++++ b/backend/src/main/resources/config/dividends/o.yml
+@@ -0,0 +1,9 @@
++asset-id: o
++forward-dividend: 3.168
++forward-dividend-currency: USD
++frequency: monthly
++avg-dividend-growth-10y: 4.3
++history:
++  - { year: 2024, amount: 3.072, currency: USD }
++  - { year: 2023, amount: 2.976, currency: USD }
++  - { year: 2022, amount: 2.808, currency: USD }
+diff --git a/backend/src/main/resources/config/fundamentals/o.yml b/backend/src/main/resources/config/fundamentals/o.yml
+new file mode 100644
+index 0000000..f36c3d6
+--- /dev/null
++++ b/backend/src/main/resources/config/fundamentals/o.yml
+@@ -0,0 +1,8 @@
++asset-id: o
++updated-at: 2025-05-06
++source: "Realty Income Q1 2025 Supplemental Operating Data"
++metrics:
++  trailing-pe: 43.5
++  forward-pe: 38.2
++  debt-leverage: "35.8%"
++  dividend-payout-ratio: "76%"
+diff --git a/backend/src/test/java/com/dokkcorp/dashboard/features/assets/price/FmpPriceProviderTest.java b/backend/src/test/java/com/dokkcorp/dashboard/features/assets/price/FmpPriceProviderTest.java
+new file mode 100644
+index 0000000..44e0616
+--- /dev/null
++++ b/backend/src/test/java/com/dokkcorp/dashboard/features/assets/price/FmpPriceProviderTest.java
+@@ -0,0 +1,279 @@
++package com.dokkcorp.dashboard.features.assets.price;
++
++import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
++import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
++import static com.github.tomakehurst.wiremock.client.WireMock.get;
++import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
++import static org.junit.jupiter.api.Assertions.assertEquals;
++import static org.junit.jupiter.api.Assertions.assertFalse;
++import static org.junit.jupiter.api.Assertions.assertThrows;
++import static org.junit.jupiter.api.Assertions.assertTrue;
++
++import java.nio.charset.StandardCharsets;
++import java.time.Instant;
++import java.time.LocalTime;
++import java.time.ZoneId;
++import java.util.List;
++
++import org.junit.jupiter.api.AfterEach;
++import org.junit.jupiter.api.BeforeEach;
++import org.junit.jupiter.api.Test;
++import org.springframework.core.io.ClassPathResource;
++import org.springframework.util.StreamUtils;
++import org.springframework.web.client.RestClient;
++
++import com.dokkcorp.dashboard.config.ExternalCallExecutor;
++import com.dokkcorp.dashboard.exception.ExternalProviderException;
++import com.dokkcorp.dashboard.features.assets.model.AssetDefinition;
++import com.dokkcorp.dashboard.features.assets.model.AssetProvider;
++import com.dokkcorp.dashboard.features.assets.model.AssetType;
++import com.dokkcorp.dashboard.features.assets.model.MarketHours;
++import com.dokkcorp.dashboard.features.assets.model.SyncConfig;
++import com.dokkcorp.dashboard.providers.fmp.FMPClient;
++import com.github.tomakehurst.wiremock.WireMockServer;
++import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
++
++class FmpPriceProviderTest {
++
++    private WireMockServer wireMock;
++    private FmpPriceProvider provider;
++    private AssetDefinition inveb;
++
++    @BeforeEach
++    void setUp() {
++        wireMock = new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort());
++        wireMock.start();
++
++        ExternalCallExecutor executor = new ExternalCallExecutor(1, 0);
++        FMPClient fmpClient = new FMPClient(
++                RestClient.builder(),
++                executor,
++                "test-key",
++                wireMock.baseUrl());
++        provider = new FmpPriceProvider(fmpClient);
++
++        inveb = new AssetDefinition(
++                "inveb",
++                "Investor AB",
++                AssetProvider.FMP,
++                "INVE-B.ST",
++                "INVE-B",
++                AssetType.STOCK,
++                "SEK",
++                new MarketHours(ZoneId.of("Europe/Stockholm"), LocalTime.of(9, 0), LocalTime.of(17, 35)),
++                new SyncConfig(15, 0),
++                null);
++    }
++
++    @AfterEach
++    void tearDown() {
++        wireMock.stop();
++    }
++
++    @Test
++    void fetch_mapsFmpProfileToPriceQuote() throws Exception {
++        String fixture = StreamUtils.copyToString(
++                new ClassPathResource("fixtures/fmp/profile-inveb.json").getInputStream(),
++                StandardCharsets.UTF_8);
++
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("INVE-B.ST"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody(fixture)));
++
++        Instant before = Instant.now();
++        PriceQuote quote = provider.fetch(inveb);
++        Instant after = Instant.now();
++
++        assertEquals(245.5, quote.price());
++        assertEquals("SEK", quote.currency());
++        assertEquals(1_000_000_000d, quote.marketCap());
++        assertEquals(-1.25, quote.changePercent24h());
++        assertEquals(123_456d, quote.volume());
++        assertFalse(quote.fetchedAt().isBefore(before));
++        assertFalse(quote.fetchedAt().isAfter(after));
++    }
++
++    @Test
++    void fetch_convertsGBpToGbpForLondonStocks() throws Exception {
++        AssetDefinition brwm = new AssetDefinition(
++                "brwm",
++                "BlackRock World Mining",
++                AssetProvider.FMP,
++                "BRWM.L",
++                "BRWM",
++                AssetType.TRUST,
++                "GBP",
++                new MarketHours(ZoneId.of("Europe/London"), LocalTime.of(8, 0), LocalTime.of(16, 35)),
++                new SyncConfig(15, 0),
++                null);
++
++        String fixture = StreamUtils.copyToString(
++                new ClassPathResource("fixtures/fmp/profile-brwm.json").getInputStream(),
++                StandardCharsets.UTF_8);
++
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("BRWM.L"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody(fixture)));
++
++        PriceQuote quote = provider.fetch(brwm);
++
++        assertEquals(5.50, quote.price()); // 550.0 GBp normalized to 5.50 GBP
++        assertEquals("GBP", quote.currency());
++        assertEquals(1_400_000_000d, quote.marketCap());
++        assertEquals(1.5, quote.changePercent24h());
++        assertEquals(250_000d, quote.volume());
++    }
++
++    @Test
++    void fetch_doesNotConvertGbpToGbpWhenAlreadyInPounds() throws Exception {
++        AssetDefinition brwm = new AssetDefinition(
++                "brwm",
++                "BlackRock World Mining",
++                AssetProvider.FMP,
++                "BRWM.L",
++                "BRWM",
++                AssetType.TRUST,
++                "GBP",
++                new MarketHours(ZoneId.of("Europe/London"), LocalTime.of(8, 0), LocalTime.of(16, 35)),
++                new SyncConfig(15, 0),
++                null);
++
++        String fixture = "[{\n" +
++                "  \"symbol\": \"BRWM.L\",\n" +
++                "  \"price\": 5.50,\n" +
++                "  \"marketCap\": 1400000000,\n" +
++                "  \"changePercentage\": 1.5,\n" +
++                "  \"volume\": 250000,\n" +
++                "  \"currency\": \"GBP\"\n" +
++                "}]";
++
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("BRWM.L"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody(fixture)));
++
++        PriceQuote quote = provider.fetch(brwm);
++
++        assertEquals(5.50, quote.price()); // 5.50 GBP stays 5.50 GBP
++        assertEquals("GBP", quote.currency());
++    }
++
++    @Test
++    void fetch_retrievesPriceInUsdForNyseStocks() throws Exception {
++        AssetDefinition o = new AssetDefinition(
++                "o",
++                "Realty Income",
++                AssetProvider.FMP,
++                "O",
++                "O",
++                AssetType.REIT,
++                "USD",
++                new MarketHours(ZoneId.of("America/New_York"), LocalTime.of(9, 30), LocalTime.of(16, 0)),
++                new SyncConfig(15, 0),
++                null);
++
++        String fixture = StreamUtils.copyToString(
++                new ClassPathResource("fixtures/fmp/profile-o.json").getInputStream(),
++                StandardCharsets.UTF_8);
++
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("O"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody(fixture)));
++
++        PriceQuote quote = provider.fetch(o);
++
++        assertEquals(55.0, quote.price());
++        assertEquals("USD", quote.currency());
++        assertEquals(50_000_000_000d, quote.marketCap());
++        assertEquals(-0.85, quote.changePercent24h());
++        assertEquals(3_200_000d, quote.volume());
++    }
++
++
++    @Test
++    void fetch_throwsExternalProviderExceptionOnCurrencyMismatch() {
++        String fixture = "[{\n" +
++                "  \"symbol\": \"INVE-B.ST\",\n" +
++                "  \"price\": 245.5,\n" +
++                "  \"marketCap\": 1000000000,\n" +
++                "  \"changePercentage\": -1.25,\n" +
++                "  \"volume\": 123456,\n" +
++                "  \"currency\": \"USD\"\n" + // Configured is SEK
++                "}]";
++
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("INVE-B.ST"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody(fixture)));
++
++        assertThrows(ExternalProviderException.class, () -> provider.fetch(inveb));
++    }
++
++
++
++    @Test
++    void fetch_propagatesExternalProviderExceptionOnFailure() {
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("INVE-B.ST"))
++                .willReturn(aResponse().withStatus(500)));
++
++        assertThrows(ExternalProviderException.class, () -> provider.fetch(inveb));
++    }
++
++    @Test
++    void fetch_propagatesExternalProviderExceptionOnEmptyResponse() {
++        wireMock.stubFor(get(urlPathEqualTo("/profile"))
++                .withQueryParam("symbol", equalTo("INVE-B.ST"))
++                .withQueryParam("apikey", equalTo("test-key"))
++                .willReturn(aResponse()
++                        .withStatus(200)
++                        .withHeader("Content-Type", "application/json")
++                        .withBody("[]")));
++
++        assertThrows(ExternalProviderException.class, () -> provider.fetch(inveb));
++    }
++
++    @Test
++    void fetch_rejectsNonFmpAsset() {
++        AssetDefinition scrapeAsset = new AssetDefinition(
++                "chdiv",
++                "UBS ETF",
++                AssetProvider.SCRAPE,
++                "CHDIV.SW",
++                "CHDIV",
++                AssetType.ETF,
++                "CHF",
++                new MarketHours(ZoneId.of("Europe/Zurich"), LocalTime.of(9, 0), LocalTime.of(17, 30)),
++                new SyncConfig(10, 0),
++                "yahoo-six-chart");
++
++        IllegalArgumentException error = assertThrows(
++                IllegalArgumentException.class,
++                () -> provider.fetch(scrapeAsset));
++
++        assertEquals("FmpPriceProvider cannot fetch asset with provider: SCRAPE", error.getMessage());
++    }
++
++    @Test
++    void providerId_returnsFmp() {
++        assertEquals("fmp", provider.providerId());
++    }
++}
+diff --git a/backend/src/test/resources/config/assets-registry.yml b/backend/src/test/resources/config/assets-registry.yml
+new file mode 100644
+index 0000000..89fbc24
+--- /dev/null
++++ b/backend/src/test/resources/config/assets-registry.yml
+@@ -0,0 +1,47 @@
++app:
++  assets-registry:
++    entries:
++      - id: inveb
++        display-name: Investor AB
++        provider: fmp
++        symbol: INVE-B.ST
++        db-symbol: INVE-B
++        type: STOCK
++        currency: SEK
++        market-hours:
++          zone: Europe/Stockholm
++          open: "09:00"
++          close: "17:35"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 0
++      - id: brwm
++        display-name: BlackRock World Mining
++        provider: fmp
++        symbol: BRWM.L
++        db-symbol: BRWM
++        type: TRUST
++        currency: GBP
++        market-hours:
++          zone: Europe/London
++          open: "08:00"
++          close: "16:35"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 3
++      - id: o
++        display-name: Realty Income
++        provider: fmp
++        symbol: O
++        db-symbol: O
++        type: REIT
++        currency: USD
++        market-hours:
++          zone: America/New_York
++          open: "09:30"
++          close: "16:00"
++        sync:
++          interval-minutes: 15
++          offset-minutes: 0
++
++
+diff --git a/backend/src/test/resources/fixtures/fmp/profile-o.json b/backend/src/test/resources/fixtures/fmp/profile-o.json
+new file mode 100644
+index 0000000..a6827d1
+--- /dev/null
++++ b/backend/src/test/resources/fixtures/fmp/profile-o.json
+@@ -0,0 +1,10 @@
++[
++  {
++    "symbol": "O",
++    "price": 55.0,
++    "marketCap": 50000000000,
++    "changePercentage": -0.85,
++    "volume": 3200000,
++    "currency": "USD"
++  }
++]
+diff --git a/frontend/src/app/app.routes.ts b/frontend/src/app/app.routes.ts
+index 9a4eb7b..29445d9 100644
+--- a/frontend/src/app/app.routes.ts
++++ b/frontend/src/app/app.routes.ts
+@@ -13,6 +13,15 @@ export const routes: Routes = [
+         path: 'inveb',
+         loadComponent: () => import('./features/stocks/inveb/inveb').then(m => m.Inveb)
+     },
++    {
++        path: 'brwm',
++        loadComponent: () => import('./features/stocks/brwm/brwm').then(m => m.Brwm)
++    },
++    {
++        path: 'o',
++        loadComponent: () => import('./features/stocks/o/o').then(m => m.O)
++    },
++
+     // La route pour la 404, retour au dashboard
+     {
+         path: '**',
+diff --git a/frontend/src/app/features/dashboard/dashboard.html b/frontend/src/app/features/dashboard/dashboard.html
+index ccebe28..7d2525d 100644
+--- a/frontend/src/app/features/dashboard/dashboard.html
++++ b/frontend/src/app/features/dashboard/dashboard.html
+@@ -42,6 +42,11 @@
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                 <app-asset-dashboard-card asset="inveb" title="Investor AB" [price]="invebPrice()"
+                     [change]="invebChange()" currencySymbol="SEK"></app-asset-dashboard-card>
++                <app-asset-dashboard-card asset="brwm" title="BlackRock World Mining" [price]="brwmPrice()"
++                    [change]="brwmChange()" currencySymbol="┬ú"></app-asset-dashboard-card>
++                <app-asset-dashboard-card asset="o" title="Realty Income" [price]="oPrice()"
++                    [change]="oChange()" currencySymbol="$"></app-asset-dashboard-card>
++
+             </div>
+         </section>
+ 
+diff --git a/frontend/src/app/features/dashboard/dashboard.spec.ts b/frontend/src/app/features/dashboard/dashboard.spec.ts
+index d579dcc..42e77b2 100644
+--- a/frontend/src/app/features/dashboard/dashboard.spec.ts
++++ b/frontend/src/app/features/dashboard/dashboard.spec.ts
+@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
+ import { provideRouter } from '@angular/router';
+ import { of } from 'rxjs';
+ import { vi } from 'vitest';
+-import type { HypeDto, InveBDto } from '../../core/models';
++import type { HypeDto, AssetDto } from '../../core/models';
+ import { Dashboard } from './dashboard';
+ import { DashboardApiService } from '../../core/services/dashboard-api.service';
+ 
+@@ -11,25 +11,55 @@ describe('Mon Premier Test Dashboard', () => {
+     summary: { currentPrice: 1.25, priceChangePercentage24h: 5.42 },
+   } as HypeDto;
+ 
+-  const invebDto = { currentPrice: 245.5, priceChangePercentage24h: -1.25 } as InveBDto;
++  const mockAssetDto = {
++    assetId: 'inveb',
++    symbol: 'INVE-B',
++    currentPrice: 245.5,
++    priceChangePercentage24h: -1.25,
++  } as AssetDto;
++
++  const mockBrwmDto = {
++    assetId: 'brwm',
++    symbol: 'BRWM',
++    currentPrice: 5.50,
++    priceChangePercentage24h: 1.5,
++  } as AssetDto;
++
++  const mockODto = {
++    assetId: 'o',
++    symbol: 'O',
++    currentPrice: 55.0,
++    priceChangePercentage24h: -0.85,
++  } as AssetDto;
+ 
+   const getData = vi.fn((cle: string) => {
+     if (cle === 'hype') {
+       return of(hypeDto);
+     }
+-    if (cle === 'inveb') {
+-      return of(invebDto);
++    return of(null);
++  });
++
++  const getAsset = vi.fn((assetId: string) => {
++    if (assetId === 'inveb') {
++      return of(mockAssetDto);
++    }
++    if (assetId === 'brwm') {
++      return of(mockBrwmDto);
++    }
++    if (assetId === 'o') {
++      return of(mockODto);
+     }
+     return of(null);
+   });
+ 
+-  const fauxServiceApi = { getData };
++  const fauxServiceApi = { getData, getAsset };
+ 
+   beforeEach(() => {
+     getData.mockClear();
++    getAsset.mockClear();
+   });
+ 
+-  it('devrait bien recevoir et stocker les prix de Hype et Inveb', () => {
++  it('devrait bien recevoir et stocker les prix de Hype, Inveb, Brwm et O', () => {
+     TestBed.configureTestingModule({
+       imports: [Dashboard],
+       providers: [{ provide: DashboardApiService, useValue: fauxServiceApi }, provideRouter([])],
+@@ -42,11 +72,15 @@ describe('Mon Premier Test Dashboard', () => {
+ 
+     expect(composant.hypePrice()).toBe(1.25);
+     expect(composant.invebPrice()).toBe(245.5);
++    expect(composant.brwmPrice()).toBe(5.50);
++    expect(composant.oPrice()).toBe(55.0);
+     expect(composant.hypeChange()).toBe(5.42);
+     expect(composant.invebChange()).toBe(-1.25);
++    expect(composant.brwmChange()).toBe(1.5);
++    expect(composant.oChange()).toBe(-0.85);
+   });
+ 
+-  it('devrait appeler getData pour hype et inveb au mount', () => {
++  it('devrait appeler getData pour hype et getAsset pour inveb/brwm/o au mount', () => {
+     TestBed.configureTestingModule({
+       imports: [Dashboard],
+       providers: [{ provide: DashboardApiService, useValue: fauxServiceApi }, provideRouter([])],
+@@ -56,7 +90,11 @@ describe('Mon Premier Test Dashboard', () => {
+     fixture.detectChanges();
+ 
+     expect(getData).toHaveBeenCalledWith('hype');
+-    expect(getData).toHaveBeenCalledWith('inveb');
+-    expect(getData).toHaveBeenCalledTimes(2);
++    expect(getData).toHaveBeenCalledTimes(1);
++    expect(getAsset).toHaveBeenCalledWith('inveb');
++    expect(getAsset).toHaveBeenCalledWith('brwm');
++    expect(getAsset).toHaveBeenCalledWith('o');
++    expect(getAsset).toHaveBeenCalledTimes(3);
+   });
+ });
++
+diff --git a/frontend/src/app/features/dashboard/dashboard.ts b/frontend/src/app/features/dashboard/dashboard.ts
+index 0b7661e..d9df059 100644
+--- a/frontend/src/app/features/dashboard/dashboard.ts
++++ b/frontend/src/app/features/dashboard/dashboard.ts
+@@ -1,6 +1,7 @@
+ import { Component, inject, computed, signal, DestroyRef } from '@angular/core';
+ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+-import type { HypeDto, InveBDto } from '../../core/models';
++import { Subscription } from 'rxjs';
++import type { HypeDto, AssetDto } from '../../core/models';
+ import { AssetDashboardCard } from '../../shared/components/asset-dashboard-card/asset-dashboard-card';
+ import { DashboardApiService } from '../../core/services/dashboard-api.service';
+ import { LucideAngularModule, Zap, TrendingUp, Landmark, Boxes } from 'lucide-angular';
+@@ -21,28 +22,67 @@ export class Dashboard {
+   private destroyRef = inject(DestroyRef);
+ 
+   private hypeData = signal<HypeDto | null>(null);
+-  private invebData = signal<InveBDto | null>(null);
++  private invebAsset = signal<AssetDto | null>(null);
++  private brwmAsset = signal<AssetDto | null>(null);
++  private oAsset = signal<AssetDto | null>(null);
++
++  private hypeSub?: Subscription;
++  private invebSub?: Subscription;
++  private brwmSub?: Subscription;
++  private oSub?: Subscription;
+ 
+   hypePrice = computed(() => this.hypeData()?.summary?.currentPrice ?? null);
+-  invebPrice = computed(() => this.invebData()?.currentPrice ?? null);
++  invebPrice = computed(() => this.invebAsset()?.currentPrice ?? null);
++  brwmPrice = computed(() => this.brwmAsset()?.currentPrice ?? null);
++  oPrice = computed(() => this.oAsset()?.currentPrice ?? null);
+ 
+   hypeChange = computed(() => this.hypeData()?.summary?.priceChangePercentage24h ?? null);
+-  invebChange = computed(() => this.invebData()?.priceChangePercentage24h ?? null);
++  invebChange = computed(() => this.invebAsset()?.priceChangePercentage24h ?? null);
++  brwmChange = computed(() => this.brwmAsset()?.priceChangePercentage24h ?? null);
++  oChange = computed(() => this.oAsset()?.priceChangePercentage24h ?? null);
+ 
+   constructor() {
+     this.refresh();
+     const intervalID = setInterval(() => this.refresh(), 180000);
+-    this.destroyRef.onDestroy(() => clearInterval(intervalID));
++    this.destroyRef.onDestroy(() => {
++      clearInterval(intervalID);
++      this.hypeSub?.unsubscribe();
++      this.invebSub?.unsubscribe();
++      this.brwmSub?.unsubscribe();
++      this.oSub?.unsubscribe();
++    });
+   }
+ 
+   refresh() {
+-    this.api
++    this.hypeSub?.unsubscribe();
++    this.hypeSub = this.api
+       .getData('hype')
+-      .pipe(takeUntilDestroyed(this.destroyRef))
+       .subscribe((data) => this.hypeData.set(data));
+-    this.api
+-      .getData('inveb')
+-      .pipe(takeUntilDestroyed(this.destroyRef))
+-      .subscribe((data) => this.invebData.set(data));
++
++    this.invebSub?.unsubscribe();
++    this.invebSub = this.api
++      .getAsset('inveb')
++      .subscribe({
++        next: (data) => this.invebAsset.set(data),
++        error: () => this.invebAsset.set(null),
++      });
++
++    this.brwmSub?.unsubscribe();
++    this.brwmSub = this.api
++      .getAsset('brwm')
++      .subscribe({
++        next: (data) => this.brwmAsset.set(data),
++        error: () => this.brwmAsset.set(null),
++      });
++
++    this.oSub?.unsubscribe();
++    this.oSub = this.api
++      .getAsset('o')
++      .subscribe({
++        next: (data) => this.oAsset.set(data),
++        error: () => this.oAsset.set(null),
++      });
+   }
++
+ }
++
+diff --git a/frontend/src/app/features/stocks/o/o.html b/frontend/src/app/features/stocks/o/o.html
+new file mode 100644
+index 0000000..a7448b6
+--- /dev/null
++++ b/frontend/src/app/features/stocks/o/o.html
+@@ -0,0 +1 @@
++<app-asset-page [assetId]="'o'"></app-asset-page>
+diff --git a/frontend/src/app/features/stocks/o/o.spec.ts b/frontend/src/app/features/stocks/o/o.spec.ts
+new file mode 100644
+index 0000000..5a34c70
+--- /dev/null
++++ b/frontend/src/app/features/stocks/o/o.spec.ts
+@@ -0,0 +1,65 @@
++import { TestBed } from '@angular/core/testing';
++import { of } from 'rxjs';
++import { vi, type Mock } from 'vitest';
++
++import { O } from './o';
++import { DashboardApiService } from '../../../core/services/dashboard-api.service';
++import type { AssetDto } from '../../../core/models';
++
++describe('O', () => {
++  let getAssetSpy: Mock;
++
++  const mockAsset: AssetDto = {
++    assetId: 'o',
++    symbol: 'O',
++    displayName: 'Realty Income',
++    type: 'REIT',
++    currency: 'USD',
++    currentPrice: 55.0,
++    marketCap: 50000,
++    priceChangePercentage24h: -0.85,
++    totalVolume: 3200,
++    lastRefresh: Date.UTC(2026, 5, 2, 9, 30, 0),
++    priceSource: 'FMP',
++    marketStatus: 'OPEN',
++    historyPrices: [1, 2],
++    historyDays: [10, 20],
++    livePrices: [3, 4],
++    liveDays: [30, 40],
++    dividends: null,
++    fundamentals: null,
++  };
++
++  beforeAll(() => {
++    (globalThis as any).ResizeObserver = class {
++      observe() {}
++      unobserve() {}
++      disconnect() {}
++    };
++  });
++
++  beforeEach(async () => {
++    getAssetSpy = vi.fn().mockReturnValue(of(mockAsset));
++
++    await TestBed.configureTestingModule({
++      imports: [O],
++      providers: [
++        {
++          provide: DashboardApiService,
++          useValue: { getAsset: getAssetSpy },
++        },
++      ],
++    }).compileComponents();
++  });
++
++  it('should compile and render the AssetPage component with assetId o', async () => {
++    const fixture = TestBed.createComponent(O);
++    fixture.detectChanges();
++
++    expect(getAssetSpy).toHaveBeenCalledWith('o');
++    const element: HTMLElement = fixture.nativeElement;
++    const assetPageEl = element.querySelector('app-asset-page');
++    expect(assetPageEl).toBeTruthy();
++    fixture.destroy();
++  }, 15000);
++});
+diff --git a/frontend/src/app/features/stocks/o/o.ts b/frontend/src/app/features/stocks/o/o.ts
+new file mode 100644
+index 0000000..42f3063
+--- /dev/null
++++ b/frontend/src/app/features/stocks/o/o.ts
+@@ -0,0 +1,9 @@
++import { Component } from '@angular/core';
++import { AssetPage } from '../../../shared/components/asset-page/asset-page';
++
++@Component({
++  selector: 'app-o',
++  imports: [AssetPage],
++  templateUrl: './o.html',
++})
++export class O {}

@@ -1,0 +1,127 @@
+﻿[
+    {
+        "id":  "inveb",
+        "name":  "Investor AB",
+        "fmp_profile":  {
+                            "price":  386.75,
+                            "ok":  true,
+                            "mcap":  null,
+                            "currency":  "SEK"
+                        },
+        "fh_quote":  {
+                         "ok":  false,
+                         "note":  "Le serveur distant a retourné une erreur : (403) Interdit."
+                     }
+    },
+    {
+        "id":  "brwm",
+        "name":  "BlackRock World Mining",
+        "fmp_profile":  {
+                            "price":  1027.6,
+                            "ok":  true,
+                            "mcap":  null,
+                            "currency":  "GBp"
+                        },
+        "fh_quote":  {
+                         "ok":  false,
+                         "note":  "Le serveur distant a retourné une erreur : (403) Interdit."
+                     }
+    },
+    {
+        "id":  "o",
+        "name":  "Realty Income",
+        "fmp_profile":  {
+                            "price":  62.17,
+                            "ok":  true,
+                            "mcap":  null,
+                            "currency":  "USD"
+                        },
+        "fh_quote":  {
+                         "price":  62.17,
+                         "ok":  true,
+                         "changePct":  0.0483
+                     }
+    },
+    {
+        "id":  "iii",
+        "name":  "3i Group",
+        "fmp_profile":  {
+                            "price":  2308,
+                            "ok":  true,
+                            "mcap":  null,
+                            "currency":  "GBp"
+                        },
+        "fh_quote":  {
+                         "ok":  false,
+                         "note":  "Le serveur distant a retourné une erreur : (403) Interdit."
+                     }
+    },
+    {
+        "id":  "chdiv",
+        "name":  "UBS Swiss Dividend ETF",
+        "fmp_profile":  {
+                            "ok":  false,
+                            "raw":  {
+
+                                    },
+                            "note":  "rÃ©ponse vide ou sans prix"
+                        },
+        "fh_quote":  {
+                         "ok":  false,
+                         "note":  "Le serveur distant a retourné une erreur : (403) Interdit."
+                     },
+        "fh_etf_profile":  {
+                               "ok":  false,
+                               "note":  "Le serveur distant a retourné une erreur : (403) Interdit."
+                           },
+        "fh_etf_sectors":  {
+                               "ok":  false,
+                               "note":  "pas de sectorExposure"
+                           }
+    },
+    {
+        "id":  "qqqe",
+        "name":  "UBS Nasdaq 100 ETF",
+        "fmp_profile":  {
+                            "ok":  false,
+                            "raw":  {
+
+                                    },
+                            "note":  "rÃ©ponse vide ou sans prix"
+                        },
+        "fh_quote":  {
+                         "ok":  false,
+                         "note":  "Le serveur distant a retourné une erreur : (403) Interdit."
+                     },
+        "fh_etf_profile":  {
+                               "ok":  false,
+                               "note":  "Le serveur distant a retourné une erreur : (403) Interdit."
+                           },
+        "fh_etf_sectors":  {
+                               "ok":  false,
+                               "note":  "pas de sectorExposure"
+                           }
+    },
+    {
+        "id":  "infr",
+        "name":  "iShares Global Infra ETF",
+        "fmp_profile":  {
+                            "price":  2907,
+                            "ok":  true,
+                            "mcap":  null,
+                            "currency":  "GBp"
+                        },
+        "fh_quote":  {
+                         "ok":  false,
+                         "note":  "Le serveur distant a retourné une erreur : (403) Interdit."
+                     },
+        "fh_etf_profile":  {
+                               "ok":  false,
+                               "note":  "Le serveur distant a retourné une erreur : (403) Interdit."
+                           },
+        "fh_etf_sectors":  {
+                               "ok":  false,
+                               "note":  "pas de sectorExposure"
+                           }
+    }
+]

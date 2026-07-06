@@ -169,15 +169,45 @@ class ConfigurableAssetServiceTest {
     }
 
     @Test
-    void getData_returnsDisplayNameWhenCacheIsEmpty() {
+    void getData_warmsUpViaSyncPriceWhenCacheIsEmpty() {
+        stubProviderQuote();
+        stubHistorySnapshot(200d, 1_000L);
+        when(marketHoursGuard.isOpen(inveb)).thenReturn(false);
         when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.CLOSED);
         when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("INVE-B"))
+                .thenReturn(Collections.emptyList());
+        when(assetDailyRepository.findTop144BySymbolOrderByLastRefreshDesc("INVE-B"))
                 .thenReturn(Collections.emptyList());
 
         AssetDto result = service.getData("inveb");
 
         assertEquals("Investor AB", result.displayName());
+        assertEquals(245.5, result.currentPrice());
+        assertEquals(MarketStatus.CLOSED, result.marketStatus());
+        verify(priceProvider, times(1)).fetch(inveb);
+        verify(assetDailyRepository, never()).save(any(AssetDaily.class));
+    }
+
+    @Test
+    void getData_returnsFundamentalsFromYaml_whenProviderFailsOnCacheMiss() {
+        when(priceProvider.fetch(inveb)).thenThrow(new RuntimeException("FMP down"));
+        when(marketHoursGuard.status(inveb)).thenReturn(MarketStatus.CLOSED);
+        when(assetSnapshotRepository.findTop365BySymbolOrderByDayDesc("INVE-B"))
+                .thenReturn(Collections.emptyList());
+
+        AssetFundamentalsProperties.FundamentalsConfig config = new AssetFundamentalsProperties.FundamentalsConfig();
+        config.setAssetId("inveb");
+        config.setUpdatedAt(LocalDate.of(2026, 4, 15));
+        config.setSource("Q1 2026");
+        config.getMetrics().put("trailing-pe", 6.11);
+        assetFundamentalsProperties.getFundamentals().put("inveb", config);
+
+        AssetDto result = service.getData("inveb");
+
         assertNull(result.currentPrice());
+        assertNotNull(result.fundamentals());
+        assertEquals(LocalDate.of(2026, 4, 15), result.fundamentals().updatedAt());
+        assertEquals(6.11, result.fundamentals().metrics().get("trailing-pe"));
     }
 
     @Test

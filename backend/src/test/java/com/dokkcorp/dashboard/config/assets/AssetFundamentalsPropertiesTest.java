@@ -58,16 +58,18 @@ class AssetFundamentalsPropertiesTest {
         assertEquals("Glencore", brwmConfig.getTopHoldings().get(0).getName());
         assertEquals(0, new BigDecimal("7.6").compareTo(brwmConfig.getTopHoldings().get(0).getWeightPercent()));
 
-        // o (Realty Income) — property types + retail tenant industries
+        // o (Realty Income) — blended property types + retail industries (≥3% ABR)
         assertTrue(properties.getFundamentals().containsKey("o"));
         AssetFundamentalsProperties.FundamentalsConfig oConfig = properties.getFundamentals().get("o");
         assertNotNull(oConfig);
-        assertEquals(4, oConfig.getSectorWeights().size());
-        assertEquals("Retail", oConfig.getSectorWeights().get(0).getSector());
-        assertEquals(0, new BigDecimal("78.9").compareTo(oConfig.getSectorWeights().get(0).getWeightPercent()));
-        assertFalse(oConfig.getRetailIndustryWeights().isEmpty());
-        assertEquals("Grocery", oConfig.getRetailIndustryWeights().get(0).getSector());
-        assertEquals(0, new BigDecimal("11.0").compareTo(oConfig.getRetailIndustryWeights().get(0).getWeightPercent()));
+        assertEquals(13, oConfig.getSectorWeights().size());
+        assertEquals("Industrial", oConfig.getSectorWeights().get(0).getSector());
+        assertEquals(0, new BigDecimal("15.5").compareTo(oConfig.getSectorWeights().get(0).getWeightPercent()));
+        assertEquals("Grocery", oConfig.getSectorWeights().get(1).getSector());
+        assertEquals(0, new BigDecimal("11.0").compareTo(oConfig.getSectorWeights().get(1).getWeightPercent()));
+        assertEquals(8, oConfig.getMetrics().size());
+        assertEquals("0.8%", oConfig.getMetrics().get("same-store-rent-growth"));
+        assertTrue(oConfig.getRetailIndustryWeights().isEmpty());
     }
 
     @Test

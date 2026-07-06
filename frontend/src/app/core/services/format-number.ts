@@ -22,3 +22,27 @@ export function formatNumber(value: number | string | undefined | null): string 
 
     return num.toFixed(2).replace(/\.00$/, '');
 }
+
+export function formatCurrency(
+  amount: number,
+  currencyCode: string,
+  locale = 'fr-FR',
+): string {
+  if (!Number.isFinite(amount)) {
+    return formatNumber(amount);
+  }
+  const code = currencyCode?.trim() ?? '';
+  if (!code) {
+    return formatNumber(amount);
+  }
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: code,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch {
+    return `${formatNumber(amount)} ${code}`;
+  }
+}

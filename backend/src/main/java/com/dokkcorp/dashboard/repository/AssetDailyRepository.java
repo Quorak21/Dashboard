@@ -1,10 +1,13 @@
 package com.dokkcorp.dashboard.repository;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.dokkcorp.dashboard.model.entity.AssetDaily;
@@ -16,6 +19,15 @@ public interface AssetDailyRepository extends JpaRepository<AssetDaily, Long> {
 
     // Récupérer le dernier élément inséré, la dernière mise à jour
     Optional<AssetDaily> findFirstBySymbolOrderByLastRefreshDesc(String symbol);
+
+    @Query("""
+            SELECT ad FROM AssetDaily ad
+            WHERE ad.symbol IN :symbols
+            AND ad.lastRefresh = (
+                SELECT MAX(ad2.lastRefresh) FROM AssetDaily ad2 WHERE ad2.symbol = ad.symbol
+            )
+            """)
+    List<AssetDaily> findLatestBySymbols(@Param("symbols") Collection<String> symbols);
 
     // Récupérer les 144 derniers éléments pour le graphique pour la chart daily, les 24 dernière heures
     List<AssetDaily> findTop144BySymbolOrderByLastRefreshDesc(String symbol);

@@ -1,17 +1,24 @@
 package com.dokkcorp.dashboard.jobs;
 
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import com.dokkcorp.dashboard.features.crypto.hype.HypeService;
 import com.dokkcorp.dashboard.features.crypto.hype.HypeDto;
 import com.dokkcorp.dashboard.features.assets.AssetRegistry;
 import com.dokkcorp.dashboard.features.assets.ConfigurableAssetService;
-import com.dokkcorp.dashboard.features.assets.MarketHoursGuard;
 import com.dokkcorp.dashboard.features.assets.ProviderCallMetrics;
 import com.dokkcorp.dashboard.features.assets.model.AssetDefinition;
 import com.dokkcorp.dashboard.features.assets.model.AssetProvider;
+import com.dokkcorp.dashboard.features.assets.model.SyncConfig;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import com.dokkcorp.dashboard.model.entity.AssetDaily;
 import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
@@ -19,7 +26,8 @@ import com.dokkcorp.dashboard.model.entity.AssetSnapshot;
 import com.dokkcorp.dashboard.repository.AssetDailyRepository;
 import com.dokkcorp.dashboard.repository.AssetSnapshotRepository;
 
-import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 import jakarta.transaction.Transactional;
@@ -27,10 +35,19 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Scheduled asset synchronization.
+ *
+ * <p>FMP price fetches run on {@code sync.interval-minutes} regardless of market hours so the
+ * dashboard cache stays warm overnight and across time zones. Daily {@code AssetDaily} persistence
+ * remains gated by {@link com.dokkcorp.dashboard.features.assets.MarketHoursGuard#isOpen} inside
+ * {@link ConfigurableAssetService#syncPrice(String)}.
+ */
 @Component
 public class AssetSyncJob {
 
     private static final Logger logger = LoggerFactory.getLogger(AssetSyncJob.class);
+    private static final long FMP_THROTTLE_MS = 500L;
 
     private final AssetSnapshotRepository assetSnapshotRepository;
 
@@ -42,20 +59,24 @@ public class AssetSyncJob {
 
     private final AssetRegistry assetRegistry;
 
-    private final MarketHoursGuard marketHoursGuard;
-
     private final ProviderCallMetrics providerCallMetrics;
+
+    private final TaskScheduler taskScheduler;
+
+    private final AtomicBoolean fmpSyncRunning = new AtomicBoolean(false);
+
+    private volatile int lastWarmUpUtcMinute = -1;
 
     public AssetSyncJob(AssetSnapshotRepository assetSnapshotRepository, AssetDailyRepository assetDailyRepository,
             HypeService hypeService, ConfigurableAssetService configurableAssetService, AssetRegistry assetRegistry,
-            MarketHoursGuard marketHoursGuard, ProviderCallMetrics providerCallMetrics) {
+            ProviderCallMetrics providerCallMetrics, TaskScheduler taskScheduler) {
         this.assetSnapshotRepository = assetSnapshotRepository;
         this.assetDailyRepository = assetDailyRepository;
         this.hypeService = hypeService;
         this.configurableAssetService = configurableAssetService;
         this.assetRegistry = assetRegistry;
-        this.marketHoursGuard = marketHoursGuard;
         this.providerCallMetrics = providerCallMetrics;
+        this.taskScheduler = taskScheduler;
     }
 
     // toutes les 10 minutes sur des chiffres ronds (00, 10, 20...)
@@ -65,24 +86,95 @@ public class AssetSyncJob {
         this.hypeService.getData();
     }
 
-    @Scheduled(cron = "0 0/15 * * * ?")
+    @EventListener(ApplicationReadyEvent.class)
+    public void warmUpFmpAssetsOnStartup() {
+        taskScheduler.schedule(this::runWarmUp, Instant.now());
+    }
+
+    private void runWarmUp() {
+        if (!fmpSyncRunning.compareAndSet(false, true)) {
+            return;
+        }
+        try {
+            lastWarmUpUtcMinute = ZonedDateTime.now(ZoneOffset.UTC).getMinute();
+            enqueueFmpSync(true);
+        } finally {
+            fmpSyncRunning.set(false);
+        }
+    }
+
+    @Scheduled(cron = "0 * * * * ?")
     public void syncFmpAssets() {
+        if (fmpSyncRunning.get()) {
+            return;
+        }
+        int minuteOfHour = ZonedDateTime.now(ZoneOffset.UTC).getMinute();
+        if (minuteOfHour == lastWarmUpUtcMinute) {
+            return;
+        }
+        enqueueFmpSync(false);
+    }
+
+    static boolean isDueForSync(int minuteOfHour, SyncConfig sync) {
+        if (sync == null) {
+            return true;
+        }
+        if (sync.intervalMinutes() <= 0) {
+            return false;
+        }
+        return Math.floorMod(minuteOfHour - sync.offsetMinutes(), sync.intervalMinutes()) == 0;
+    }
+
+    private void enqueueFmpSync(boolean forceAll) {
+        int minuteOfHour = ZonedDateTime.now(ZoneOffset.UTC).getMinute();
+        List<AssetDefinition> due = collectDueFmpAssets(minuteOfHour, forceAll);
+        if (due.isEmpty()) {
+            this.providerCallMetrics.logMetrics();
+            return;
+        }
+        scheduleFmpSyncChain(due, 0);
+    }
+
+    private List<AssetDefinition> collectDueFmpAssets(int minuteOfHour, boolean forceAll) {
         List<AssetDefinition> fmpAssets = this.assetRegistry.byProvider(AssetProvider.FMP);
-        if (fmpAssets != null) {
-            for (AssetDefinition asset : fmpAssets) {
-                if (asset == null) {
-                    continue;
-                }
-                try {
-                    if (this.marketHoursGuard.isOpen(asset)) {
-                        this.configurableAssetService.syncPrice(asset.id());
-                    }
-                } catch (Exception e) {
-                    logger.error("Erreur lors de la synchronisation de l'actif FMP : {}", asset.id(), e);
-                }
+        if (fmpAssets == null) {
+            return List.of();
+        }
+        List<AssetDefinition> due = new ArrayList<>();
+        for (AssetDefinition asset : fmpAssets) {
+            if (asset == null) {
+                continue;
+            }
+            if (forceAll || isDueForSync(minuteOfHour, asset.sync())) {
+                due.add(asset);
             }
         }
-        this.providerCallMetrics.logMetrics();
+        return due;
+    }
+
+    private void scheduleFmpSyncChain(List<AssetDefinition> due, int index) {
+        if (index >= due.size()) {
+            this.providerCallMetrics.logMetrics();
+            return;
+        }
+
+        AssetDefinition asset = due.get(index);
+        try {
+            this.configurableAssetService.syncPrice(asset.id());
+        } catch (Exception e) {
+            logger.error("Erreur lors de la synchronisation de l'actif FMP : {}", asset.id(), e);
+        }
+
+        int next = index + 1;
+        if (next < due.size()) {
+            taskScheduler.schedule(
+                    () -> scheduleFmpSyncChain(due, next),
+                    Instant.now().plusMillis(FMP_THROTTLE_MS));
+        } else {
+            taskScheduler.schedule(
+                    this.providerCallMetrics::logMetrics,
+                    Instant.now().plusMillis(FMP_THROTTLE_MS));
+        }
     }
 
     // Tâche de mise en BD à la cloture des marchés
@@ -96,15 +188,28 @@ public class AssetSyncJob {
 
     private void sendRegistrySnapshots() {
         List<AssetDefinition> assets = this.assetRegistry.all();
-        if (assets == null) {
+        if (assets == null || assets.isEmpty()) {
             return;
         }
+        List<String> symbols = assets.stream()
+                .filter(asset -> asset != null && asset.dbSymbol() != null)
+                .map(AssetDefinition::dbSymbol)
+                .toList();
+        if (symbols.isEmpty()) {
+            return;
+        }
+        Map<String, AssetDaily> latestBySymbol = this.assetDailyRepository.findLatestBySymbols(symbols).stream()
+                .collect(Collectors.toMap(
+                        AssetDaily::getSymbol,
+                        daily -> daily,
+                        AssetSyncJob::preferLatestDaily));
+
         for (AssetDefinition asset : assets) {
             if (asset == null) {
                 continue;
             }
             try {
-                saveRegistrySnapshot(asset);
+                saveRegistrySnapshot(asset, latestBySymbol.get(asset.dbSymbol()));
             } catch (Exception e) {
                 logger.error("Sauvegarde du snapshot {} ({}) n'a pas fonctionné",
                         asset.dbSymbol(), asset.id(), e);
@@ -112,14 +217,27 @@ public class AssetSyncJob {
         }
     }
 
-    private void saveRegistrySnapshot(AssetDefinition asset) {
-        Optional<AssetDaily> latest = this.assetDailyRepository
-                .findFirstBySymbolOrderByLastRefreshDesc(asset.dbSymbol());
-        if (latest.isEmpty()) {
+    static AssetDaily preferLatestDaily(AssetDaily left, AssetDaily right) {
+        if (left.getCurrentPrice() != null && right.getCurrentPrice() == null) {
+            return left;
+        }
+        if (right.getCurrentPrice() != null && left.getCurrentPrice() == null) {
+            return right;
+        }
+        Long leftId = left.getId();
+        Long rightId = right.getId();
+        if (leftId != null && rightId != null) {
+            return leftId > rightId ? left : right;
+        }
+        return left;
+    }
+
+    private void saveRegistrySnapshot(AssetDefinition asset, AssetDaily latest) {
+        if (latest == null) {
             logger.warn("Snapshot {} reporté : aucun point AssetDaily", asset.dbSymbol());
             return;
         }
-        AssetDaily ad = latest.get();
+        AssetDaily ad = latest;
         if (ad.getLastRefresh() == null) {
             logger.warn("Snapshot {} reporté : timestamp de dernière mise à jour manquant", asset.dbSymbol());
             return;

@@ -40,10 +40,11 @@ describe('PriceFreshnessBadge', () => {
     expect(element.querySelector('.rounded-full')?.textContent).toContain('Différé');
   });
 
-  it('renders "Donnée Obsolète" when data age is > 30 minutes', () => {
+  it('renders "Donnée Obsolète" when data age exceeds 2× sync interval', () => {
     fixture.componentRef.setInput('marketStatus', 'OPEN');
     fixture.componentRef.setInput('priceSource', 'FMP');
-    // 40 minutes ago
+    fixture.componentRef.setInput('syncIntervalMinutes', 15);
+    // 40 minutes ago (> 2 × 15 min)
     fixture.componentRef.setInput('lastRefresh', Date.now() - 40 * 60 * 1000);
     fixture.detectChanges();
 
@@ -54,9 +55,22 @@ describe('PriceFreshnessBadge', () => {
     expect(element.querySelector('.rounded-full')?.textContent).toContain('Donnée Obsolète');
   });
 
+  it('renders "En Direct" when age is within 2× sync interval', () => {
+    fixture.componentRef.setInput('marketStatus', 'OPEN');
+    fixture.componentRef.setInput('priceSource', 'FMP');
+    fixture.componentRef.setInput('syncIntervalMinutes', 15);
+    // 20 minutes ago (< 2 × 15 min)
+    fixture.componentRef.setInput('lastRefresh', Date.now() - 20 * 60 * 1000);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.freshness().type).toBe('live');
+    expect(fixture.componentInstance.freshness().label).toBe('En Direct');
+  });
+
   it('renders "En Direct" when marketStatus is OPEN, source is FMP, and age is fresh', () => {
     fixture.componentRef.setInput('marketStatus', 'OPEN');
     fixture.componentRef.setInput('priceSource', 'FMP');
+    fixture.componentRef.setInput('syncIntervalMinutes', 15);
     // 5 minutes ago
     fixture.componentRef.setInput('lastRefresh', Date.now() - 5 * 60 * 1000);
     fixture.detectChanges();

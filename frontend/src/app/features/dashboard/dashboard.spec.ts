@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 import type { HypeDto, AssetDto } from '../../core/models';
 import { Dashboard } from './dashboard';
@@ -107,6 +107,51 @@ describe('Mon Premier Test Dashboard', () => {
     expect(getAsset).toHaveBeenCalledWith('brwm');
     expect(getAsset).toHaveBeenCalledWith('o');
     expect(getAsset).toHaveBeenCalledTimes(3);
+  });
+
+  it('devrait remettre les prix à null quand les appels API échouent', () => {
+    const failingApi = {
+      getData: vi.fn(() => throwError(() => new Error('API down'))),
+      getAsset: vi.fn(() => throwError(() => new Error('API down'))),
+      getRegisteredAssets: vi.fn(() => of(mockRegisteredAssets)),
+    };
+
+    TestBed.configureTestingModule({
+      imports: [Dashboard],
+      providers: [{ provide: DashboardApiService, useValue: failingApi }, provideRouter([])],
+    });
+
+    const fixture = TestBed.createComponent(Dashboard);
+    const composant = fixture.componentInstance;
+    fixture.detectChanges();
+
+    expect(composant.hypePrice()).toBeNull();
+    expect(composant.assets()['inveb']).toBeNull();
+    expect(composant.assets()['brwm']).toBeNull();
+    expect(composant.assets()['o']).toBeNull();
+  });
+
+  it('devrait rafraîchir les données toutes les 3 minutes', () => {
+    vi.useFakeTimers();
+
+    TestBed.configureTestingModule({
+      imports: [Dashboard],
+      providers: [{ provide: DashboardApiService, useValue: fauxServiceApi }, provideRouter([])],
+    });
+
+    const fixture = TestBed.createComponent(Dashboard);
+    fixture.detectChanges();
+
+    expect(getData).toHaveBeenCalledTimes(1);
+    expect(getAsset).toHaveBeenCalledTimes(3);
+
+    vi.advanceTimersByTime(180000);
+    fixture.detectChanges();
+
+    expect(getData).toHaveBeenCalledTimes(2);
+    expect(getAsset).toHaveBeenCalledTimes(6);
+
+    vi.useRealTimers();
   });
 });
 

@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { formatNumber } from '../../../core/services/format-number';
+import { formatNumber, formatCurrency } from '../../../core/services/format-number';
 import type { DividendsBlock, DividendHistoryEntry } from '../../../core/models';
 
 const HISTORY_YEARS = 10;
@@ -61,11 +61,11 @@ export class DividendCard {
     return last10.map((entry: DividendHistoryEntry) => {
       const formattedAmount =
         entry.amount !== null && entry.amount !== undefined && !isNaN(entry.amount)
-          ? formatNumber(entry.amount)
+          ? formatCurrency(entry.amount, entry.currency || this.currency() || '')
           : '-';
       return {
         year: entry.year,
-        amount: `${formattedAmount} ${entry.currency || this.currency() || ''}`.trim(),
+        amount: formattedAmount,
       };
     });
   });
@@ -113,7 +113,7 @@ export class DividendCard {
       return '-';
     }
     const currencyStr = div.forwardDividendCurrency || this.currency() || '';
-    return `${formatNumber(div.forwardDividend)} ${currencyStr}`.trim();
+    return formatCurrency(div.forwardDividend, currencyStr);
   });
 
   estimatedYieldLabel = computed(() => {

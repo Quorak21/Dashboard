@@ -22,6 +22,7 @@ describe('AssetPage', () => {
     lastRefresh: Date.now(),
     priceSource: 'FMP',
     marketStatus: 'OPEN',
+    syncIntervalMinutes: 15,
     historyPrices: [100, 110, 120],
     historyDays: [2021, 2022, 2023],
     livePrices: [248, 249, 250],
@@ -46,11 +47,11 @@ describe('AssetPage', () => {
   };
 
   beforeAll(() => {
-    (globalThis as any).ResizeObserver = class {
+    vi.stubGlobal('ResizeObserver', class {
       observe() {}
       unobserve() {}
       disconnect() {}
-    };
+    });
   });
 
   beforeEach(async () => {

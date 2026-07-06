@@ -51,6 +51,8 @@ export interface AssetDto {
   lastRefresh: number | null;
   priceSource: PriceSource | null;
   marketStatus: MarketStatus | null;
+  /** Minutes between FMP syncs from assets-registry; UI stale threshold = 2× this. */
+  syncIntervalMinutes: number | null;
   historyPrices: number[];
   historyDays: number[];
   livePrices: number[];

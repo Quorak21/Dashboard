@@ -23,6 +23,9 @@ const KEY_LABELS: Record<string, string> = {
   'affo-payout-ratio': 'AFFO Payout Ratio',
   'portfolio-occupancy': 'Portfolio Occupancy',
   'dividend-payout-ratio': 'Dividend Payout Ratio',
+  'same-store-rent-growth': 'Same Store Rent Growth',
+  'avg-lease-term': 'Avg Lease Term (WALT)',
+  'rent-recapture': 'Rent Recapture',
 };
 
 const METRIC_ORDER = [
@@ -33,6 +36,9 @@ const METRIC_ORDER = [
   'affo-payout-ratio',
   'dividend-payout-ratio',
   'portfolio-occupancy',
+  'same-store-rent-growth',
+  'avg-lease-term',
+  'rent-recapture',
   'management-cost',
   'five-y-nav-cagr',
   'five-y-total-return',

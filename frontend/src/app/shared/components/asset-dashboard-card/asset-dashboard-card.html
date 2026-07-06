@@ -2,6 +2,18 @@
 <a [routerLink]="link()"
     class="group relative w-60 flex flex-col items-center p-6 rounded-2xl bg-dark-800/40 backdrop-blur-md border border-copper-500/20 shadow-lg shadow-black/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_30px_rgba(184,115,51,0.2)] hover:border-copper-500/50 overflow-hidden">
 
+    @if (showMarketBadge()) {
+    <span
+        class="absolute top-3 right-3 z-20 w-2.5 h-2.5 rounded-full border border-white/10 shadow-sm"
+        [class.bg-green-500]="isMarketOpen()"
+        [class.shadow-green-500/50]="isMarketOpen()"
+        [class.bg-red-500]="!isMarketOpen()"
+        [class.shadow-red-500/50]="!isMarketOpen()"
+        [class.animate-pulse]="!isMarketOpen()"
+        [attr.aria-label]="isMarketOpen() ? 'Marché ouvert' : 'Marché fermé'"
+        [attr.title]="isMarketOpen() ? 'Marché ouvert' : 'Marché fermé'"></span>
+    }
+
     <!-- Lueur au survol -->
     <div
         class="absolute inset-0 bg-gradient-to-b from-transparent to-copper-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
