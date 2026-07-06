@@ -16,7 +16,7 @@ export class AssetDashboardCard {
   change = input<number | null>(null);
   currencySymbol = input<string>('$');
 
-  logo = computed(() => "assets/logos/" + this.asset() + ".png");
+  logo = computed(() => "/assets/logos/" + this.asset() + ".png");
   link = computed(() => this.asset() === 'hype' ? '/hype' : '/asset/' + this.asset());
 
 }
