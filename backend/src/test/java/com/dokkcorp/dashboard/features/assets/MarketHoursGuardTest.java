@@ -38,12 +38,12 @@ class MarketHoursGuardTest {
             new SyncConfig(15, 0),
             null);
 
-    private final AssetDefinition brwm = new AssetDefinition(
-            "brwm",
-            "World Mining",
+    private final AssetDefinition londonAsset = new AssetDefinition(
+            "lse-test",
+            "London Test",
             AssetProvider.FMP,
-            "BRWM.L",
-            "BRWM",
+            "LSE.L",
+            "LSE",
             AssetType.STOCK,
             "GBP",
             new MarketHours(LONDON, LocalTime.of(8, 0), LocalTime.of(16, 30)),
@@ -108,24 +108,24 @@ class MarketHoursGuardTest {
 
         // Avant ouverture (07:59)
         Clock beforeOpen = fixedClock(monday, 7, 59, LONDON);
-        assertFalse(new MarketHoursGuard(beforeOpen).isOpen(brwm));
+        assertFalse(new MarketHoursGuard(beforeOpen).isOpen(londonAsset));
 
         // À l'ouverture (08:00)
         Clock atOpen = fixedClock(monday, 8, 0, LONDON);
-        assertTrue(new MarketHoursGuard(atOpen).isOpen(brwm));
+        assertTrue(new MarketHoursGuard(atOpen).isOpen(londonAsset));
 
         // Juste avant la fermeture (16:30)
         Clock beforeClose = fixedClock(monday, 16, 30, LONDON);
-        assertTrue(new MarketHoursGuard(beforeClose).isOpen(brwm));
+        assertTrue(new MarketHoursGuard(beforeClose).isOpen(londonAsset));
 
         // Après fermeture (16:31)
         Clock afterClose = fixedClock(monday, 16, 31, LONDON);
-        assertFalse(new MarketHoursGuard(afterClose).isOpen(brwm));
+        assertFalse(new MarketHoursGuard(afterClose).isOpen(londonAsset));
 
         // Week-end (Dimanche)
         LocalDate sunday = LocalDate.of(2026, 6, 7);
         Clock weekend = fixedClock(sunday, 12, 0, LONDON);
-        assertFalse(new MarketHoursGuard(weekend).isOpen(brwm));
+        assertFalse(new MarketHoursGuard(weekend).isOpen(londonAsset));
     }
 
     @Test

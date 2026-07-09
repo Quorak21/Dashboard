@@ -19,7 +19,6 @@ $fhKey = $env:FINNHUB_API_KEY
 
 $assets = @(
     @{ Id = "inveb"; Name = "Investor AB"; FmpSymbol = "INVE-B.ST"; FhSymbol = "INVE-B.ST"; Isin = $null },
-    @{ Id = "brwm"; Name = "BlackRock World Mining"; FmpSymbol = "BRWM.L"; FhSymbol = "BRWM.L"; Isin = $null },
     @{ Id = "o"; Name = "Realty Income"; FmpSymbol = "O"; FhSymbol = "O"; Isin = $null },
     @{ Id = "iii"; Name = "3i Group"; FmpSymbol = "III.L"; FhSymbol = "III.L"; Isin = $null },
     @{ Id = "chdiv"; Name = "UBS Swiss Dividend ETF"; FmpSymbol = "CHDIV.SW"; FhSymbol = "CHDIV.SW"; Isin = "CH1244681594" },

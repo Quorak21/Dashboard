@@ -41,23 +41,6 @@ class AssetFundamentalsPropertiesTest {
         assertEquals("ABB", topHoldings.get(0).getName());
         assertEquals(0, new BigDecimal("16.5").compareTo(topHoldings.get(0).getWeightPercent()));
 
-        // brwm should be loaded
-        assertTrue(properties.getFundamentals().containsKey("brwm"));
-        AssetFundamentalsProperties.FundamentalsConfig brwmConfig = properties.getFundamentals().get("brwm");
-        assertNotNull(brwmConfig);
-        assertEquals("brwm", brwmConfig.getAssetId());
-        assertEquals(LocalDate.of(2026, 6, 30), brwmConfig.getUpdatedAt());
-        assertEquals(
-                "BlackRock World Mining Trust — Portfolio Update Q2 2026 (30 June 2026)",
-                brwmConfig.getSource());
-        assertEquals("~5.5%", brwmConfig.getMetrics().get("five-y-avg-discount"));
-        assertEquals("6.9%", brwmConfig.getMetrics().get("gearing-leverage"));
-        assertEquals("0.95%", brwmConfig.getMetrics().get("ongoing-charges-ter"));
-        assertFalse(brwmConfig.getTopHoldings().isEmpty());
-        assertEquals(10, brwmConfig.getTopHoldings().size());
-        assertEquals("Glencore", brwmConfig.getTopHoldings().get(0).getName());
-        assertEquals(0, new BigDecimal("7.6").compareTo(brwmConfig.getTopHoldings().get(0).getWeightPercent()));
-
         // o (Realty Income) — blended property types + retail industries (≥3% ABR)
         assertTrue(properties.getFundamentals().containsKey("o"));
         AssetFundamentalsProperties.FundamentalsConfig oConfig = properties.getFundamentals().get("o");

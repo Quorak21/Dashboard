@@ -1,6 +1,6 @@
 # Dashboard — Backlog
 
-**Statut produit** : Epic 6 livré (7 actifs registry, overview dynamique, navigation complète). En attente de déploiement prod.
+**Statut produit** : Epic 6 livré (6 actifs registry, overview dynamique, navigation complète). En attente de déploiement prod.
 
 | Fichier | Rôle |
 |---------|------|
@@ -21,7 +21,7 @@ Pas de tâche critique pour le moment.
 
 ### ÉLEVÉ
 
-- **DEF-01** — **Routage paramétré unique Angular** : remplacer les wrappers par actif (`Brwm`, `O`, `Iii`, `Infr`…) par une route unique `/asset/:assetId` dans `app.routes.ts` et supprimer les fichiers redondants. (Rétro Epic 6)
+- **DEF-01** — **Routage paramétré unique Angular** : remplacer les wrappers par actif (`O`, `Iii`, `Infr`…) par une route unique `/asset/:assetId` dans `app.routes.ts` et supprimer les fichiers redondants. (Rétro Epic 6)
 - **DEF-02** — **Factorisation des subscriptions dashboard** : remplacer les blocs RxJS copiés-collés dans `dashboard.ts` par une boucle / map `assetId → signal` (refresh, unsubscribe, polling 3 min). (Rétro Epic 6 + deferred 6-5)
 
 ### MOYEN

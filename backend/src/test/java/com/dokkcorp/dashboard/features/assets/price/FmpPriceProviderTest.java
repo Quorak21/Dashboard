@@ -51,12 +51,12 @@ class FmpPriceProviderTest {
             new SyncConfig(15, 0),
             null);
 
-    private static final AssetDefinition brwm = new AssetDefinition(
-            "brwm",
-            "World Mining",
+    private static final AssetDefinition londonTrust = new AssetDefinition(
+            "lse-test",
+            "London Test",
             AssetProvider.FMP,
-            "BRWM.L",
-            "BRWM",
+            "LSE.L",
+            "LSE",
             AssetType.TRUST,
             "GBP",
             new MarketHours(ZoneId.of("Europe/London"), LocalTime.of(8, 0), LocalTime.of(16, 35)),
@@ -130,18 +130,18 @@ class FmpPriceProviderTest {
     void fetch_convertsGBpToGbpForLondonStocks() throws Exception {
 
         String fixture = StreamUtils.copyToString(
-                new ClassPathResource("fixtures/fmp/profile-brwm.json").getInputStream(),
+                new ClassPathResource("fixtures/fmp/profile-london-gbp.json").getInputStream(),
                 StandardCharsets.UTF_8);
 
         wireMock.stubFor(get(urlPathEqualTo("/profile"))
-                .withQueryParam("symbol", equalTo("BRWM.L"))
+                .withQueryParam("symbol", equalTo("LSE.L"))
                 .withQueryParam("apikey", equalTo("test-key"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(fixture)));
 
-        PriceQuote quote = provider.fetch(brwm);
+        PriceQuote quote = provider.fetch(londonTrust);
 
         assertEquals(5.50, quote.price()); // 550.0 GBp normalized to 5.50 GBP
         assertEquals("GBP", quote.currency());
@@ -154,7 +154,7 @@ class FmpPriceProviderTest {
     void fetch_doesNotConvertGbpToGbpWhenAlreadyInPounds() throws Exception {
 
         String fixture = "[{\n" +
-                "  \"symbol\": \"BRWM.L\",\n" +
+                "  \"symbol\": \"LSE.L\",\n" +
                 "  \"price\": 5.50,\n" +
                 "  \"marketCap\": 1400000000,\n" +
                 "  \"changePercentage\": 1.5,\n" +
@@ -163,14 +163,14 @@ class FmpPriceProviderTest {
                 "}]";
 
         wireMock.stubFor(get(urlPathEqualTo("/profile"))
-                .withQueryParam("symbol", equalTo("BRWM.L"))
+                .withQueryParam("symbol", equalTo("LSE.L"))
                 .withQueryParam("apikey", equalTo("test-key"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(fixture)));
 
-        PriceQuote quote = provider.fetch(brwm);
+        PriceQuote quote = provider.fetch(londonTrust);
 
         assertEquals(5.50, quote.price()); // 5.50 GBP stays 5.50 GBP
         assertEquals("GBP", quote.currency());

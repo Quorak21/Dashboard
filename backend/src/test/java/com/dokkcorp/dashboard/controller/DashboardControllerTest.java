@@ -106,12 +106,12 @@ class DashboardControllerTest {
     @Test
     void testGetAssetDataDirectGenericRoute() throws Exception {
         AssetDto mockAsset = new AssetDto(
-                "brwm",
-                "BRWM",
-                "World Mining",
-                AssetType.STOCK,
-                "GBP",
-                500.0,
+                "o",
+                "O",
+                "Realty",
+                AssetType.REIT,
+                "USD",
+                55.0,
                 1000000.0,
                 -0.5,
                 5000.0,
@@ -122,14 +122,14 @@ class DashboardControllerTest {
                 List.of(), List.of(), List.of(), List.of(),
                 null, null
         );
-        when(configurableAssetService.getData("brwm")).thenReturn(mockAsset);
+        when(configurableAssetService.getData("o")).thenReturn(mockAsset);
 
-        mockMvc.perform(get("/api/dashboard/asset/brwm"))
+        mockMvc.perform(get("/api/dashboard/asset/o"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.assetId").value("brwm"))
-                .andExpect(jsonPath("$.symbol").value("BRWM"));
+                .andExpect(jsonPath("$.assetId").value("o"))
+                .andExpect(jsonPath("$.symbol").value("O"));
 
-        verify(configurableAssetService, times(1)).getData("brwm");
+        verify(configurableAssetService, times(1)).getData("o");
         verifyNoMoreInteractions(configurableAssetService);
     }
 

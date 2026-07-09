@@ -18,21 +18,12 @@ describe('Mon Premier Test Dashboard', () => {
     priceChangePercentage24h: -1.25,
   } as AssetDto;
 
-  const mockBrwmDto = {
-    assetId: 'brwm',
-    symbol: 'BRWM',
-    currentPrice: 5.50,
-    priceChangePercentage24h: 1.5,
-  } as AssetDto;
-
   const mockODto = {
     assetId: 'o',
     symbol: 'O',
     currentPrice: 55.0,
     priceChangePercentage24h: -0.85,
   } as AssetDto;
-
-
 
   const getData = vi.fn((cle: string) => {
     if (cle === 'hype') {
@@ -45,9 +36,6 @@ describe('Mon Premier Test Dashboard', () => {
     if (assetId === 'inveb') {
       return of(mockAssetDto);
     }
-    if (assetId === 'brwm') {
-      return of(mockBrwmDto);
-    }
     if (assetId === 'o') {
       return of(mockODto);
     }
@@ -56,8 +44,7 @@ describe('Mon Premier Test Dashboard', () => {
 
   const mockRegisteredAssets = [
     { id: 'inveb', displayName: 'Investor AB', type: 'STOCK', currency: 'SEK' },
-    { id: 'brwm', displayName: 'World Mining', type: 'TRUST', currency: 'GBP' },
-    { id: 'o', displayName: 'Realty', type: 'REIT', currency: 'USD' }
+    { id: 'o', displayName: 'Realty', type: 'REIT', currency: 'USD' },
   ];
 
   const getRegisteredAssets = vi.fn(() => of(mockRegisteredAssets));
@@ -70,7 +57,7 @@ describe('Mon Premier Test Dashboard', () => {
     getRegisteredAssets.mockClear();
   });
 
-  it('devrait bien recevoir et stocker les prix de Hype, Inveb, Brwm et O', () => {
+  it('devrait bien recevoir et stocker les prix de Hype, Inveb et O', () => {
     TestBed.configureTestingModule({
       imports: [Dashboard],
       providers: [{ provide: DashboardApiService, useValue: fauxServiceApi }, provideRouter([])],
@@ -83,15 +70,13 @@ describe('Mon Premier Test Dashboard', () => {
 
     expect(composant.hypePrice()).toBe(1.25);
     expect(composant.assets()['inveb']?.currentPrice).toBe(245.5);
-    expect(composant.assets()['brwm']?.currentPrice).toBe(5.50);
     expect(composant.assets()['o']?.currentPrice).toBe(55.0);
     expect(composant.hypeChange()).toBe(5.42);
     expect(composant.assets()['inveb']?.priceChangePercentage24h).toBe(-1.25);
-    expect(composant.assets()['brwm']?.priceChangePercentage24h).toBe(1.5);
     expect(composant.assets()['o']?.priceChangePercentage24h).toBe(-0.85);
   });
 
-  it('devrait appeler getData pour hype et getAsset pour inveb/brwm/o au mount', () => {
+  it('devrait appeler getData pour hype et getAsset pour inveb/o au mount', () => {
     TestBed.configureTestingModule({
       imports: [Dashboard],
       providers: [{ provide: DashboardApiService, useValue: fauxServiceApi }, provideRouter([])],
@@ -104,9 +89,8 @@ describe('Mon Premier Test Dashboard', () => {
     expect(getData).toHaveBeenCalledTimes(1);
     expect(getRegisteredAssets).toHaveBeenCalledTimes(1);
     expect(getAsset).toHaveBeenCalledWith('inveb');
-    expect(getAsset).toHaveBeenCalledWith('brwm');
     expect(getAsset).toHaveBeenCalledWith('o');
-    expect(getAsset).toHaveBeenCalledTimes(3);
+    expect(getAsset).toHaveBeenCalledTimes(2);
   });
 
   it('devrait remettre les prix à null quand les appels API échouent', () => {
@@ -127,7 +111,6 @@ describe('Mon Premier Test Dashboard', () => {
 
     expect(composant.hypePrice()).toBeNull();
     expect(composant.assets()['inveb']).toBeNull();
-    expect(composant.assets()['brwm']).toBeNull();
     expect(composant.assets()['o']).toBeNull();
   });
 
@@ -143,15 +126,14 @@ describe('Mon Premier Test Dashboard', () => {
     fixture.detectChanges();
 
     expect(getData).toHaveBeenCalledTimes(1);
-    expect(getAsset).toHaveBeenCalledTimes(3);
+    expect(getAsset).toHaveBeenCalledTimes(2);
 
     vi.advanceTimersByTime(180000);
     fixture.detectChanges();
 
     expect(getData).toHaveBeenCalledTimes(2);
-    expect(getAsset).toHaveBeenCalledTimes(6);
+    expect(getAsset).toHaveBeenCalledTimes(4);
 
     vi.useRealTimers();
   });
 });
-

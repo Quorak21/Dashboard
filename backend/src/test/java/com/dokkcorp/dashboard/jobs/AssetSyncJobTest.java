@@ -200,20 +200,20 @@ class AssetSyncJobTest {
     @Test
     void sendRegistrySnapshots_isolatesFailuresPerAsset() {
         AssetDefinition inveb = invebDefinition();
-        AssetDefinition brwm = new AssetDefinition(
-                "brwm", "World Mining", AssetProvider.FMP,
-                "BRWM.L", "BRWM", AssetType.TRUST, "GBP", null, null, null);
+        AssetDefinition oAsset = new AssetDefinition(
+                "o", "Realty", AssetProvider.FMP,
+                "O", "O", AssetType.REIT, "USD", null, null, null);
         AssetDaily invebDaily = new AssetDaily();
         invebDaily.setSymbol("INVE-B");
         invebDaily.setCurrentPrice(250d);
         invebDaily.setLastRefresh(Instant.ofEpochMilli(1712222222L));
-        AssetDaily brwmDaily = new AssetDaily();
-        brwmDaily.setSymbol("BRWM");
-        brwmDaily.setCurrentPrice(500d);
-        brwmDaily.setLastRefresh(Instant.ofEpochMilli(1713333333L));
+        AssetDaily oDaily = new AssetDaily();
+        oDaily.setSymbol("O");
+        oDaily.setCurrentPrice(55d);
+        oDaily.setLastRefresh(Instant.ofEpochMilli(1713333333L));
 
-        when(assetRegistry.all()).thenReturn(List.of(inveb, brwm));
-        when(assetDailyRepository.findLatestBySymbols(anyList())).thenReturn(List.of(invebDaily, brwmDaily));
+        when(assetRegistry.all()).thenReturn(List.of(inveb, oAsset));
+        when(assetDailyRepository.findLatestBySymbols(anyList())).thenReturn(List.of(invebDaily, oDaily));
         when(assetSnapshotRepository.save(any(AssetSnapshot.class)))
                 .thenThrow(new RuntimeException("DB failure"))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -225,7 +225,7 @@ class AssetSyncJobTest {
         ArgumentCaptor<AssetSnapshot> captor = ArgumentCaptor.forClass(AssetSnapshot.class);
         verify(assetSnapshotRepository, times(2)).save(captor.capture());
         assertEquals("INVE-B", captor.getAllValues().get(0).getSymbol());
-        assertEquals("BRWM", captor.getAllValues().get(1).getSymbol());
+        assertEquals("O", captor.getAllValues().get(1).getSymbol());
     }
 
     @Test
@@ -261,7 +261,7 @@ class AssetSyncJobTest {
     @Test
     void syncFmpAssets_isolatesFailuresPerAsset() {
         AssetDefinition asset1 = new AssetDefinition("inveb", null, null, null, null, null, null, null, null, null);
-        AssetDefinition asset2 = new AssetDefinition("brwm", null, null, null, null, null, null, null, null, null);
+        AssetDefinition asset2 = new AssetDefinition("o", null, null, null, null, null, null, null, null, null);
 
         when(assetRegistry.byProvider(AssetProvider.FMP)).thenReturn(List.of(asset1, asset2));
 
@@ -270,7 +270,7 @@ class AssetSyncJobTest {
         job.syncFmpAssets();
 
         verify(configurableAssetService, times(1)).syncPrice("inveb");
-        verify(configurableAssetService, times(1)).syncPrice("brwm");
+        verify(configurableAssetService, times(1)).syncPrice("o");
         verify(providerCallMetrics, times(1)).logMetrics();
     }
 
@@ -302,12 +302,12 @@ class AssetSyncJobTest {
 
     @Test
     void isDueForSync_respectsIntervalAndOffset() {
-        SyncConfig brwmSync = new SyncConfig(15, 3);
+        SyncConfig offsetSync = new SyncConfig(15, 3);
 
-        assertTrue(AssetSyncJob.isDueForSync(3, brwmSync));
-        assertTrue(AssetSyncJob.isDueForSync(18, brwmSync));
-        assertFalse(AssetSyncJob.isDueForSync(0, brwmSync));
-        assertFalse(AssetSyncJob.isDueForSync(15, brwmSync));
+        assertTrue(AssetSyncJob.isDueForSync(3, offsetSync));
+        assertTrue(AssetSyncJob.isDueForSync(18, offsetSync));
+        assertFalse(AssetSyncJob.isDueForSync(0, offsetSync));
+        assertFalse(AssetSyncJob.isDueForSync(15, offsetSync));
         assertTrue(AssetSyncJob.isDueForSync(0, new SyncConfig(15, 0)));
         assertTrue(AssetSyncJob.isDueForSync(42, null));
         assertFalse(AssetSyncJob.isDueForSync(0, new SyncConfig(0, 0)));

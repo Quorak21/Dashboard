@@ -17,20 +17,6 @@ app:
         sync:
           interval-minutes: 15
           offset-minutes: 0
-      - id: brwm
-        display-name: World Mining
-        provider: fmp
-        symbol: BRWM.L
-        db-symbol: BRWM
-        type: TRUST
-        currency: GBP
-        market-hours:
-          zone: Europe/London
-          open: "08:00"
-          close: "16:35"
-        sync:
-          interval-minutes: 15
-          offset-minutes: 3
       - id: o
         display-name: Realty
         provider: fmp

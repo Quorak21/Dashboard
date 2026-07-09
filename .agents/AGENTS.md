@@ -10,7 +10,7 @@ Ces règles s'appliquent à l'agent unique travaillant sur cette base de code.
 - **Registry YAML** (`assets-registry.yml`) : ajouter un actif = config, pas un nouveau service par symbole.
 - Déploiement : front **Vercel** (`dashboard.dokkcorp.ch`), back **Docker** sur VPS (`api.dokkcorp.ch`).
 
-**Actifs suivis** : HYPE (crypto), InveB, BRWM, Realty Income (O), 3i Group (III), iShares Global Infrastructure (INFR), etc.
+**Actifs suivis** : HYPE (crypto), InveB, Realty Income (O), 3i Group (III), iShares Global Infrastructure (INFR), etc.
 
 ## Stack technique
 
